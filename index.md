@@ -3,9 +3,15 @@ layout: home
 title: ""
 ---
 
-<div style="max-width:680px;margin:80px auto;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#f0f0f0;line-height:1.7;">
+<style>
+body { background:#0a0a0a !important; color:#f0f0f0 !important; }
+.site-header { background:#0a0a0a !important; border-top:none !important; border-bottom:1px solid #222 !important; }
+.site-title, .site-title:visited { color:#fff !important; }
+.site-footer { background:#0a0a0a !important; border-top:1px solid #222 !important; color:#666 !important; }
+.wrapper { max-width:680px; }
+</style>
 
-<img src="https://nazare.io/assets/logo.png" alt="Nazaré Ventures" style="height:48px;margin-bottom:40px;" onerror="this.style.display='none'">
+<div style="max-width:680px;margin:80px auto;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#f0f0f0;line-height:1.7;">
 
 <h1 style="font-size:2.2rem;font-weight:700;margin-bottom:8px;color:#ffffff;">Nazaré Ventures</h1>
 <p style="font-size:1.1rem;color:#aaa;margin-bottom:48px;">Early-stage AI infrastructure fund</p>
@@ -41,7 +47,7 @@ AI applications are expensive to build and fragile to run. The infrastructure la
 <h2 style="font-size:1.1rem;text-transform:uppercase;letter-spacing:0.1em;color:#aaa;margin-bottom:24px;">Founder</h2>
 
 <p style="margin-bottom:8px;"><strong style="color:#fff;">Dr. Steven Waterhouse</strong></p>
-<p style="color:#ccc;margin-bottom:16px;">Former Partner, Pantera Capital. Co-founder & CEO, Orchid (orchid.com). PhD, Oxford.</p>
+<p style="color:#ccc;margin-bottom:16px;">Former Partner, Pantera Capital. Co-founder &amp; CEO, Orchid (orchid.com). PhD, Cambridge.</p>
 
 <div style="margin-top:32px;">
   <a href="https://linkedin.com/in/deseventral" style="color:#4a9eff;text-decoration:none;margin-right:24px;">LinkedIn</a>
