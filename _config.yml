@@ -1,1 +1,18 @@
+title: Nazaré Ventures
+description: Early-stage AI infrastructure fund
+baseurl: ""
+url: "https://nazare.io"
 theme: minima
+
+minima:
+  skin: dark
+
+header_pages: []
+
+author:
+  name: Dr. Steven Waterhouse
+
+social_links:
+  - { platform: linkedin, user_url: "https://linkedin.com/in/deseventral" }
+
+show_excerpts: false
