@@ -3,8 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nazaré Ventures</title>
-  <meta name="description" content="Early-stage AI infrastructure fund. Founded by Dr. Steven Waterhouse, former Partner at Pantera Capital.">
+  <title>Nazaré Ventures — AI Infrastructure Fund</title>
+  <meta name="description" content="Early-stage AI infrastructure fund backing founders building training algorithms, decentralized systems, and multi-agent architectures. Founded by Dr. Steven Waterhouse, former Partner at Pantera Capital.">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Nazaré Ventures — AI Infrastructure Fund">
+  <meta property="og:description" content="We back early-stage founders building the infrastructure layer of AI. Training algorithms, decentralized systems, and multi-agent architectures.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://nazarevc.github.io/homepage/">
+  <meta property="og:image" content="https://nazare.io/media/LOGO/nazare-logo-monogram-blue.png">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Nazaré Ventures — AI Infrastructure Fund">
+  <meta name="twitter:description" content="We back early-stage founders building the infrastructure layer of AI.">
+  <meta name="twitter:image" content="https://nazare.io/media/LOGO/nazare-logo-monogram-blue.png">
+
+  <link rel="icon" type="image/png" href="https://nazare.io/media/LOGO/nazare-logo-monogram-blue.png">
+
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -18,7 +34,7 @@
       --accent-light: #3b82f6;
     }
 
-    html { font-size: 16px; }
+    html { font-size: 16px; scroll-behavior: smooth; }
 
     body {
       background: var(--bg);
@@ -41,25 +57,7 @@
       z-index: 100;
     }
 
-    .wordmark {
-      font-size: 1rem;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      color: #fff;
-      text-decoration: none;
-    }
-
-    .wordmark span {
-      color: var(--accent-light);
-    }
-
-    nav a {
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 0.875rem;
-      transition: color 0.2s;
-    }
-
+    nav a { color: var(--muted); text-decoration: none; font-size: 0.875rem; transition: color 0.2s; }
     nav a:hover { color: var(--text); }
 
     .hero {
@@ -86,10 +84,7 @@
       margin-bottom: 28px;
     }
 
-    h1 em {
-      font-style: normal;
-      color: var(--accent-light);
-    }
+    h1 em { font-style: normal; color: var(--accent-light); }
 
     .hero-sub {
       font-size: 1.15rem;
@@ -99,11 +94,7 @@
       line-height: 1.7;
     }
 
-    .cta-group {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
+    .cta-group { display: flex; gap: 16px; flex-wrap: wrap; }
 
     .btn {
       display: inline-flex;
@@ -118,28 +109,10 @@
       cursor: pointer;
     }
 
-    .btn-primary {
-      background: var(--accent);
-      color: #fff;
-      border: 1px solid var(--accent);
-    }
-
+    .btn-primary { background: var(--accent); color: #fff; border: 1px solid var(--accent); }
     .btn-primary:hover { background: var(--accent-light); border-color: var(--accent-light); }
-
-    .btn-ghost {
-      background: transparent;
-      color: var(--muted);
-      border: 1px solid var(--border);
-    }
-
+    .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
     .btn-ghost:hover { color: var(--text); border-color: #333; }
-
-    .divider {
-      max-width: 760px;
-      margin: 0 auto;
-      padding: 0 40px;
-      border-top: 1px solid var(--border);
-    }
 
     .section {
       max-width: 760px;
@@ -148,7 +121,7 @@
       border-bottom: 1px solid var(--border);
     }
 
-    .section:last-child { border-bottom: none; }
+    .section:last-of-type { border-bottom: none; }
 
     .section-label {
       font-size: 0.72rem;
@@ -159,11 +132,11 @@
       margin-bottom: 36px;
     }
 
+    /* Thesis */
     .thesis-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 24px;
-      margin-top: 8px;
     }
 
     .thesis-item {
@@ -173,19 +146,10 @@
       padding: 24px;
     }
 
-    .thesis-item h3 {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: #fff;
-      margin-bottom: 10px;
-    }
+    .thesis-item h3 { font-size: 0.9rem; font-weight: 600; color: #fff; margin-bottom: 10px; }
+    .thesis-item p { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
 
-    .thesis-item p {
-      font-size: 0.85rem;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-
+    /* Stats */
     .stats-row {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -196,50 +160,114 @@
       overflow: hidden;
     }
 
-    .stat {
-      background: var(--surface);
-      padding: 28px 24px;
+    .stat { background: var(--surface); padding: 28px 24px; }
+    .stat-value { font-size: 2rem; font-weight: 700; color: #fff; letter-spacing: -0.02em; margin-bottom: 4px; }
+    .stat-label { font-size: 0.8rem; color: var(--muted); }
+
+    /* Portfolio */
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
     }
 
-    .stat-value {
-      font-size: 2rem;
-      font-weight: 700;
+    .portfolio-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px;
+    }
+
+    .portfolio-card.featured {
+      border-color: #1a3a6e;
+    }
+
+    .portfolio-name {
+      font-size: 1rem;
+      font-weight: 600;
       color: #fff;
-      letter-spacing: -0.02em;
       margin-bottom: 4px;
     }
 
-    .stat-label {
-      font-size: 0.8rem;
-      color: var(--muted);
+    .portfolio-stage {
+      font-size: 0.75rem;
+      color: var(--accent-light);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
     }
 
-    .founder-block {
-      display: flex;
-      gap: 32px;
-      align-items: flex-start;
+    .portfolio-desc {
+      font-size: 0.85rem;
+      color: #888;
+      line-height: 1.6;
+      margin-bottom: 12px;
     }
 
-    .founder-text h3 {
-      font-size: 1.2rem;
-      font-weight: 600;
+    .portfolio-metric {
+      font-size: 0.82rem;
+      color: #999;
+    }
+
+    .portfolio-metric strong {
       color: #fff;
-      margin-bottom: 8px;
+      font-weight: 600;
     }
+
+    .portfolio-rest {
+      margin-top: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .portfolio-tag {
+      font-size: 0.78rem;
+      padding: 5px 14px;
+      border-radius: 20px;
+      background: #161616;
+      border: 1px solid var(--border);
+      color: #888;
+    }
+
+    /* Track record */
+    .track-record-text {
+      color: #888;
+      font-size: 0.95rem;
+      line-height: 1.7;
+      max-width: 600px;
+      margin-bottom: 24px;
+    }
+
+    .track-logos {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .track-tag {
+      font-size: 0.82rem;
+      padding: 6px 16px;
+      border-radius: 6px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: #ccc;
+      font-weight: 500;
+    }
+
+    /* Founder */
+    .founder-block { display: flex; gap: 32px; align-items: flex-start; }
+
+    .founder-text h3 { font-size: 1.2rem; font-weight: 600; color: #fff; margin-bottom: 8px; }
 
     .founder-text p {
       color: #888;
       font-size: 0.92rem;
       line-height: 1.7;
-      max-width: 520px;
+      max-width: 560px;
     }
 
-    .tag-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 16px;
-    }
+    .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
 
     .tag {
       font-size: 0.78rem;
@@ -250,22 +278,8 @@
       color: #888;
     }
 
-    .links-row {
-      display: flex;
-      gap: 24px;
-      margin-top: 28px;
-      flex-wrap: wrap;
-    }
-
-    .links-row a {
-      font-size: 0.875rem;
-      color: var(--accent-light);
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
+    .links-row { display: flex; gap: 24px; margin-top: 28px; flex-wrap: wrap; }
+    .links-row a { font-size: 0.875rem; color: var(--accent-light); text-decoration: none; display: flex; align-items: center; gap: 6px; }
     .links-row a:hover { text-decoration: underline; }
 
     footer {
@@ -283,6 +297,7 @@
       nav { padding: 20px 24px; }
       .hero, .section { padding-left: 24px; padding-right: 24px; }
       .stats-row { grid-template-columns: 1fr; }
+      .portfolio-grid { grid-template-columns: 1fr; }
       .founder-block { flex-direction: column; }
       footer { flex-direction: column; gap: 12px; text-align: center; }
     }
@@ -291,7 +306,9 @@
 <body>
 
 <nav>
-  <a class="wordmark" href="/"><img src="https://nazare.io/media/LOGO/nazare-logo-monogram-blue.png" alt="Nazaré Ventures" style="height:32px;width:auto;vertical-align:middle;"></a>
+  <a href="/homepage/">
+    <img src="https://nazare.io/media/LOGO/nazare-logo-monogram-blue.png" alt="Nazaré Ventures" style="height:32px;width:auto;vertical-align:middle;">
+  </a>
   <a href="mailto:7@nazare.io">Contact</a>
 </nav>
 
@@ -302,7 +319,8 @@
     We back early-stage founders building the foundations — new training algorithms, decentralized systems, and multi-agent architectures.
   </p>
   <div class="cta-group">
-    <a class="btn btn-primary" href="https://docsend.com/view/h4bav3bqjpjkr82a" target="_blank">View Fund Deck</a>
+    <a class="btn btn-primary" href="https://docsend.com/view/9iyepcy4j38hrtzn" target="_blank">View Fund Deck</a>
+    <a class="btn btn-ghost" href="https://docsend.com/view/yi9xmhviu83zynhf" target="_blank">Read Thesis</a>
     <a class="btn btn-ghost" href="mailto:7@nazare.io">Get in Touch</a>
   </div>
 </section>
@@ -344,23 +362,68 @@
 </section>
 
 <section class="section">
+  <p class="section-label">Select Portfolio</p>
+  <div class="portfolio-grid">
+    <div class="portfolio-card featured">
+      <div class="portfolio-name">Prime Intellect</div>
+      <div class="portfolio-stage">AI Compute Infrastructure</div>
+      <div class="portfolio-desc">Decentralized compute platform for AI training and post-training. Launched Lab for production model fine-tuning.</div>
+      <div class="portfolio-metric">Backed by <strong>Founders Fund</strong>, <strong>Menlo Ventures</strong></div>
+    </div>
+    <div class="portfolio-card featured">
+      <div class="portfolio-name">Vast.ai</div>
+      <div class="portfolio-stage">GPU Marketplace</div>
+      <div class="portfolio-desc">The largest GPU marketplace for AI compute. Used by thousands of ML engineers and researchers worldwide.</div>
+      <div class="portfolio-metric">Rapidly scaling · Thousands of ML engineers</div>
+    </div>
+    <div class="portfolio-card">
+      <div class="portfolio-name">Provably</div>
+      <div class="portfolio-stage">Verifiable AI</div>
+      <div class="portfolio-desc">Cryptographic verification for AI model outputs. Trustless inference at scale.</div>
+    </div>
+    <div class="portfolio-card">
+      <div class="portfolio-name">Dimensional</div>
+      <div class="portfolio-stage">AI Robotics OS</div>
+      <div class="portfolio-desc">Open-source operating system for AI-native robots. Combines LLM agents with reactive control for generalist robotics.</div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <p class="section-label">Track Record</p>
+  <p class="track-record-text">
+    As a partner at Pantera Capital and Fabric Ventures, Steven was among the earliest institutional investors in crypto and decentralized infrastructure. His track record of early-stage investments includes companies that went on to define the industry.
+  </p>
+  <div class="track-logos">
+    <span class="track-tag">Coinbase</span>
+    <span class="track-tag">Circle</span>
+    <span class="track-tag">Ripple</span>
+    <span class="track-tag">Sky Mavis</span>
+    <span class="track-tag">Zcash</span>
+    <span class="track-tag">OmiseGO</span>
+    <span class="track-tag">Bakkt</span>
+  </div>
+</section>
+
+<section class="section">
   <p class="section-label">Founder</p>
   <div class="founder-block">
     <div class="founder-text">
       <h3>Dr. Steven Waterhouse</h3>
       <p>
-        Former Partner at Pantera Capital. Co-founder &amp; CEO of Orchid (orchid.com).
-        PhD, University of Cambridge.
+        Former Partner at Pantera Capital and Fabric Ventures, where he led early-stage investments in category-defining crypto and infrastructure companies. Co-founder &amp; CEO of Orchid, the decentralized privacy network backed by a16z and Sequoia. PhD in Computer Science from the University of Cambridge. Previously co-founder of RPX Corporation (IPO 2011, Nasdaq: RPXC).
       </p>
       <div class="tag-row">
         <span class="tag">Pantera Capital</span>
+        <span class="tag">Fabric Ventures</span>
         <span class="tag">Orchid</span>
+        <span class="tag">RPX (IPO)</span>
         <span class="tag">Cambridge PhD</span>
-        <span class="tag">AI Infrastructure</span>
       </div>
       <div class="links-row">
         <a href="https://linkedin.com/in/deseventral" target="_blank">↗ LinkedIn</a>
-        <a href="https://docsend.com/view/h4bav3bqjpjkr82a" target="_blank">↗ Fund Deck</a>
+        <a href="https://docsend.com/view/9iyepcy4j38hrtzn" target="_blank">↗ Fund Deck</a>
+        <a href="https://docsend.com/view/yi9xmhviu83zynhf" target="_blank">↗ Thesis</a>
         <a href="mailto:7@nazare.io">✉ 7@nazare.io</a>
       </div>
     </div>
@@ -368,7 +431,7 @@
 </section>
 
 <footer>
-  <span>© 2026 Nazaré Ventures</span>
+  <span>&copy; 2026 Nazaré Ventures</span>
   <span><a href="https://nazare.io" style="color:inherit;text-decoration:none;">nazare.io</a></span>
 </footer>
 
