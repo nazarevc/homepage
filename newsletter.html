@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Waves — Weekly Intelligence from Nazaré Ventures</title>
+  <meta name="description" content="AI Waves is a weekly note from Nazaré Ventures on what we're watching in AI infrastructure, what's happening in our portfolio, and where we're going next.">
+
+  <meta property="og:title" content="AI Waves #1: Agents Are in the Wild. Everyone Is Scrambling.">
+  <meta property="og:description" content="OpenAI acquired OpenClaw. Meta bought Moltbook. Anthropic shipped Dispatch. The scramble is on.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://nazare.io/ai-waves">
+  <meta property="og:image" content="https://nazare.io/media/LOGO/nazare-logo-monogram-blue.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AI Waves #1: Agents Are in the Wild. Everyone Is Scrambling.">
+  <meta name="twitter:description" content="OpenAI acquired OpenClaw. Meta bought Moltbook. Anthropic shipped Dispatch. The scramble is on.">
+
+  <link rel="icon" type="image/png" href="https://nazare.io/media/LOGO/nazare-logo-monogram-blue.png">
+  <style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');</style>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #080808;
+      --surface: #111;
+      --border: #1e1e1e;
+      --text: #e8e8e8;
+      --muted: #666;
+      --accent: #2563eb;
+      --accent-light: #3b82f6;
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    nav {
+      padding: 28px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: rgba(8,8,8,0.92);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+
+    nav a { color: var(--muted); text-decoration: none; font-size: 0.875rem; transition: color 0.2s; }
+    nav a:hover { color: var(--text); }
+
+    .hero {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 64px 40px 32px;
+    }
+
+    .eyebrow {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent-light);
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 4.5vw, 3rem);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      color: #fff;
+      margin-bottom: 20px;
+    }
+
+    .hero-sub {
+      font-size: 1.1rem;
+      color: #999;
+      max-width: 600px;
+      margin-bottom: 32px;
+      line-height: 1.7;
+    }
+
+    .subscribe-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 32px;
+      margin-bottom: 16px;
+    }
+
+    .subscribe-box h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .subscribe-box p {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .newsletter-form {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .newsletter-form-input {
+      font-family: 'Inter', sans-serif;
+      color: #fff;
+      font-size: 14px;
+      background: var(--bg);
+      border: 1px solid #333;
+      box-sizing: border-box;
+      border-radius: 6px;
+      padding: 10px 14px;
+      flex: 1;
+      min-width: 200px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .newsletter-form-input:focus {
+      border-color: var(--accent-light);
+    }
+
+    .newsletter-form-input::placeholder {
+      color: var(--muted);
+    }
+
+    .newsletter-form-button, .newsletter-loading-button {
+      background: var(--accent);
+      font-size: 14px;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      height: 40px;
+      padding: 10px 24px;
+      border-radius: 6px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    .newsletter-form-button:hover {
+      background: var(--accent-light);
+    }
+
+    .newsletter-loading-button { display: none; }
+
+    .newsletter-success, .newsletter-error { display: none; align-items: center; width: 100%; }
+    .newsletter-success-message { color: #4ade80; font-size: 0.9rem; }
+    .newsletter-error-message { color: #f87171; font-size: 0.9rem; }
+
+    .newsletter-back-button {
+      color: var(--muted);
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      margin-top: 10px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      display: none;
+    }
+
+    .newsletter-back-button:hover { text-decoration: underline; }
+
+    .section {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 44px 40px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section:last-of-type { border-bottom: none; }
+
+    .section-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    .article-date {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    .article-body {
+      font-size: 0.95rem;
+      color: #ccc;
+      line-height: 1.8;
+    }
+
+    .article-body p {
+      margin-bottom: 20px;
+    }
+
+    .article-body strong {
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .article-body a {
+      color: var(--accent-light);
+      text-decoration: none;
+    }
+
+    .article-body a:hover {
+      text-decoration: underline;
+    }
+
+    .article-body h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #fff;
+      margin: 40px 0 20px;
+    }
+
+    .read-more {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.9rem;
+      color: var(--accent-light);
+      text-decoration: none;
+      margin-top: 8px;
+    }
+
+    .read-more:hover { text-decoration: underline; }
+
+    .author-box {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      margin-top: 32px;
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
+    }
+
+    .author-info h4 { font-size: 0.9rem; font-weight: 600; color: #fff; margin-bottom: 4px; }
+    .author-info p { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
+    .author-info a { color: var(--accent-light); text-decoration: none; font-size: 0.82rem; }
+    .author-info a:hover { text-decoration: underline; }
+
+    footer {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 40px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    @media (max-width: 600px) {
+      nav { padding: 20px 24px; }
+      .hero, .section { padding-left: 24px; padding-right: 24px; }
+      .newsletter-form { flex-direction: column; }
+      .newsletter-form-input { width: 100%; }
+      footer { flex-direction: column; gap: 12px; text-align: center; }
+      .author-box { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="https://nazare.io">
+    <img src="https://nazare.io/assets/logo.png" alt="Nazaré Ventures" style="height:32px;width:auto;vertical-align:middle;">
+  </a>
+  <div style="display:flex;gap:24px;align-items:center;">
+    <a href="https://nazare.io">Home</a>
+    <a href="https://robotwave.substack.com" target="_blank">Robot Wave</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <p class="eyebrow">AI Waves #1 — March 19, 2026</p>
+  <h1>Agents Are in the Wild. Everyone Is Scrambling.</h1>
+  <p class="hero-sub">
+    A weekly note from Nazaré Ventures on what we're watching in AI infrastructure, what's happening in our portfolio, and where we're going next.
+  </p>
+
+  <div class="subscribe-box">
+    <h3>Subscribe to AI Waves</h3>
+    <p>Weekly intelligence on AI infrastructure, portfolio news, and where we're investing.</p>
+    <div class="newsletter-form-container">
+      <form class="newsletter-form" action="https://app.loops.so/api/newsletter-form/cmms8vvlm04910iyqbwdpua3e" method="POST">
+        <input class="newsletter-form-input" placeholder="you@example.com" required type="email" name="newsletter-form-input">
+        <button type="submit" class="newsletter-form-button">Subscribe</button>
+        <button type="button" class="newsletter-loading-button">Please wait...</button>
+      </form>
+      <div class="newsletter-success"><p class="newsletter-success-message">You're in. First issue hits your inbox soon.</p></div>
+      <div class="newsletter-error"><p class="newsletter-error-message">Something went wrong, please try again.</p></div>
+      <button class="newsletter-back-button" type="button">&larr; Back</button>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="article-body">
+
+    <p>We are seeing the first AI agents deployed in the wild, and every major platform is racing to own the layer.</p>
+
+    <p><strong>OpenAI acquired OpenClaw</strong>, the open-source agent framework that crossed 100,000 GitHub stars faster than React, TensorFlow, or Kubernetes. <strong>Meta bought Moltbook</strong>. <strong>Anthropic shipped Dispatch</strong>, letting you control desktop agents from your phone. In the space of a few weeks, agents went from demo to default. The scramble is on.</p>
+
+    <p>OpenClaw is the one that matters most right now. It's persistent, always-on, running on your machine, connected to your tools. Not a chatbot you open and close. Closer to a digital coworker that sits in the background and acts on your behalf.</p>
+
+    <p>But there's a problem nobody is talking about. 40,000 exposed OpenClaw instances have already been found on the public internet. Roughly 7% of the skills on Clawdhub are malicious. Users are giving root access to their computers to AI agents, and most of them have no idea what that means.</p>
+
+    <p>This is Linux in 1999. The open-source infrastructure is real, adoption is exploding, and nobody has solved the enterprise layer yet. Red Hat built a $34B business by doing exactly that for Linux: packaging, securing, certifying, and supporting open-source software for organizations that needed it to work and needed it to be safe.</p>
+
+    <p>The same opportunity exists now for agents. 86% of CIOs plan to move workloads back on-premise. A recent court ruling found that AI tool outputs lack attorney-client privilege, which means every law firm, bank, and healthcare company now has a compliance reason to keep agents on infrastructure they control.</p>
+
+    <p>The company that configures, deploys, secures, and maintains AI agents on sovereign infrastructure will build one of the defining businesses of this cycle.</p>
+
+    <a class="read-more" href="https://robotwave.substack.com/p/root-access-openclaw-red-hat-and" target="_blank">Read the full analysis on Robot Wave ↗</a>
+
+    <h2>What We're Watching</h2>
+
+    <p><strong>Anthropic sues the Pentagon.</strong> Dario Amodei drew a hard line: no AI for autonomous weapons, no mass domestic surveillance. The Pentagon declared Anthropic a supply-chain risk. Trump called them "radical left, woke." Anthropic sued. The deeper question: who controls the AI infrastructure stack, under what conditions, and who decides? "Sovereign AI infrastructure", systems that can't be held hostage by any single government or platform, is becoming a core investment thesis, not just a talking point. <a href="https://techcrunch.com/2026/03/13/the-biggest-ai-stories-of-the-year-so-far/" target="_blank">Full story</a></p>
+
+    <p><strong>Circle is up 125%+ in a month.</strong> CRCL has doubled, outpacing Coinbase (+8.5%). The drivers: higher-for-longer rates boosting reserve income, tokenized assets ballooning to ~$26.5B, and USDC becoming the default settlement layer for prediction markets ($22B+ volume on Polymarket alone in 2025) and an emerging, but still small mechanism for agent payments. <a href="https://www.coindesk.com/markets/2026/03/16/circle-is-up-100-in-a-month-why-this-boring-stablecoin-is-suddenly-the-hottest-trade-in-crypto" target="_blank">CoinDesk</a></p>
+
+    <p><strong>NVIDIA is building on OpenClaw.</strong> At GTC this week, NVIDIA launched <a href="https://www.nvidia.com/en-us/ai/nemoclaw/" target="_blank">NemoClaw</a>, an open-source security and privacy layer built on top of OpenClaw, the emerging OS for personal AI agents. It runs open models locally via Nemotron, routes sensitive requests through a privacy router, and deploys with a single command across consumer GPUs through DGX. When NVIDIA builds its enterprise stack on top of an open-source agent framework, that's the clearest validation signal in infrastructure.</p>
+
+    <div class="author-box">
+      <div class="author-info">
+        <h4>Dr. Steven Waterhouse</h4>
+        <p>Founder & GP, Nazaré Ventures. PhD in AI from Cambridge. Co-founded RPX (Nasdaq:2011) and Orchid (Coinbase:2019). Early partner at Pantera Capital (2013).</p>
+        <a href="https://linkedin.com/in/deseventral" target="_blank">LinkedIn ↗</a> &nbsp;&nbsp; <a href="https://nazare.io">nazare.io ↗</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="section">
+  <div class="subscribe-box" style="text-align:center;">
+    <h3>Get AI Waves in your inbox</h3>
+    <p>Weekly intelligence on AI infrastructure from Nazaré Ventures. No spam, unsubscribe anytime.</p>
+    <div class="newsletter-form-container">
+      <form class="newsletter-form" action="https://app.loops.so/api/newsletter-form/cmms8vvlm04910iyqbwdpua3e" method="POST" style="justify-content:center;">
+        <input class="newsletter-form-input" placeholder="you@example.com" required type="email" name="newsletter-form-input" style="max-width:300px;">
+        <button type="submit" class="newsletter-form-button">Subscribe</button>
+        <button type="button" class="newsletter-loading-button">Please wait...</button>
+      </form>
+      <div class="newsletter-success"><p class="newsletter-success-message">You're in. First issue hits your inbox soon.</p></div>
+      <div class="newsletter-error"><p class="newsletter-error-message">Something went wrong, please try again.</p></div>
+      <button class="newsletter-back-button" type="button">&larr; Back</button>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>&copy; 2026 Nazaré Ventures</span>
+  <span><a href="https://nazare.io" style="color:inherit;text-decoration:none;">nazare.io</a></span>
+</footer>
+
+<script>
+function submitHandler(event) {
+  event.preventDefault();
+  var container = event.target.parentNode;
+  var form = container.querySelector(".newsletter-form");
+  var formInput = container.querySelector(".newsletter-form-input");
+  var success = container.querySelector(".newsletter-success");
+  var errorContainer = container.querySelector(".newsletter-error");
+  var errorMessage = container.querySelector(".newsletter-error-message");
+  var backButton = container.querySelector(".newsletter-back-button");
+  var submitButton = container.querySelector(".newsletter-form-button");
+  var loadingButton = container.querySelector(".newsletter-loading-button");
+
+  const rateLimit = () => {
+    errorContainer.style.display = "flex";
+    errorMessage.innerText = "Too many signups, please try again in a little while";
+    submitButton.style.display = "none";
+    formInput.style.display = "none";
+    backButton.style.display = "block";
+  }
+  var time = new Date();
+  var timestamp = time.valueOf();
+  var previousTimestamp = localStorage.getItem("loops-form-timestamp");
+  if (previousTimestamp && Number(previousTimestamp) + 60000 > timestamp) {
+    rateLimit();
+    return;
+  }
+  localStorage.setItem("loops-form-timestamp", timestamp);
+  submitButton.style.display = "none";
+  loadingButton.style.display = "flex";
+  var formBody = "userGroup=&mailingLists=&email=" + encodeURIComponent(formInput.value);
+  fetch(event.target.action, {
+    method: "POST",
+    body: formBody,
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+  })
+    .then((res) => [res.ok, res.json(), res])
+    .then(([ok, dataPromise, res]) => {
+      if (ok) {
+        success.style.display = "flex";
+        form.reset();
+      } else {
+        dataPromise.then(data => {
+          errorContainer.style.display = "flex";
+          errorMessage.innerText = data.message ? data.message : res.statusText;
+        });
+      }
+    })
+    .catch(error => {
+      if (error.message === "Failed to fetch") { rateLimit(); return; }
+      errorContainer.style.display = "flex";
+      if (error.message) errorMessage.innerText = error.message;
+      localStorage.setItem("loops-form-timestamp", '');
+    })
+    .finally(() => {
+      formInput.style.display = "none";
+      loadingButton.style.display = "none";
+      backButton.style.display = "block";
+    });
+}
+function resetFormHandler(event) {
+  var container = event.target.parentNode;
+  var formInput = container.querySelector(".newsletter-form-input");
+  var success = container.querySelector(".newsletter-success");
+  var errorContainer = container.querySelector(".newsletter-error");
+  var errorMessage = container.querySelector(".newsletter-error-message");
+  var backButton = container.querySelector(".newsletter-back-button");
+  var submitButton = container.querySelector(".newsletter-form-button");
+  success.style.display = "none";
+  errorContainer.style.display = "none";
+  errorMessage.innerText = "Something went wrong, please try again";
+  backButton.style.display = "none";
+  formInput.style.display = "flex";
+  submitButton.style.display = "flex";
+}
+var formContainers = document.getElementsByClassName("newsletter-form-container");
+for (var i = 0; i < formContainers.length; i++) {
+  var formContainer = formContainers[i];
+  var handlersAdded = formContainer.classList.contains('newsletter-handlers-added');
+  if (handlersAdded) continue;
+  formContainer.querySelector(".newsletter-form").addEventListener("submit", submitHandler);
+  formContainer.querySelector(".newsletter-back-button").addEventListener("click", resetFormHandler);
+  formContainer.classList.add("newsletter-handlers-added");
+}
+</script>
+
+</body>
+</html>
