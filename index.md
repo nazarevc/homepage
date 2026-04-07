@@ -17,7 +17,7 @@ body { background:#0a0a0a !important; color:#f0f0f0 !important; }
 <p style="font-size:1.1rem;color:#aaa;margin-bottom:48px;">Early-stage AI infrastructure fund</p>
 
 <p style="font-size:1.05rem;margin-bottom:32px;">
-We back the builders of the next layer of AI — the training algorithms, decentralized systems, and multi-agent architectures that make capable AI possible and accessible.
+We back the builders of the next layer of AI — the training algorithms, infrastructure, and multi-agent architectures that make capable AI possible and accessible.
 </p>
 
 <hr style="border:none;border-top:1px solid #333;margin:40px 0;">
@@ -30,7 +30,7 @@ AI applications are expensive to build and fragile to run. The infrastructure la
 
 <ul style="padding-left:20px;color:#ccc;">
   <li style="margin-bottom:8px;">New training algorithms and compute efficiency</li>
-  <li style="margin-bottom:8px;">Decentralized AI systems and trustless inference</li>
+  <li style="margin-bottom:8px;">AI infrastructure and compute systems</li>
   <li style="margin-bottom:8px;">Multi-agent cooperative architectures</li>
 </ul>
 
