@@ -109,14 +109,20 @@ section { padding: 2rem 0; }
   grid-template-columns: repeat(3, 1fr);
   gap: 0.5rem;
 }
-.portfolio-card {
-  padding: 0.8rem;
+a.portfolio-card {
+  display: block; padding: 0.8rem;
   border: 1px solid var(--card-border);
   border-radius: 4px; background: var(--card-bg);
-  text-align: left;
+  text-align: left; color: var(--fg);
+  transition: border-color 0.2s, background 0.2s;
 }
-.portfolio-card .co-name { font-size: 0.9rem; font-weight: 600; }
-.portfolio-card .co-focus {
+a.portfolio-card:hover {
+  border-color: var(--accent);
+  background: #111820;
+  color: var(--fg);
+}
+a.portfolio-card .co-name { font-size: 0.9rem; font-weight: 600; }
+a.portfolio-card .co-focus {
   font-size: 0.78rem; color: var(--fg-dim); margin-top: 0.1rem;
 }
 
@@ -215,18 +221,18 @@ footer {
   <div class="container">
     <div class="section-label">Selected Portfolio</div>
     <div class="portfolio-grid">
-      <div class="portfolio-card"><div class="co-name">Vast.AI</div><div class="co-focus">GPU compute cloud</div></div>
-      <div class="portfolio-card"><div class="co-name">Prime Intellect</div><div class="co-focus">Neolab</div></div>
-      <div class="portfolio-card"><div class="co-name">Aion</div><div class="co-focus">GPU neocloud</div></div>
-      <div class="portfolio-card"><div class="co-name">Dimensional</div><div class="co-focus">Robotics middleware</div></div>
-      <div class="portfolio-card"><div class="co-name">Hellas</div><div class="co-focus">Provable inference</div></div>
-      <div class="portfolio-card"><div class="co-name">Fairmath</div><div class="co-focus">FHE privacy compute</div></div>
-      <div class="portfolio-card"><div class="co-name">Provably</div><div class="co-focus">Verifiable data for agents</div></div>
-      <div class="portfolio-card"><div class="co-name">Arkhai</div><div class="co-focus">Agent compute markets</div></div>
-      <div class="portfolio-card"><div class="co-name">Layerlens</div><div class="co-focus">AI benchmarking</div></div>
-      <div class="portfolio-card"><div class="co-name">Intelligent Internet</div><div class="co-focus">Sovereign AI for a new world</div></div>
-      <div class="portfolio-card"><div class="co-name">Cultured Computer</div><div class="co-focus">Persona persistence</div></div>
-      <div class="portfolio-card"><div class="co-name">Memco</div><div class="co-focus">Agent memory infrastructure</div></div>
+      <a class="portfolio-card" href="https://vast.ai" target="_blank" rel="noopener"><div class="co-name">Vast.AI</div><div class="co-focus">GPU compute cloud</div></a>
+      <a class="portfolio-card" href="https://www.primeintellect.ai" target="_blank" rel="noopener"><div class="co-name">Prime Intellect</div><div class="co-focus">Neolab</div></a>
+      <a class="portfolio-card" href="https://aion.xyz" target="_blank" rel="noopener"><div class="co-name">Aion</div><div class="co-focus">GPU neocloud</div></a>
+      <a class="portfolio-card" href="https://dimensional.fun" target="_blank" rel="noopener"><div class="co-name">Dimensional</div><div class="co-focus">Robotics middleware</div></a>
+      <a class="portfolio-card" href="https://hellas.ai" target="_blank" rel="noopener"><div class="co-name">Hellas</div><div class="co-focus">Provable inference</div></a>
+      <a class="portfolio-card" href="https://fairmath.ai" target="_blank" rel="noopener"><div class="co-name">Fairmath</div><div class="co-focus">FHE privacy compute</div></a>
+      <a class="portfolio-card" href="https://provably.ai" target="_blank" rel="noopener"><div class="co-name">Provably</div><div class="co-focus">Verifiable data for agents</div></a>
+      <a class="portfolio-card" href="https://www.arkhai.io" target="_blank" rel="noopener"><div class="co-name">Arkhai</div><div class="co-focus">Agent compute markets</div></a>
+      <a class="portfolio-card" href="https://layerlens.ai" target="_blank" rel="noopener"><div class="co-name">Layerlens</div><div class="co-focus">AI benchmarking</div></a>
+      <a class="portfolio-card" href="https://ii.inc" target="_blank" rel="noopener"><div class="co-name">Intelligent Internet</div><div class="co-focus">Sovereign AI for a new world</div></a>
+      <a class="portfolio-card" href="https://www.cultured.computer" target="_blank" rel="noopener"><div class="co-name">Cultured Computer</div><div class="co-focus">Persona persistence</div></a>
+      <a class="portfolio-card" href="https://www.memco.ai" target="_blank" rel="noopener"><div class="co-name">Memco</div><div class="co-focus">Agent memory infrastructure</div></a>
     </div>
   </div>
 </section>
