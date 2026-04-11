@@ -18,10 +18,10 @@ layout: null
   --fg: #e8e8e8;
   --fg-muted: #999;
   --fg-dim: #555;
-  --accent: #3bb8d8;
+  --accent: #0094FF;
   --border: #1a1a1a;
-  --card-bg: #0f1318;
-  --card-border: #1a2030;
+  --card-bg: #0f0f0f;
+  --card-border: #1e1e1e;
   --font: -apple-system, "system-ui", Inter, "Segoe UI", sans-serif;
 }
 
@@ -37,6 +37,7 @@ body {
 
 a { color: var(--fg); text-decoration: none; }
 a:hover { color: var(--accent); }
+
 .container { max-width: 520px; margin: 0 auto; padding: 0 1.2rem; text-align: center; }
 
 nav {
@@ -47,7 +48,6 @@ nav {
   padding: 1rem 2rem;
   display: flex; justify-content: space-between; align-items: center;
 }
-nav .logo img { height: 18px; display: block; }
 nav .nav-link {
   font-size: 0.78rem; color: var(--fg-dim);
   letter-spacing: 0.04em; text-transform: uppercase;
@@ -104,6 +104,7 @@ section { padding: 2rem 0; }
   font-size: 0.78rem; color: var(--fg-dim); margin-top: 0.2rem;
 }
 
+/* Portfolio: 3-col card grid */
 .portfolio-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -118,7 +119,7 @@ a.portfolio-card {
 }
 a.portfolio-card:hover {
   border-color: var(--accent);
-  background: #111820;
+  background: #0d1520;
   color: var(--fg);
 }
 a.portfolio-card .co-name { font-size: 0.9rem; font-weight: 600; }
@@ -133,8 +134,8 @@ a.portfolio-card .co-focus {
   transition: padding-left 0.15s;
 }
 .writing-item:first-child { border-top: 1px solid var(--border); }
-.writing-item:hover { padding-left: 0.5rem; }
-.writing-item .w-title { font-size: 0.92rem; font-weight: 500; }
+.writing-item:hover { padding-left: 0.5rem; color: var(--fg); }
+.writing-item .w-title { font-size: 0.92rem; font-weight: 500; color: var(--fg); }
 .writing-item .w-date {
   font-size: 0.74rem; color: var(--fg-dim); margin-top: 0.15rem;
 }
@@ -175,8 +176,9 @@ a.portfolio-card .co-focus {
 footer {
   padding: 1.5rem 2rem; border-top: 1px solid var(--border);
   font-size: 0.72rem; color: var(--fg-dim);
-  display: flex; justify-content: space-between;
+  display: flex; justify-content: space-between; align-items: center;
 }
+.footer-logo { height: 16px; width: auto; opacity: 0.4; }
 
 @media (max-width: 700px) {
   .container { padding: 0 1.25rem; }
@@ -184,14 +186,16 @@ footer {
   .hero { min-height: 90vh; }
   .portfolio-grid { grid-template-columns: repeat(2, 1fr); }
   .fund-stats { gap: 2rem; }
-  footer { flex-direction: column; gap: 0.4rem; }
+  footer { flex-direction: column; gap: 0.8rem; }
 }
 </style>
 </head>
 <body>
 
 <nav>
-  <a href="https://nazare.io" class="logo"><img src="https://nazare.io/assets/logo.png" alt="Nazaré Ventures"></a>
+  <a href="https://nazare.io">
+    <img src="https://nazare.io/assets/logo.png" alt="Nazaré Ventures" style="height:18px;display:block">
+  </a>
   <a href="mailto:7@nazare.io" class="nav-link">Contact</a>
 </nav>
 
@@ -222,9 +226,9 @@ footer {
     <div class="section-label">Selected Portfolio</div>
     <div class="portfolio-grid">
       <a class="portfolio-card" href="https://vast.ai" target="_blank" rel="noopener"><div class="co-name">Vast.AI</div><div class="co-focus">GPU compute cloud</div></a>
-      <a class="portfolio-card" href="https://www.primeintellect.ai" target="_blank" rel="noopener"><div class="co-name">Prime Intellect</div><div class="co-focus">Neolab</div></a>
-      <a class="portfolio-card" href="https://aion.xyz" target="_blank" rel="noopener"><div class="co-name">Aion</div><div class="co-focus">GPU neocloud</div></a>
-      <a class="portfolio-card" href="https://dimensional.fun" target="_blank" rel="noopener"><div class="co-name">Dimensional</div><div class="co-focus">Robotics middleware</div></a>
+      <a class="portfolio-card" href="https://www.primeintellect.ai" target="_blank" rel="noopener"><div class="co-name">Prime Intellect</div><div class="co-focus">The open superintelligence stack</div></a>
+      <a class="portfolio-card" href="https://aion.xyz" target="_blank" rel="noopener"><div class="co-name">Aion</div><div class="co-focus">Applied AI research lab</div></a>
+      <a class="portfolio-card" href="https://dimensional.fun" target="_blank" rel="noopener"><div class="co-name">Dimensional</div><div class="co-focus">Open harness for robotics</div></a>
       <a class="portfolio-card" href="https://hellas.ai" target="_blank" rel="noopener"><div class="co-name">Hellas</div><div class="co-focus">Provable inference</div></a>
       <a class="portfolio-card" href="https://fairmath.ai" target="_blank" rel="noopener"><div class="co-name">Fairmath</div><div class="co-focus">FHE privacy compute</div></a>
       <a class="portfolio-card" href="https://provably.ai" target="_blank" rel="noopener"><div class="co-name">Provably</div><div class="co-focus">Verifiable data for agents</div></a>
@@ -284,8 +288,8 @@ footer {
 </section>
 
 <footer>
+  <img class="footer-logo" src="https://nazare.io/assets/logo.png" alt="nazaré">
   <span>© 2026 Nazaré Ventures</span>
-  <a href="https://nazare.io" style="color:var(--fg-dim)">nazare.io</a>
 </footer>
 
 </body>
