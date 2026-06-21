@@ -642,12 +642,11 @@ a.pcard:hover {
   overflow: hidden;
 }
 
-.founder-avatar-inner {
-  font-family: var(--serif);
-  font-size: 3rem;
-  font-weight: 400;
-  color: var(--dim2);
-  opacity: 0.6;
+.founder-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .founder-name {
@@ -1139,7 +1138,7 @@ footer span {
     <div class="founder-grid">
       <div class="founder-visual fade-in">
         <div class="founder-avatar">
-          <div class="founder-avatar-inner">SW</div>
+          <img src="/founder.jpg" alt="Dr. Steven Waterhouse">
         </div>
       </div>
       <div class="fade-in fade-in-delay-1">
