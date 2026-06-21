@@ -585,6 +585,38 @@ a.pcard:hover {
   color: var(--blue-bright);
 }
 
+.wcols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+}
+
+.wcol-title {
+  font-family: var(--sans);
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding-bottom: 0.6rem;
+  margin-bottom: 0.2rem;
+  border-bottom: 1px solid var(--bdr);
+}
+
+.wcol .witem {
+  margin: 0;
+  padding: 1rem 0;
+}
+.wcol .witem:first-child { border-top: none; }
+.wcol .witem:hover {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+@media (max-width: 800px) {
+  .wcols { grid-template-columns: 1fr; gap: 2.5rem; }
+}
+
 /* ── Founder ── */
 .founder-grid {
   display: grid;
@@ -1039,30 +1071,61 @@ footer span {
       <h2 class="fade-in">Robot Wave.</h2>
       <p class="writing-byline fade-in fade-in-delay-1">Thoughts on AI, markets, and the machine-native future by Steven Waterhouse.</p>
     </div>
-    <div class="wlist fade-in fade-in-delay-2">
-      <a class="witem" href="https://robotwave.substack.com/p/code-isnt-a-coup" target="_blank" rel="noopener">
-        <div class="wtitle-group">
-          <span class="wtitle">Code Isn't a Coup</span>
-          <span class="warrow">↗</span>
+    <div class="wcols fade-in fade-in-delay-2">
+      <div class="wcol">
+        <div class="wcol-title">Essays</div>
+        <div class="wlist">
+          <a class="witem" href="https://robotwave.nazare.io/p/virtue-is-not-a-business-model" target="_blank" rel="noopener">
+            <div class="wtitle-group">
+              <span class="wtitle">Virtue Is Not a Business Model</span>
+              <span class="warrow">↗</span>
+            </div>
+            <span class="wdate">Jun 17, 2026</span>
+          </a>
+          <a class="witem" href="https://robotwave.nazare.io/p/the-off-switch" target="_blank" rel="noopener">
+            <div class="wtitle-group">
+              <span class="wtitle">The Off Switch</span>
+              <span class="warrow">↗</span>
+            </div>
+            <span class="wdate">Jun 13, 2026</span>
+          </a>
+          <a class="witem" href="https://robotwave.nazare.io/p/code-isnt-a-coup" target="_blank" rel="noopener">
+            <div class="wtitle-group">
+              <span class="wtitle">Code Isn't a Coup</span>
+              <span class="warrow">↗</span>
+            </div>
+            <span class="wdate">Jun 9, 2026</span>
+          </a>
         </div>
-        <span class="wdate">Jun 9, 2026</span>
-      </a>
-      <a class="witem" href="https://robotwave.substack.com/p/the-ai-enhanced-operator" target="_blank" rel="noopener">
-        <div class="wtitle-group">
-          <span class="wtitle">The AI-Enhanced Operator</span>
-          <span class="warrow">↗</span>
+      </div>
+      <div class="wcol">
+        <div class="wcol-title">AI Waves</div>
+        <div class="wlist">
+          <a class="witem" href="https://robotwave.nazare.io/p/ai-waves-14-the-hand-on-the-switch" target="_blank" rel="noopener">
+            <div class="wtitle-group">
+              <span class="wtitle">#14 — The Hand on the Switch</span>
+              <span class="warrow">↗</span>
+            </div>
+            <span class="wdate">Jun 18, 2026</span>
+          </a>
+          <a class="witem" href="https://robotwave.nazare.io/p/one-claude-to-rule-them-all" target="_blank" rel="noopener">
+            <div class="wtitle-group">
+              <span class="wtitle">#13 — One Claude to Rule Them All</span>
+              <span class="warrow">↗</span>
+            </div>
+            <span class="wdate">Jun 11, 2026</span>
+          </a>
+          <a class="witem" href="https://robotwave.nazare.io/p/ai-waves-12-the-part-that-isnt-for" target="_blank" rel="noopener">
+            <div class="wtitle-group">
+              <span class="wtitle">#12 — The Part That Isn't For Sale</span>
+              <span class="warrow">↗</span>
+            </div>
+            <span class="wdate">Jun 4, 2026</span>
+          </a>
         </div>
-        <span class="wdate">Jun 3, 2026</span>
-      </a>
-      <a class="witem" href="https://robotwave.substack.com/p/the-labor-market-for-compute" target="_blank" rel="noopener">
-        <div class="wtitle-group">
-          <span class="wtitle">The Labor Market for Compute</span>
-          <span class="warrow">↗</span>
-        </div>
-        <span class="wdate">May 27, 2026</span>
-      </a>
+      </div>
     </div>
-    <a class="all-posts" href="https://robotwave.substack.com" target="_blank" rel="noopener">
+    <a class="all-posts" href="https://robotwave.nazare.io" target="_blank" rel="noopener">
       All posts on Robot Wave <span style="font-size:0.85em">↗</span>
     </a>
   </div>
