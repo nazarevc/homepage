@@ -1,0 +1,43 @@
+name: Update Writing list
+
+# Refreshes the Writing section on nazare.io from the Robot Wave feed.
+# The site is served from the my-pages branch; this job edits that branch.
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: update-writing
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the live site branch
+        uses: actions/checkout@v4
+        with:
+          ref: my-pages
+
+      - name: Rewrite Writing section from the feed
+        run: python3 .github/scripts/update_writing.py index.html
+
+      - name: Commit, push and rebuild if changed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet; then
+            echo "No new posts."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Writing: refresh from Robot Wave feed"
+          git push origin HEAD:my-pages
+          gh api --method POST "repos/${{ github.repository }}/pages/builds" || echo "Pages build request failed; the push may still trigger a build."
