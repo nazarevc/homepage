@@ -943,6 +943,11 @@ footer span {
   line-height: 1.7;
   color: var(--muted);
 }
+.writing-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.8rem;
+}
 </style>
 </head>
 <body>
@@ -1128,6 +1133,7 @@ footer span {
       <div class="wcol">
         <div class="wcol-title">Essays</div>
         <div class="wlist">
+          <!-- writing:essays -->
           <a class="witem" href="https://robotwave.nazare.io/p/defense-against-the-dark-arts" target="_blank" rel="noopener">
             <div class="wtitle-group">
               <span class="wtitle">Defense Against the Dark Arts</span>
@@ -1149,11 +1155,13 @@ footer span {
             </div>
             <span class="wdate">Oct 22, 2026</span>
           </a>
+          <!-- /writing:essays -->
         </div>
       </div>
       <div class="wcol">
         <div class="wcol-title">AI Waves</div>
         <div class="wlist">
+          <!-- writing:aiwaves -->
           <a class="witem" href="https://robotwave.nazare.io/p/ai-waves-031-under-the-influence" target="_blank" rel="noopener">
             <div class="wtitle-group">
               <span class="wtitle">#031: Under the Influence</span>
@@ -1175,12 +1183,18 @@ footer span {
             </div>
             <span class="wdate">Oct 20, 2026</span>
           </a>
+          <!-- /writing:aiwaves -->
         </div>
       </div>
     </div>
-    <a class="all-posts" href="https://robotwave.nazare.io" target="_blank" rel="noopener">
-      All posts on Robot Wave <span style="font-size:0.85em">↗</span>
-    </a>
+    <div class="writing-links">
+      <a class="all-posts" href="https://robotwave.nazare.io" target="_blank" rel="noopener">
+        All posts on Robot Wave <span style="font-size:0.85em">↗</span>
+      </a>
+      <a class="all-posts" href="https://robotwave.nazare.io/subscribe" target="_blank" rel="noopener">
+        Subscribe <span style="font-size:0.85em">↗</span>
+      </a>
+    </div>
   </div>
 </div>
 
