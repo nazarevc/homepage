@@ -505,8 +505,11 @@ a.pcard:hover {
   min-height: 80px;
   display: none;
 }
-@media (min-width: 769px) and (max-width: 1024px) {
-  .pcard-empty { display: block; }
+@media (min-width: 1025px) {
+  .pcard-empty.e4 { display: block; }
+}
+@media (max-width: 768px) {
+  .pcard-empty.e2 { display: block; }
 }
 
 .pname {
@@ -1032,7 +1035,7 @@ footer span {
         <div class="label">Portfolio</div>
         <h2 class="fade-in">Built for a <br>machine-native world.</h2>
       </div>
-      <span class="portfolio-counter">20 companies</span>
+      <span class="portfolio-counter">21 companies</span>
     </div>
     <div class="pgrid fade-in fade-in-delay-1">
       <a class="pcard" href="https://vast.ai" target="_blank" rel="noopener">
@@ -1089,7 +1092,7 @@ footer span {
       </a>
       <a class="pcard" href="https://epiloguecompute.com" target="_blank" rel="noopener">
         <div class="pname">Epilogue</div>
-        <div class="pfocus">Compute exchange for illiquid AI infra</div>
+        <div class="pfocus">Market maker for AI compute</div>
       </a>
       <a class="pcard" href="https://firmative.ai" target="_blank" rel="noopener">
         <div class="pname">Firmative</div>
@@ -1115,7 +1118,13 @@ footer span {
         <div class="pname">Thirdface</div>
         <div class="pfocus">Personal AI built on your own life</div>
       </a>
-      <div class="pcard-empty" aria-hidden="true"></div>
+      <a class="pcard" href="https://speridlabs.com" target="_blank" rel="noopener">
+        <div class="pname">Speridlabs</div>
+        <div class="pfocus">3D foundation models</div>
+      </a>
+      <div class="pcard-empty e4 e2" aria-hidden="true"></div>
+      <div class="pcard-empty e4" aria-hidden="true"></div>
+      <div class="pcard-empty e4" aria-hidden="true"></div>
     </div>
     <p class="followon">Our companies have since raised from Founders Fund, Radical Ventures, NVIDIA, Intel Capital, Dell Technologies Capital, Triatomic and USV.</p>
   </div>
@@ -1136,7 +1145,7 @@ footer span {
           <!-- writing:essays -->
           <a class="witem" href="https://robotwave.nazare.io/p/robotwave-48-small-is-beautiful-experiments" target="_blank" rel="noopener">
             <div class="wtitle-group">
-              <span class="wtitle">Robotwave #48: Small Is Beautiful: Experiments in Compute</span>
+              <span class="wtitle">Small Is Beautiful: Experiments in Compute</span>
               <span class="warrow">↗</span>
             </div>
             <span class="wdate">Nov 16, 2026</span>

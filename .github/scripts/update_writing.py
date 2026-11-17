@@ -31,6 +31,7 @@ def fetch_items():
         if issue:
             waves.append((when, f"#{issue.group(1)}: {issue.group(2).strip()}", link))
         else:
+            title = re.sub(r"^Robot\s*wave\s*#\s*\d+\s*:\s*", "", title, flags=re.I)  # drop issue-number prefix on essays
             essays.append((when, title, link))
     essays.sort(key=lambda x: x[0], reverse=True)
     waves.sort(key=lambda x: x[0], reverse=True)
