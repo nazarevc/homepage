@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Epilogue order book and other compute venues | Nazaré Ventures</title>
+<meta name="description" content="World data center capacity, pipeline, compute prices and company filings, with maps and searchable tables. Nazaré Ventures research, 25 November 2026.">
+<link rel="canonical" href="https://nazare.io/compute/">
+<meta property="og:title" content="Data centers and compute: the world report">
+<meta property="og:description" content="World data center capacity, pipeline, compute prices and company filings. Nazaré Ventures research, 25 November 2026.">
+<meta property="og:url" content="https://nazare.io/compute/">
+<meta property="og:image" content="https://nazare.io/og-image.png">
+<link rel="icon" href="/favicon-32.png">
+<style>:root{
+  /* layout: one reading column, cards on a quiet plane, maps fill the card width */
+  --plane:#f3f4f6; --surface:#ffffff; --ink:#15181d; --ink2:#5b636e; --line:#e2e5e9; --axis:#bcc2c9;
+  --land:#e3e6eb; --accent:#1b64be; --muted:#8a919b;
+  --s1:#257de0; --s2:#f47230; --s3:#00b894; --s4:#f2a600;
+  --font:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --plane:#0b0c0e; --surface:#17191c; --ink:#eef0f2; --ink2:#9aa1ab; --line:#2a2e33; --axis:#474c53;
+    --land:#2a2e34; --accent:#6aabf1; --muted:#727982;
+    --s1:#338ced; --s2:#e76624; --s3:#00a888; --s4:#d28e05;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --plane:#0b0c0e; --surface:#17191c; --ink:#eef0f2; --ink2:#9aa1ab; --line:#2a2e33; --axis:#474c53;
+  --land:#2a2e34; --accent:#6aabf1; --muted:#727982;
+  --s1:#338ced; --s2:#e76624; --s3:#00a888; --s4:#d28e05;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--plane);color:var(--ink);font:15px/1.5 var(--font)}
+main{max-width:780px;margin:0 auto;padding:20px 16px 48px;display:flex;flex-direction:column;gap:28px}
+section{display:flex;flex-direction:column;gap:12px;scroll-margin-top:12px}
+h1{font-size:25px;line-height:1.2;margin:4px 0 8px;text-wrap:balance;letter-spacing:-.01em}
+h2{font-size:20px;line-height:1.25;margin:0;text-wrap:balance}
+h3{font-size:16px;line-height:1.3;margin:0;text-wrap:balance}
+h4{font-size:15px;line-height:1.3;margin:0}
+p{margin:0}
+a{color:var(--accent)}
+.eyebrow{font-size:12px;color:var(--ink2);letter-spacing:.04em;text-transform:uppercase}
+.lead{font-size:16px;color:var(--ink);max-width:62ch}
+.jump{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.jump a{font-size:13px;text-decoration:none;border:1px solid var(--line);background:var(--surface);padding:6px 11px;border-radius:999px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;margin:0;min-width:0}
+.sub{font-size:13px;color:var(--ink2)}
+.note,figcaption{font-size:12.5px;color:var(--ink2);line-height:1.45}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@media (min-width:640px){.tiles{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.tile b{font-size:19px;line-height:1.2}
+.tile span{font-size:12.5px;color:var(--ink2);line-height:1.35}
+figure.map{margin:0}
+.map svg,.chartwrap svg,.card>svg{width:100%;height:auto;display:block;overflow:visible}
+.land{fill:var(--land)}
+.border{fill:none;stroke:var(--surface);stroke-width:.8;stroke-linejoin:round}
+.frame{fill:transparent;stroke:var(--accent);stroke-width:1.2;stroke-dasharray:3 2}
+.frame-link{cursor:pointer}
+.frame-link:focus-visible .frame{stroke-width:2.4;stroke-dasharray:none}
+.bub{fill:var(--s1);fill-opacity:.82;stroke:var(--surface);stroke-width:1.2}
+.wl{font:500 10.5px var(--font);fill:var(--ink2);paint-order:stroke;stroke:var(--surface);stroke-width:3px;stroke-linejoin:round}
+.wl-h{font-weight:700;fill:var(--ink);font-size:11.5px}
+.pt{cursor:pointer;outline:none}
+.pt.off{display:none}
+.hit{fill:transparent;stroke:transparent;stroke-width:1.6}
+.pt .dot{stroke:var(--surface);stroke-width:1.4}
+.st-run .dot{fill:var(--s1)}
+.st-con .dot{fill:var(--s2)}
+.st-plan .dot{fill:var(--surface);fill-opacity:.55;stroke:var(--s3);stroke-width:2.6}
+.st-stop .dot{fill:var(--muted)}
+.st-stop .x{stroke:var(--surface);stroke-width:1.5;fill:none;stroke-linecap:round}
+.mk .dot{fill:var(--ink)}
+.pt.sel .hit{stroke:var(--ink)}
+.pt:focus-visible .hit{stroke:var(--accent);stroke-width:2.2}
+.lbl{font:650 11.5px var(--font);fill:var(--ink);paint-order:stroke;stroke:var(--surface);stroke-width:3px;stroke-linejoin:round;pointer-events:none}
+.lbl-m{font-weight:500;fill:var(--ink2);font-size:11px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:inherit;font-size:13px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px 11px;display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.chip.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.chip:focus-visible,.jump a:focus-visible,summary:focus-visible,tr:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--ink2);align-items:center}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{display:inline-block;width:10px;height:10px;border-radius:50%;flex:none}
+.sw-run,.sw.s1{background:var(--s1)}
+.sw-con,.sw.s2{background:var(--s2)}
+.sw.s3{background:var(--s3)}
+.sw.s4{background:var(--s4)}
+.sw-plan{background:transparent;box-shadow:inset 0 0 0 2.5px var(--s3)}
+.sw-stop{background:var(--muted)}
+.sw-mk{background:var(--ink);border-radius:2px;transform:rotate(45deg);width:8px;height:8px;margin:0 1px}
+.sz{display:inline-block;border-radius:50%;background:var(--axis);flex:none}
+.sz1{width:10px;height:10px}
+.sz5{width:23px;height:23px}
+.detail{border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:6px;background:var(--plane);min-height:118px}
+.detail .who{font-size:13px;color:var(--ink2)}
+.detail .size{font-size:14px;font-weight:600}
+.detail .what{font-size:13.5px}
+.pill{align-self:flex-start;font-size:12px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:2px 9px;display:inline-flex;align-items:center;gap:6px}
+details{border-top:1px solid var(--line);padding-top:8px}
+summary{cursor:pointer;font-size:13.5px;color:var(--accent)}
+.scroll{overflow-x:auto;margin-top:8px}
+table{border-collapse:collapse;width:100%;font-size:12.5px;min-width:520px}
+table.num{min-width:0}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--ink2);font-weight:600;white-space:nowrap}
+table.num td,table.num th{font-variant-numeric:tabular-nums}
+tbody tr[data-i]{cursor:pointer}
+tbody tr.sel td{background:var(--plane)}
+td .sw{margin-right:7px;vertical-align:baseline}
+.bars{display:flex;flex-direction:column;gap:9px}
+.brow{display:grid;grid-template-columns:minmax(0,1fr);gap:3px}
+.brow .bl{font-size:12.5px;color:var(--ink2)}
+.brow .bt{position:relative;height:13px;background:transparent;border-left:1px solid var(--axis);display:block;margin-right:64px}
+.brow .bt i{position:absolute;top:0;bottom:0;left:0;border-radius:0 4px 4px 0;display:block}
+.brow .bt i.hi{opacity:.4}
+.b1{background:var(--s1)}
+.b2{background:var(--s2)}
+.brow .bv{font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums;justify-self:end;margin-top:-18px;line-height:13px}
+.chartwrap{position:relative}
+#price-hit{touch-action:pan-y;cursor:crosshair}
+.grid{stroke:var(--line);stroke-width:1}
+.axis{stroke:var(--axis);stroke-width:1}
+.tick{font:10.5px var(--font);fill:var(--ink2);font-variant-numeric:tabular-nums}
+.ln{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.ln.s1{stroke:var(--s1)}.ln.s2{stroke:var(--s2)}.ln.s3{stroke:var(--s3)}.ln.s4{stroke:var(--s4)}
+.end{stroke:var(--surface);stroke-width:2}
+.end.s1,.bar.s1{fill:var(--s1)}.end.s2,.bar.s2{fill:var(--s2)}.end.s3{fill:var(--s3)}.end.s4{fill:var(--s4)}
+.endl{font:11px var(--font);fill:var(--ink);font-variant-numeric:tabular-nums}
+.endn{font-weight:700}
+.xh{stroke:var(--axis);stroke-width:1}
+.cat{font:12px var(--font);fill:var(--ink)}
+.val{font:600 11px var(--font);fill:var(--ink2);font-variant-numeric:tabular-nums}
+.tip{position:absolute;top:6px;pointer-events:none;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-size:12px;line-height:1.5;box-shadow:0 4px 14px rgba(0,0,0,.14);white-space:nowrap;font-variant-numeric:tabular-nums}
+.tip b{display:block}
+.tip span{display:flex;align-items:center;gap:6px}
+.src{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px;font-size:13.5px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+.ln.proj{stroke-dasharray:5 4}
+.now{stroke:var(--ink2);stroke-width:1;stroke-dasharray:2 3}
+#growth-hit{touch-action:pan-y;cursor:crosshair}
+.wl tspan.wl-h{font-size:11.5px}
+
+main{gap:14px;padding-top:14px}
+.top h1{margin:2px 0 6px}
+.top .lead{font-size:15px}
+.top .meta{font-size:12.5px;color:var(--ink2);margin-top:6px}
+.bar{position:sticky;top:0;z-index:5;background:var(--plane);margin:0 -16px;padding:8px 16px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.find{display:flex;gap:8px;align-items:center}
+.find input{flex:1;min-width:0;font:inherit;font-size:16px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+.find input::placeholder{color:var(--muted)}
+.find input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.btn{font:inherit;font-size:13px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer}
+.tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:1px 1px 2px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;font:inherit;font-size:13px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 12px;cursor:pointer;white-space:nowrap}
+.tab.on{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.tab:focus-visible,.sortb:focus-visible,.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.count{font-size:12.5px;color:var(--ink2);min-height:0}
+.count:empty{display:none}
+.panel{display:flex;flex-direction:column;gap:12px}
+.panel[hidden]{display:none}
+.panel>h2{margin-top:4px}
+.doc{gap:12px}
+.doc .st{font-size:17px;line-height:1.3;margin:0}
+.sub{display:flex;flex-direction:column;gap:9px;min-width:0}
+.sub+.sub{border-top:1px solid var(--line);padding-top:12px}
+.doc h4{font-size:15px}
+.doc p{font-size:14.5px;line-height:1.5;overflow-wrap:anywhere}
+.rl{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:14.5px;overflow-wrap:anywhere}
+.doc .scroll{margin-top:0}
+table.dt{min-width:520px}
+table.dt.wide{min-width:780px}
+table.dt th{white-space:normal;min-width:76px}
+table.dt td{overflow-wrap:anywhere}
+.sortb{font:inherit;font-weight:600;color:var(--ink2);background:none;border:0;padding:0;margin:0;cursor:pointer;text-align:left}
+th[aria-sort="ascending"] .sortb,th[aria-sort="descending"] .sortb{color:var(--ink)}
+th[aria-sort="ascending"] .sortb::after{content:" \25B2";font-size:9px}
+th[aria-sort="descending"] .sortb::after{content:" \25BC";font-size:9px}
+.hint{font-size:12px;color:var(--ink2)}
+.hide{display:none!important}
+.searching .viz,.searching .tiles,.searching .pager,.searching .hint{display:none}
+.pager{display:flex;gap:8px;justify-content:space-between;margin-top:4px}
+.pager .btn{flex:1;text-align:center}
+.pager .btn[disabled]{visibility:hidden}
+table.dt.fit{min-width:0}
+.pc,.calc{display:flex;flex-direction:column;gap:10px}
+.pc .bt,.calc .bt{margin-right:92px}
+.bd{color:var(--muted)}
+.cn{font-size:13px;line-height:1.45;color:var(--ink2)}
+.cf{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.cf label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink2);min-width:0}
+.cf select,.cf input{font:inherit;font-size:16px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 10px;min-width:0;width:100%;box-sizing:border-box;height:42px}
+.cd{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:6px}
+.tiles.ct{grid-template-columns:repeat(3,minmax(0,1fr))}
+.ct .tile b{font-size:17px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.cf label.w2{grid-column:span 2}
+.ct .tile{padding:10px}
+@media (min-width:640px){.cf{grid-template-columns:minmax(0,1fr) minmax(0,.7fr) minmax(0,1.6fr) minmax(0,1.1fr)}.cf label.w2{grid-column:auto}}
+.sw.s3{background:var(--s3)}.sw.s4{background:var(--s4)}
+.gap{display:flex;flex-direction:column;gap:9px}
+.gax{position:relative;height:14px}
+.gax span{position:absolute;top:0;transform:translateX(-50%);font-size:11px;color:var(--muted);white-space:nowrap}
+.gax span.f{transform:none}
+.grow{display:grid;grid-template-columns:minmax(0,1fr);gap:3px}
+.gl{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;color:var(--ink2)}
+.gl b{font-weight:600;color:var(--ink);white-space:nowrap}
+.gl span{text-align:right}
+.gt{position:relative;height:14px;display:block}
+.gt b{position:absolute;top:0;bottom:0;width:1px;background:var(--line)}
+.gline{position:absolute;top:6px;height:2px;background:var(--axis)}
+.gd{position:absolute;top:2px;width:10px;height:10px;border-radius:50%;margin-left:-5px;box-shadow:0 0 0 2px var(--surface)}
+.g1{background:var(--s1)}.g2{background:var(--s2)}
+.ph{display:flex;flex-direction:column;gap:8px}
+.ph svg{display:block;width:100%;height:auto;touch-action:pan-y}
+.pl{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.pl.hs1{stroke:var(--s1)}.pl.hs2{stroke:var(--s2)}.pl.hs3{stroke:var(--s3)}.pl.hs4{stroke:var(--s4)}
+.pm{stroke:var(--surface);stroke-width:1.5}
+.pm.hs3{fill:var(--s3)}.pm.hs4{fill:var(--s4)}
+.pg{stroke:var(--line);stroke-width:1}.pt{fill:var(--muted);font-size:10px}.px{stroke:var(--axis);stroke-width:1}
+.csvb{align-self:flex-start;font:inherit;font-size:12px;color:var(--ink2);background:transparent;border:1px solid var(--line);border-radius:8px;padding:4px 9px;cursor:pointer}
+.searching .csvb{display:none}
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap');
+/* Nazare brand layer: the nazare.io palette, type and wave, in one dark theme */
+:root:root:root{
+  --plane:#05070a; --surface:#0c111c; --ink:#e8ecf0; --ink2:#9aa3ae; --line:#18202e; --axis:#2e3748;
+  --land:#1a2333; --accent:#00aaff; --muted:#7d8692;
+  --s1:#1a9cf0; --s2:#e76624; --s3:#00a888; --s4:#d28e05;
+  --blue:#0088cc; --blue2:#00aaff;
+  --serif:'Playfair Display',Georgia,'Times New Roman',serif;
+  --font:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  color-scheme:dark;
+}
+body{background:var(--plane);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+#wv{position:fixed;inset:0;width:100vw;height:100vh;z-index:0;pointer-events:none;opacity:.35}
+main{position:relative;z-index:1}
+h1,h2,.doc .st,.card h3{font-family:var(--serif);font-weight:500;letter-spacing:-.01em}
+h2{font-size:24px}
+.card h3{font-size:18px}
+.doc .st{font-size:19px}
+
+/* header */
+.brand{position:relative;margin:-14px -16px 0;padding:14px 16px 34px;overflow:hidden;border-bottom:1px solid var(--line)}
+.brand::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 72% 38%,rgba(0,136,204,.16) 0%,rgba(0,136,204,0) 100%);pointer-events:none}
+.bnav{position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:26px}
+.bnav a.wm{display:block;line-height:0}
+.bnav img{height:17px;width:auto}
+.bnav .bl{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink2);border:1px solid var(--line);border-radius:999px;padding:4px 10px}
+.hmark{position:absolute;right:6px;top:108px;width:140px;height:auto;opacity:.09;pointer-events:none}
+.brand .in{position:relative}
+.brand .eyebrow{display:flex;align-items:center;gap:10px;font-size:11px;letter-spacing:.18em;color:var(--blue2);font-weight:500;margin-bottom:10px}
+.brand .eyebrow::before{content:"";flex:none;width:22px;height:1.5px;background:var(--blue)}
+.brand h1{font-family:var(--serif);font-weight:500;font-size:clamp(34px,8.6vw,58px);line-height:1.05;letter-spacing:-.025em;margin:0 0 14px;max-width:14ch}
+.brand h1 .hl{background:linear-gradient(135deg,var(--blue),var(--blue2),#66ddff);-webkit-background-clip:text;background-clip:text;color:transparent;font-style:italic}
+.brand .lead{font-size:16px;line-height:1.6;color:var(--ink);max-width:54ch}
+.brand .meta{font-size:12.5px;color:var(--ink2);margin-top:10px}
+.hwave{position:absolute;left:0;right:0;bottom:0;width:100%;height:34px;display:block;pointer-events:none}
+
+/* sticky bar and tabs */
+.bar{background:rgba(5,7,10,.88);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.find input,.btn{background:var(--surface);border-color:var(--line)}
+.find input:focus-visible{outline-color:var(--blue2)}
+.tab{background:transparent;color:var(--ink2);border-color:var(--line)}
+.tab:hover{color:var(--ink);border-color:var(--blue)}
+.tab.on{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#02060b;border-color:transparent;font-weight:600}
+.pager .btn[data-go]{border-color:var(--blue);color:var(--ink)}
+.pager .btn[data-go]:hover{background:rgba(0,136,204,.12)}
+
+/* panels, cards, tiles */
+.panel>h2{display:flex;align-items:center;gap:10px}
+.panel>h2::before{content:"";flex:none;width:22px;height:2px;background:var(--blue2)}
+.card,.doc{position:relative;background:linear-gradient(180deg,rgba(0,136,204,.05),transparent 120px),var(--surface)}
+.card::before,.doc::before{content:"";position:absolute;left:14px;right:14px;top:-1px;height:1px;background:linear-gradient(90deg,var(--blue2),rgba(0,170,255,0) 70%)}
+.tile{background:var(--surface);border-color:var(--line);padding:12px 12px 11px}
+.tile b{font-family:var(--serif);font-weight:600;font-size:24px;letter-spacing:-.01em;background:linear-gradient(135deg,var(--blue2),#66ddff);-webkit-background-clip:text;background-clip:text;color:transparent;width:fit-content}
+table.dt th{color:var(--ink2);text-transform:uppercase;letter-spacing:.06em;font-size:11px}
+table.dt th .sortb{text-transform:uppercase;letter-spacing:.06em;font-size:11px}
+a{color:var(--blue2)}
+.foot{border-top:1px solid var(--line)}
+.foot a{color:var(--blue2)}
+@media (min-width:720px){
+  .brand{padding:18px 16px 46px}
+  .bnav{margin-bottom:44px}
+  .hmark{right:16px;top:86px;width:280px;opacity:.13}
+  .hwave{height:46px}
+}
+@media (prefers-reduced-motion:reduce){#wv{display:none}}
+.foot{border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--ink2)}
+.tabs,.pager{display:none}
+</style>
+</head>
+<body>
+<canvas id="wv" aria-hidden="true"></canvas>
+<main>
+<header class="top brand">
+  <div class="bnav"><a class="wm" href="https://nazare.io" target="_blank" rel="noopener"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANIAAAAwCAYAAABkFSTLAAAWXklEQVR42u1debRV1Xn/ffecx2MSUAKiIiIEscYBE30qRW0cEocqBCOJNmpMtWmrUZuoqW2W1VWb0EgSqzFqYmIGE4sLrImJ0eJQHGqMEhQHFHAWB2RSxvfevefXP8634WO7z7nTeXCrb6911h3POXt/+5unA/SO3vEhGySFZEQyzvhtFMmTSX6P5GKS5+lvcdY1416w9o4PA+EAKAEQESmLCAFUzG+7ADgAwMF67ANgB3OJgwFcDSDJuof0grl3fECJpwSgJCLlAFHtDKADwCF67AtgkHeJBECXCpvXAewtIutIihJiLyH1jg8dUe0C4EAlmoMB7AdgsPe3CoCy0kQf77duAAeJyHySJRFJegmpd3zgJZGIJCQnAPgrVdkmABhSB+GUAbwM4A8AHtHXZ0Sks9dG6h0fllFStWx/ABfmEE6khyWcRw3hPCsiG2q9aS8h9Y4P2qjo6/0AVgIYCKAth3Cc1FkoIutDdhaAJKTO9ap2vePD4KUDgAUA9lYb51WPcJ7NIxwADDkVMgnJ3HTLH6pcxLoUAVCplvq9+23T91sBcPbY4r6B3+sGVM5mbbXR6HwDe0K7/sBeshoHbgZGNeJWlINXuRLCedZIngFgBIB7ATwnImu9/0VmzVawNI0fNRlzOoGaAafBr1IPzSVuFOF1XtEHPOhYapQZkIy3JsNwc96aTKsKfsS14q2Q3C2g7nUBeNOnSJKRiLhA1lCk7sQDAIwFMAxAPz13leqgfwLwgIi84Z9fRIDNzCUGsAeAjwMYD2AUgKEABigH6wSwGsDbABaryJ8vIu+GrlfD/WOkQbythWR2T5Ia5rcFnHWv9lc1ZxyA4Ujdv+3KfdeoPfEqgIUA5gFYbCRW1IhmQXKE4oR/3lIR6c7BrZEAjkQa69kNwHa6/mW6f/cAeDhvPkoAYq65g+LqfgYGg1TyOfx4A8CzircLRKSr5vWTXG+OtSQ3kHyKZB/DJTapgCT3InkNyaWsbawgeRPJ/YwUkSaIKDLvx5O8jORjJDey9pGQfE3ndbQH/GpBPpDcneQ7Cqv1+tpTxzp9fZLkoCqS3+5TH5JTSd5C8i3WN9aTfJDkVzUGUxN8fC5P8vc697Xemvbx4Gnhep3iTN54gmR7Fiw8HDma5M9IvlnH+ruVBq4g+Weh64YWHRqvkuzvA4/kN0i+a/5X0Zt2kyzr54q+79b3bqwj+XV/wxshIpJjSN6g17SjTLLLHJ3mcN91B9Y7h+Sh1QjdbPiYwL17eizKIyRvnz5Hcl6AeXRnwMd+V/HOe5vkpQYfojoI6X5zbzs6fDOB5Bc8ZC8H8Mrt32MhQvIYySSSd9cAA/8oe+esJXk1yZ1y168Xd0dFX5e6TdP/DCZ5u7n4RnNTe263+c6fvBs/drp7rcSkAHJIfLpuruUelnhrkUbdZr6J2bhL8wjd45wrDTJ2FXgk3uHguTCLkAwy7kzyNo/RlQNrzRtl7xw3HtcgZ1ViMsh8j4G3xa+J+nubvl5k7tNl5hmChZtLu3cvS1CXmv/6+13L+iuB/79E8pis9ccBPd8FrPro5NoBzATwaQAbAfTV70J6fMnz5zuvSKx6cgXAlwCsEZELdEKVWjxOGq2eDuDrJhYQGe+OW1yX2mcvqa1WVj19R7XldjLxM+r8Kvp6OcnRAM7Se2d5mGIA229F+ygzVKGR/ArJjwGYrTZixexHRV/d3iwH8ILaA+sUbkPUFhmj++s8V5HZt08AuIfkFBF5KCtVJjB3e1j8goh0kzwbwLdNQmjk4Y5/vYqPM4aY+gO4CcA0M+/IwMLB41XFj5X6v0FqV48xuF3x8HY0gDtJnici3/ft0CyPVx8AfdWF+C0loi4FcieABwE8DGARgBV6o+0VUT8J4Ai9dmI20Lk0ywDOJ/mQiMyqwQHhEOVbSkQVQ5yJcdvOB/ALAHPUUO4MSJNBanBOBnCaGtwWYboBnAlgpYhcGCB0R1QrAfy7Ar0oF2mkRv8X1ZFB45otGeYRSocZA+AuACP1P7FHDBsB3KqE9oiuz0fGPkpMnwTwBQCHmmvEet2hAGaTPExEnq+RmEKjryL/BABXOXez2Uu33o0ANuhv/TSw6jMxMfD7le6tg0FkYLAUwE8B/AZpus86b/3tSkjH6B7s6zFOt85rSHaLyA1b4G5A7XGq2w4kOzyd+SdOvFeRIh1qaDKgczvxvpjkdnn2klFZTjFqXOJd9z2S5zrniK8OZrmASY4jOcuIc18NPb5Wm6BAV+zn1dD31e0uklM89dKtbwDJRwx86K3p7tCeWdhkqLFnkFzuwdpd/351ZpSqqHb3enNx1zlBf79PP3d6KuSlJI/RPRqmx+4kJ5L8strqfT0c+Z5RDWlgR5LXOhsngB+lgKrcj+QlZl6Jpyp3kTx8C9s0h5BGkZytn98ieaI3idjFYcymxJ6uOsMDpL/JZ2cVTLkFqt7/lgcYN883SB7k+/2reLW2iD2pl8huspvbPJJ9c64VF3Q4hDg1sA9uLn8bcChExh7IIqIfGKR2e1UVNuacA9QerZg5ufucksVoaiCkTylRWMRfQHJKtbhgBqM90WO0Fle+Ugt+ZODGMSRXm2vatSwiOWTT9TIIaSXJY0muUVfkAfUEqKwUIHlzQDI5A3puNRcmyeneBjogrTOetrZGPIAKhDbD0X1iOq4npZJZ41G6niSAsNN9ZmMQdaTuj0Uc9zorL8hZw9ycI2BaADaJSqU4g6NXI6TJJH9qPv+c5GAP4SMbevEI3f42kOTz3vXd6z+5tdTjJdbruvVPDjjR3Hqu2LSPGYT0Fsnr9f20RpDVSJThKjkSzxvjXOLjQm5Mfd1e4z2VgHrxb40SUQCRT8ogpB/0FCGZe++nMamQCnWzIXoJnHtRQDVNVIrsXE/sJyczQkg+GmCG683elWokJLfv55B8Tt//yAt01wu/c7x7uNe7jOYkDcKgLUOzcnBeuSnOluECXEdyFck76l1gIAMAJP8loOKVPRUhzhHZPgEuJznCusWbQBYhuYsCxdet/9hozKtGJNhV3aohRLiXZP8sjq/HQxkM4JtFMAAzz296BO7ud3LoPjmE5K5xs6p0jzhbq9591PW3a+DUV/s7jRYVNYkfJfUXvJ4B64vhuavt6K8u0W8rUBr1TCV6/kz1+kUBD9jHcly+RxhvWmK8Vv8tIm85t3gBiaAb1RPnjx0BDDJJk0UVnlVIbg/gNnWrVjy370IAp7jsZOuCN6XOowHsaZJQK8azd1uB8xVNzUFg73ZHY/VCx+l+nqtpOHXto3rLCGASgL2Mx895dO8RkccdrJvEDRGRlQB+4q3dvT+JZBSSNM6l/ASA/9ULVhqciCOkJQCeRFru68cIdjP39WtKrgcwywDIxYtebpLAba5hSd39QwOEHCtTebfIBEl1MPxSXfEVz027DMBJIrKsSmhgOYATM3LyFtgGH00MR/Q7Zvw+sIFyHKr7+pciMq/J/MtjFFfLnlCY5RX5NbltFL3mP5rYkhMK+wLYJ4+Q5ioQYz9+0cBmlEk+rYTkp6wP8yndcWARea6BDF7J2Vj7/aZUfJKfVwmcmFKDQuu1bGIsyesBHGviHe5+61USLcxCMAObNY7R1QGfvOCueMieaMB0MICpBjFRQAUrANzUqNQ0cDnUu6ZLQH1Qr50UIJnd3jwD4Gmkyb+JKcfpC2BSnAPQBQVH5l/M2MQBWTUqpgYlt6zYUwtYB3IP1gDsFQY4PTUiZSjTAZzhEZGTRmeLyH0kY7/7TV7uXxW426xl1unVnADgO0gz65MCCMkFmV8E8JiqzEm9DEnPG4E0ixsGqUuaJPCKrrnIeqIKyUcNIVmGe2CcwzGWBlSuZih6ZRUOlaWj0i/4MkiWGO/KAAAfURVtsEbCbW1+pJHxAUiLvcYi7SgzaisEWmMloq9gc3ZG7KWiXCwiv6qViJzqHHAOMPB9P5W4H0Har22gctJY4R/p+776v1Ha2+0ghVlR0sit9UkRea9Btc6p9GNNCy0xePomgAHGyVAEMcVI06ley5Dse8YZHKNSlF1gRmezHiQFelltjA41NvdVzjRSAdvmOTVqGV16DCyYi1kiOglpOkzFS/mJAVwrIlfqGssN9nCjqb0ZrWrPQeqQGG3qxeI6JK+DxepAF55mxuImVGdn9wz30sTcnh+uUkl6oBdEP6NCWuaya5wDwARomfp7UdtiV6QJpScrgkiGjVc23izLIGxyrQPGGgDnA/gH5cIsahMcYWjg+CYvgdMR0W2aexg1AnOvIO54hc+RSIvhshDC7q+/XpcT6fLefqH2wXTjGGlWzX+nAGkxxLPp3Wg3dnePoGTgu8Fxq5dLO/WO5LkAvqEuaRiO7mwbq4JUU0O6kXbPvE+lxBIAlxfpYHAITnI80oTR7cymOxXnYbXREmUWbNCVPh7Ad9WtbAkmMR6myOOmeWMt0irZmSJyHcnzC1STgDQRtdkxYBuhZQg/+set3q+ZJABcB+BsQzzWSxOb75epHrsMaQnFOvWErQHwnh4rkKbQv+CaYaik61dwk8IKyWEqcUYEYkUvAJimtkLdWdQm8/twAP+p90i8bPE2jzheV9t3hcJkvX7vYLNabYwlAF43hD2sBbtOSY6avqYgm67m7WhlieTUuauUiMqGcKw4nwPg10jbLC0GsK6O3gttitgDVVVggbGi/gBuQRow9GNFywF8RkTeaMTgNkS0pxLqDgFXeqSE819IexzMB/C260NQ4336qPTeqQXxY0NAZY0A3K1e0fYC4mj4f90g0qhFn1b7xa+xKWmA92sicm9Oq7AQ56I5EkXIcR6BsoBY0Q/VVvERfAOAU0XkqWaCkRrfuyaDiATAlQBmiMiyKq3LgrBRadStrubxLYgm72bs73YismprTyZuXc2OEYCLPWPYIfrjAI4VkeV+Uz/jNq/UEajsKMgGcM6FK5H2nQ7Fiv5GRObU4+bOYDJHADjKc6U7xDpbRG40BLfJuVBrfMXEa3Yy8ZpSC+CGU4FXeJqJex2n6VervZ51PalOtp5qZ9SWPZC6t8UzkDcC+LISUZu2dUqayAWMAPxFgW7uc5H2nA7Fii4SkZsbJSJvTPOQxKk2s0TkRiWgShP3KWmwtAOpqzlpEUJy4xW17wZ5zHZnAGM1104KbvJI1BsMbQEjsgNpQDXxpNEfRORPSnDdTWY2E6nLu8PLn2qUiKbkxIquEpEZjcaKjARNlEgOCLitAeBGE1diAQm9JxcUmC/KcHbzeNUkDdAwEwFwWE/gt2aq99Ws877mKLUyIY32NnBTzlMNqUO1OjMI4AJVExY1ot6ZWNFEpD0BSoFY0UwAX200VhRA7qFIsxRgbLqSeuFeUmRjkw/pcrbjZACPNRk/6gkbuhvAHzOI/AS3hoK6+Yr2t1uANN/uKX3/jDq7BrQiIW0yGjO+LxcYKN0bwKkA7ghwt1BnpCw39+5IY0WDvZT+GGnf6S8F8t6aGf2wudtPKNiKArK+CeAyJaA5XhpOq2g09wQaoLjyio8bW7sIWExB2qFprNqM45A2S1kuImtamZCyCGaXZhISjXu6DcB/II21zMlRfUt5aTmmrmgXo9I5e+VJbK4rKlJfZ4DgCXXjN9nJ1qmpJyiTmavrCEnreBs7HO5G2obaeloTk7vYVJaKUaX7YXPg3DErh5+3tqqN5MaqQGoPAHSQHNhIc3WvH/QMpIWDLyN9lk7fjBZZcU5WehuAnyNtK+XHil4DMEVE3lEJmBTs+l3rIbfL8DhMEajUBBHtBeCH+vVsZCcct2Hb2ElUmL6jiCzGS+v24LMkj9P1NDrPWPftApVA9PoovgbgzlYlJIcYz3uqleP0owCcrgtsq6NkOBYRFzeaAeA8/flnIrLcy8uzHLfdErLXcP/7AP7SBIudQ2QVgKki8nJRDw4wCFQSEdfwHYHaqbOU0VRqVWtcIxhFugkAfoc0U2KF2nc+M6PJa9uWIRLRPViXUUd2A8ndta4qrrdfg543EWlqmvVaOqZ1tYi8SzJqRUJynHse3h8LcAbkv5LsEJEurzVYyRyuPVhJRKhIMobkbABf0+u8BuBa3ZBQ/ld7QFI5u+hSbM64iI1t1K2EbtvqRk0esSEKhyQPZmRF76kbTJ1nZLr9vA8+rlBOGczpatM5R893tYCQVSpkt5X3riQii5DWTJWMVHI4MxLAb0mO1f0v2Q5Eee3IlIgORFoZ2984kJzt+wyA6536l9VFqNs2Oi+ogcZfZ7RmejjnnJmBnm22AcoXa2zqPorkP5Nc5jUknGb+c5vXbopen+rIzOv0jK4yq13zwx5+7L3rOdeV0zNwdi0ZCdqq6lMk7/T25RFtPikkDzG97WwP7l/X2fzEvZ5TUHMWh/z9Taejbq8ZKUm+QnJyzvkS8NT9ve6n33zHNYicZPej1Z8hexWAzxoOY5/INxRpacI5JH+DtMfEUpUs7aqajFcPzpHY3Oa2U3+fISK3kmzX9sYrAjVZkfEelpRL7aG9JKwd4t7PA9CP5JkF53mVVDr/TucQqcT7LYDPeClUTsWcCuBoRfb7keYhOltnsEqdCUizI/bH5qz4NqRJv2e6tr4k1yhcB3jSadC2jDG5pjQisp7kqQAeQBqQLZuixUTNgdtJ/l5t2rkA3tF4Hr2WzUcBOB1p0aeNX9pM+vO0/3nVlsXbVCJ5nPc7XkdOBtpm2ScZdAb+S/O0B/dEjC06a5pGlGWPs51pAO3aMYdaMff0eMU1UTTqyUfNs4SyJJPlzu4xLuUALDea51lN8tqp7WqeAGLhPl89Wll9CXtUIgVwZYL2QfTbWyfekzhW6aNh7lDJfRfJZ7xH9YS6y5LkhaG5x61djsQIwCXKPad6nhn7PNjElJJbp4WNq7jfpovIJaYLEU1pfcgW2NUzsMs5xX89URDpOOJa30MnIktInqZ6fD/j9NjiGawGZn0C9UrWqbIQwGmuu4+B9wq9/3Bv7TupdNuAbZztoNLhCZJHIi1G7PCeWmIzH4YgzQxBRixOPK0kVjf7+SIyM+RAKrWQly4UwU807f8UVaciDyiJeTKFJYzExBPa9FiopQuXOA7mxXVexPsfPwJVD1FHl6KoB48Q8typnsMlBg6Jx3QiDzYV475v0/c/BnC4bZFlVScvYO1gPQybCy2lnty0HiCmis57EdLcycs1TBAH9iwxcKgYXEq8PXbn3gpgUhYRwX/KtXcUXcQlGQHFqAYduEtE/g7A8UirWju9cmgfyUvmETJPaCnGQSJyu0uKDXTWeR5pig1sJjmACaq+VLz5JjmwK/qohjz3AZiI9DlDb5j158GmpIh2iyLJWSbmVQkw2/neul3w+eAcQooCpSs9xsAVHiUR2SAil6nUma72YcWsu2TgEHnfO7i9rTb4oSLyOZX+maEMyfAyEenDblc1m0Fr0vF3M4FL2+xxhYg8VOvDxvTzoUj7wh2CtFXUUOWs3WpQL0KahzUHwIMisjHrYdBmfm3aMGQ7QzQlpBWXc0Vkg/5/iP6PW6lilObZSQ+EEl69vg0jFDZHI33w8EhTlr0eabHfAgD/g7Rj7YteAxVmwMc5J8pm/2IAS0TkaYsn5pyJKrX8PV8gIi/1QHZ21sO6BwH4c22M8gmkaT7DNbQhSCsKXOX0kxpaeEBE3rY2WF5Q/f8A+sPWaxtSi6gAAAAASUVORK5CYII=" alt="nazaré" width="75" height="17"></a><span class="bl">Research</span></div>
+  <img class="hmark" src="data:image/png;base64,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" alt="" aria-hidden="true" width="480" height="144">
+  <div class="in">
+  <p class="eyebrow">As of 25 November 2026</p>
+  <h1>Compute venues: <span class="hl">the Epilogue order book</span></h1>
+  <p class="lead">A companion page to the Nazaré compute report. It reads the Epilogue order book and other places to buy and sell compute, on 25 Nov 2026.</p>
+  <p class="meta"><a href="/compute/">Back to the compute report</a></p>
+  </div>
+  <svg class="hwave" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true"><path d="M0,26 C360,58 720,0 1080,26 C1260,38 1350,32 1440,26" fill="none" stroke="#00aaff" stroke-opacity=".35" stroke-width="1.5" vector-effect="non-scaling-stroke"/><path d="M0,40 C320,66 680,14 1040,40 C1220,52 1330,46 1440,40" fill="none" stroke="#0088cc" stroke-opacity=".22" stroke-width="1.2" vector-effect="non-scaling-stroke"/></svg>
+</header>
+<div id="barmark"></div>
+<div class="bar">
+  <div class="find"><input id="q" type="search" placeholder="Search a company, place or figure" aria-label="Search the whole report" autocomplete="off" enterkeyhint="search"><button type="button" class="btn" id="qc" hidden>Clear</button></div>
+  <div class="tabs" role="tablist" aria-label="Sections"><button type="button" class="tab on" role="tab" id="t-epilogue" data-t="epilogue" aria-controls="p-epilogue" aria-selected="true">Epilogue</button></div>
+  <div class="count" id="qn" aria-live="polite"></div>
+</div>
+<section class="panel" id="p-epilogue" role="tabpanel" aria-labelledby="t-epilogue"><h2>Epilogue order book and other venues</h2><p class="hint">Disclosure: Nazaré Ventures is an investor in Epilogue, a market maker for compute, and in Vast.ai, a compute cloud.</p><div class="card viz">
+    <h3>Buyers outnumber sellers for every asset on Epilogue</h3>
+    <p class="sub">Order book listings by asset, 25 Nov 2026</p>
+    <div class="legend"><span><i class="sw s1"></i>Sell listings</span><span><i class="sw s2"></i>Buy listings</span></div>
+    <svg viewBox="0 0 500 246" role="img" aria-label="Bar chart of Epilogue order book listings by asset on 25 Nov 2026. Buy listings exceed sell listings for every asset. B300: 35 buy, 13 sell."><text class="cat" x="76" y="23" text-anchor="end">B300</text><rect class="bar s1" x="84" y="8" width="141.9" height="11" rx="2"><title>B300: 13 sell listings</title></rect><text class="val" x="230.9" y="17.5">13</text><rect class="bar s2" x="84" y="21" width="382" height="11" rx="2"><title>B300: 35 buy listings</title></rect><text class="val" x="471" y="30.5">35</text><text class="cat" x="76" y="57" text-anchor="end">B200</text><rect class="bar s1" x="84" y="42" width="32.7" height="11" rx="2"><title>B200: 3 sell listings</title></rect><text class="val" x="121.7" y="51.5">3</text><rect class="bar s2" x="84" y="55" width="43.7" height="11" rx="2"><title>B200: 4 buy listings</title></rect><text class="val" x="132.7" y="64.5">4</text><text class="cat" x="76" y="91" text-anchor="end">H200</text><rect class="bar s1" x="84" y="76" width="10.9" height="11" rx="2"><title>H200: 1 sell listings</title></rect><text class="val" x="99.9" y="85.5">1</text><rect class="bar s2" x="84" y="89" width="54.6" height="11" rx="2"><title>H200: 5 buy listings</title></rect><text class="val" x="143.6" y="98.5">5</text><text class="cat" x="76" y="125" text-anchor="end">H100</text><rect class="bar s1" x="84" y="110" width="10.9" height="11" rx="2"><title>H100: 1 sell listings</title></rect><text class="val" x="99.9" y="119.5">1</text><rect class="bar s2" x="84" y="123" width="21.8" height="11" rx="2"><title>H100: 2 buy listings</title></rect><text class="val" x="110.8" y="132.5">2</text><text class="cat" x="76" y="159" text-anchor="end">Hardware</text><rect class="bar s1" x="84" y="144" width="32.7" height="11" rx="2"><title>Hardware: 3 sell listings</title></rect><text class="val" x="121.7" y="153.5">3</text><rect class="bar s2" x="84" y="157" width="76.4" height="11" rx="2"><title>Hardware: 7 buy listings</title></rect><text class="val" x="165.4" y="166.5">7</text><text class="cat" x="76" y="193" text-anchor="end">Other</text><rect class="bar s1" x="84" y="178" width="10.9" height="11" rx="2"><title>Other: 1 sell listings</title></rect><text class="val" x="99.9" y="187.5">1</text><rect class="bar s2" x="84" y="191" width="65.5" height="11" rx="2"><title>Other: 6 buy listings</title></rect><text class="val" x="154.5" y="200.5">6</text><text class="cat" x="76" y="227" text-anchor="end">Colocation</text><rect class="bar s1" x="84" y="212" width="131" height="11" rx="2"><title>Colocation: 12 sell listings</title></rect><text class="val" x="220" y="221.5">12</text><rect class="bar s2" x="84" y="225" width="229.2" height="11" rx="2"><title>Colocation: 21 buy listings</title></rect><text class="val" x="318.2" y="234.5">21</text></svg>
+    <p class="note">Colocation means space and power without chips. Listings are asks and bids, not trades.</p>
+  </div><div class="card viz">
+    <h3>B300 sell prices fall as the contract gets longer</h3>
+    <p class="sub">Epilogue offers, dollars per GPU-hour, 25 Nov 2026</p>
+    <div class="scroll"><table class="num">
+      <thead><tr><th>Term</th><th>Price</th><th>Detail</th></tr></thead>
+      <tbody>
+        <tr><td>3 months</td><td>$8.35</td><td>8 servers, Iceland</td></tr>
+        <tr><td>6 months</td><td>$7.30</td><td>4 to 8 servers, Spain</td></tr>
+        <tr><td>12 months</td><td>$6.30 to $6.60</td><td>US and unnamed sites</td></tr>
+        <tr><td>18 months</td><td>$6.25</td><td>Spain</td></tr>
+        <tr><td>36 months</td><td>$5.15 to $5.20</td><td>2 to 32 servers</td></tr>
+        <tr><td>36 to 60 months</td><td>$4.15 to $4.35</td><td>16 to 44 servers, US</td></tr>
+        <tr><td>48 months</td><td>$4.60</td><td>128 servers</td></tr>
+        <tr><td>60 months</td><td>$5.05</td><td>16 servers, US</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">Bids with a price run from $4.80 for 36 months to $7.50 for terms up to 12 months. One server holds 8 GPUs.</p>
+  </div><p class="hint">Tap a column heading to sort a table. Swipe a wide table sideways.</p><div class="card doc"><h3 class="st">What the Epilogue site and other venues show</h3><div class="sub"><p>Epilogue&#x27;s public order book showed 80 buy listings against 34 sell listings on 25 Nov 2026. The gap is widest for the newest chip, the B300, with 35 bids against 13 offers.</p></div><div class="sub"><h4>Epilogue order book, 25 Nov 2026</h4><div class="scroll"><table class="dt fit"><thead><tr><th><button type="button" class="sortb">Asset</button></th><th><button type="button" class="sortb">Sell listings</button></th><th><button type="button" class="sortb">Buy listings</button></th></tr></thead><tbody><tr><td>B300</td><td>13</td><td>35</td></tr><tr><td>B200</td><td>3</td><td>4</td></tr><tr><td>H200</td><td>1</td><td>5</td></tr><tr><td>H100</td><td>1</td><td>2</td></tr><tr><td>Hardware</td><td>3</td><td>7</td></tr><tr><td>Other</td><td>1</td><td>6</td></tr><tr><td>Colocation (space and power)</td><td>12</td><td>21</td></tr><tr><td>Total</td><td>34</td><td>80</td></tr></tbody></table></div><p>Source: <a href="https://epilogue.inc/orderbook" target="_blank" rel="noopener">epilogue.inc/orderbook</a>, read 25 Nov 2026. The page states 4,952 GPUs for rent. Listings are asks and bids, not trades.</p></div><div class="sub"><h4>B300 sell prices by contract length</h4><p>A node is one server with 8 GPUs. Prices are dollars per GPU-hour.</p><div class="scroll"><table class="dt fit"><thead><tr><th><button type="button" class="sortb">Term</button></th><th><button type="button" class="sortb">Price</button></th><th><button type="button" class="sortb">Detail</button></th></tr></thead><tbody><tr><td>3 months</td><td>$8.35</td><td>8 nodes, Iceland, from 27 Nov 2026</td></tr><tr><td>6 months</td><td>$7.30</td><td>4 to 8 nodes, Spain, mid-Dec 2026</td></tr><tr><td>12 months</td><td>$6.30 to $6.60</td><td>US and unnamed sites, Dec 2026 to Jan 2027</td></tr><tr><td>18 months</td><td>$6.25</td><td>Spain</td></tr><tr><td>36 months</td><td>$5.15 to $5.20</td><td>2 to 32 nodes, one site in Iceland</td></tr><tr><td>36 to 60 months</td><td>$4.15 to $4.35</td><td>16 to 44 nodes, US, Dec 2026 to Feb 2027</td></tr><tr><td>48 months</td><td>$4.60</td><td>128 nodes</td></tr><tr><td>60 months</td><td>$5.05</td><td>16 nodes, US, Feb 2027</td></tr></tbody></table></div></div><div class="sub"><h4>What the bids say</h4><ul class="rl"><li>B300 bids with a price run from $4.80 (4 nodes, 36 months, US) to $7.50 (1 node, up to 12 months, Europe). One bid offers $6.75 for 32 nodes for 6 months.</li><li>Most bids give no price.</li><li>A 36-month US bid at $4.80 sits above the cheapest long offers at $4.15 to $4.35. Price does not block long contracts. Size, start date and buyer credit are the likely blocks (my reading).</li><li>Epilogue&#x27;s 12-month B300 offers ($6.30 to $6.60) sit below the public 12-month median of $7.18 and far below on-demand at $9.50.</li><li>Older chips show a wide gap. For the H100, one offer asks $3.40 and one bid pays $2.40, both for 12 months.</li><li>H200: one offer at $3.90 in Japan, bids from $2.85 to $3.80. B200: offers from $5.25 to $7.50, bids from $5.00 to $6.20.</li><li>One buyer wants 1,000 H100 chips for 12 months. One wants 800 B200 chips for 36 months in Europe.</li><li>Colocation bids run from 0.2 MW to 100 MW, and four ask for 20 MW or more. Two offers show a price: $110 per kW a month for 1.5 MW, and $175 per kW a month for 8.45 to 18.24 MW in Mississippi on a 10-year term.</li><li>European supply on the book: B300 in Spain and Iceland, B200 in Sweden at $6.55 for 12 months, and 6 MW of colocation for July 2027. European demand: three bids.</li></ul></div><div class="sub"><h4>Epilogue&#x27;s own statements, not verified</h4><ul class="rl"><li>The book has carried &quot;billions&quot; in contract value and has 150+ suppliers.</li><li>Sellers offer clusters of 2 to 64 nodes on 1 to 3 year terms, plus idle H100 and H200 nodes.</li><li>Buyers get month-to-month to 12-month terms, one standard contract, resale rights and a 2-day test with escrow.</li><li>The site names Cisco and Deloitte as partners.</li></ul><p>The <a href="https://epilogue.inc/" target="_blank" rel="noopener">home</a>, <a href="https://epilogue.inc/research" target="_blank" rel="noopener">research</a> and <a href="https://epilogue.inc/partnerships" target="_blank" rel="noopener">partnerships</a> pages carry no price or volume data.</p></div><div class="sub"><h4>Other venues</h4><div class="scroll"><table class="dt fit"><thead><tr><th><button type="button" class="sortb">Venue</button></th><th><button type="button" class="sortb">What it measures</button></th><th><button type="button" class="sortb">Reading</button></th></tr></thead><tbody><tr><td><a href="https://data.ornn.com/" target="_blank" rel="noopener">Ornn Compute Price Index</a></td><td>Volume-weighted executed rentals, set daily. Listed on Bloomberg. ICE has a futures contract spec for Q4 2026</td><td>H100 at $3.16 on 24 Nov 2026</td></tr><tr><td><a href="https://www.silicondata.com/products/silicon-index/h100" target="_blank" rel="noopener">Silicon Data</a></td><td>Daily neocloud list prices</td><td>H100 at $3.10 on 22 Nov 2026</td></tr><tr><td><a href="https://rentservers.com/gpu-price-tracker/" target="_blank" rel="noopener">GetDeploying, via RentServers</a></td><td>Median public list price across 19 to 46 providers</td><td>See the rental table above</td></tr><tr><td><a href="https://computecensus.com/gpu-prices/" target="_blank" rel="noopener">Compute Census</a></td><td>13 chips, 36 providers</td><td>On-demand medians on 6 Nov 2026: H200 $4.80, B200 $6.90, A100 $1.75</td></tr><tr><td><a href="https://gpurentalprices.com/gpu-price-index/2026-11" target="_blank" rel="noopener">GPU Rental Prices</a></td><td>Daily list-price index, set to 100 on 5 Jul 2026</td><td>111.24 for November 2026 to date</td></tr></tbody></table></div></div></div><div class="pager"><button type="button" class="btn" disabled>Back</button><button type="button" class="btn" disabled>Next</button></div></section>
+<footer class="foot"><p>Published by <a href="https://nazare.io">Nazaré Ventures</a> on 25 November 2026. Figures come from the sources named on this page and in the Sources tab of the compute report. Company statements are not audited.</p><p>Disclosure: Nazaré Ventures is an investor in Epilogue, a market maker for compute, and in Vast.ai, a compute cloud.</p><p>This page is research. It is not investment advice or an offer of any security.</p></footer>
+</main>
+<script type="application/json" id="data">{"la":[{"n":"São Paulo","k":"m","st":"mk","u":"","s":"536.7 MW leased inventory","d":"Vacancy 9.6%. Largest market in the region (CBRE, Q1 2026). Brazil had 706 MW in Aug 2026, about half of the region, with vacancy of 4% (JLL)."},{"n":"Querétaro, Mexico","k":"m","st":"mk","u":"","s":"298.2 MW leased inventory","d":"Vacancy 10.6%. Up 450% in a year. It took 213 MW of the region's 270.7 MW of new leasing (CBRE). Odata built a 72 MW site on a campus planned for 300 MW (JLL)."},{"n":"Santiago, Chile","k":"m","st":"mk","u":"","s":"165.8 MW leased inventory","d":"Vacancy 3.3%. Leads the region in hyperscaler-owned capacity (CBRE). The grid coordinator counts 359 MW connected or in connection in 2026 and 3,429 MW of projects for 2034."},{"n":"Bogotá, Colombia","k":"m","st":"mk","u":"","s":"44.3 MW leased inventory","d":"Vacancy 18.7%. 360 MW planned across 31 projects (CBRE)."},{"n":"Scala AI City, Eldorado do Sul, Brazil","k":"p","st":"plan","u":"Scala Data Centers","s":"54 MW first, up to 4.75 GW","d":"Planned. Seeking tenants. Scala has 220 MW in construction elsewhere (JLL)."},{"n":"Rio AI City, Rio de Janeiro, Brazil","k":"p","st":"plan","u":"Elea Data Centers","s":"Up to 1.5 GW by 2028","d":"Planned."},{"n":"Pecém, Ceará, Brazil","k":"p","st":"con","u":"ByteDance, with Casa dos Ventos","s":"300 MW","d":"In construction at July 2026 (Bloomberg)."},{"n":"Stargate Argentina, Patagonia","k":"p","st":"plan","u":"Sur Energy. OpenAI signed a letter of intent","s":"Up to 500 MW, $25B","d":"No construction one year after the announcement (Chequeado). The source names Patagonia, not a site, so the dot is placed in the region."}],"af":[{"n":"Johannesburg and South Africa","k":"m","st":"mf","u":"","s":"About 350 MW of live IT load in South Africa","d":"South Africa holds more than 60 percent of Africa's capacity. Equinix committed about $438M in Apr 2026 for 160 MW more. Announced expansions would take IT load above 1,200 MW (Daily Maverick)."},{"n":"Teraco Isando, Johannesburg","k":"p","st":"run","u":"Teraco","s":"70 MW","d":"Running. The largest site in Africa."},{"n":"Equinix Cape Town","k":"p","st":"plan","u":"Equinix","s":"174 MW plan","d":"A court challenge opened in Aug 2026 (BISI, 16 Nov 2026)."},{"n":"Lagos, Nigeria","k":"m","st":"mf","u":"","s":"78.6 MW","d":"Forecast to pass 218 MW by 2030. Nigeria's installed capacity is 28 MW to about 197 MW, by source (Regenerative Africa Consulting, S&P Global Ratings)."},{"n":"Egypt","k":"m","st":"mf","u":"","s":"15 to 20 MW of IT load, or about 60 MW in 14 sites, by source","d":"Estimates (Stratexis, 2026)."}],"ca":[{"n":"Toronto","k":"m","st":"mk","u":"","s":"More than 378 MW","d":"Largest hub in Canada, about a third of the national total (Arizton)."},{"n":"Calgary","k":"m","st":"mf","u":"","s":"Pipeline 15.3 times live capacity","d":"datacenterHawk. Alberta's grid can connect 1.2 GW of new data center load by 2028 (AESO, via TD Economics)."},{"n":"Sturgeon County, Alberta","k":"p","st":"con","u":"Meta","s":"1 GW, $9.17B (C$13B), can grow to 1.8 GW","d":"Announced 8 Jul 2026. Runs mostly on gas (DCD). Alberta lists it as under construction."},{"n":"Near Calgary, Alberta","k":"p","st":"plan","u":"Amazon","s":"About $4.3B","d":"Planned (CBRE, cited by Data Center Frontier). Power not published. Dot size is a placeholder."}],"us":[{"n":"Northern Virginia","k":"m","st":"mk","u":"","s":"4,496.5 MW leased","d":"Vacancy 0.2%, with 10.8 MW free. 2,420 MW in construction. Asking rent $190 to $235 per kW a month. JLL counts nearly 7 GW with hyperscaler sites."},{"n":"Atlanta","k":"m","st":"mk","u":"","s":"1,803 MW leased","d":"Vacancy 1.6%. 2,882 MW in construction, the most of any market. Asking rent $185 to $200 per kW a month."},{"n":"Dallas-Fort Worth","k":"m","st":"mk","u":"","s":"1,433 MW leased","d":"Vacancy 2.8%. 768 MW in construction. Asking rent $160 to $185 per kW a month."},{"n":"Chicago","k":"m","st":"mk","u":"","s":"911 MW leased","d":"Vacancy 2.2%. 707 MW in construction, 646 MW preleased. Asking rent $195 to $225 per kW a month."},{"n":"Phoenix","k":"m","st":"mk","u":"","s":"1,069 MW leased","d":"Vacancy 1.1%. 248 MW in construction (CBRE). JLL counts 1,700 MW with hyperscaler sites."},{"n":"Hillsboro, Oregon","k":"m","st":"mk","u":"","s":"491 MW leased","d":"Vacancy 0.2%, with 1.1 MW free. 170 MW in construction. City paused new projects."},{"n":"Silicon Valley","k":"m","st":"mk","u":"","s":"509 MW leased","d":"Vacancy 4.2%. Asking rent $200 to $275 per kW a month, the highest of the eight markets."},{"n":"New York Tri-State","k":"m","st":"mk","u":"","s":"190 MW leased","d":"Vacancy 7.2%. Rent for 10 MW and above rose 19% in H1 2026."},{"n":"PORTS-Pike, Piketon, Ohio","k":"p","st":"plan","u":"OpenAI, SB Energy","s":"8 GW IT, 4.25 GW first","d":"Announced Aug 2026. Phases from 2028."},{"n":"Pecos County, Texas","k":"p","st":"plan","u":"AWS, Pacifico Energy","s":"Gas plant permitted for 7.65 GW","d":"Planned. The figure is power supply, not IT load."},{"n":"Project Matador, Carson County, Texas","k":"p","st":"con","u":"Fermi America, no tenant named","s":"Permits for 6 GW of generation","d":"Turbines arriving. The figure is power supply, not IT load."},{"n":"Hyperion, Richland Parish, Louisiana","k":"p","st":"con","u":"Meta, Blue Owl","s":"5 GW at full build, $50B+","d":"In construction. No live load yet. Epoch projects 1,632 MW IT by Jan 2028."},{"n":"Homer City, Pennsylvania","k":"p","st":"plan","u":"AWS (reported)","s":"Gas plant up to 4.4 GW","d":"Plan for 36 buildings filed. The figure is power supply, not IT load."},{"n":"Project Camellia, Effingham County, Georgia","k":"p","st":"plan","u":"OpenAI","s":"3.2 GW utility supply, $20B","d":"Site plan approved 17 Nov 2026. Lawsuit open."},{"n":"Project Jupiter, Doña Ana County, New Mexico","k":"p","st":"con","u":"OpenAI, Oracle, Stack","s":"About 2.2 GW (Epoch est.)","d":"In construction. Air permit hearing pulled 6 Nov 2026."},{"n":"Pecos, Reeves County, Texas","k":"p","st":"plan","u":"Microsoft","s":"About 2 GW","d":"Announced. On-site gas."},{"n":"Sweetwater, Texas","k":"p","st":"plan","u":"IREN, no tenant named","s":"2 GW","d":"1.4 GW substation energized."},{"n":"Colossus 2, Memphis, Tennessee","k":"p","st":"run","u":"SpaceX (xAI), Anthropic","s":"946 MW IT running (Epoch est.), about 2 GW cluster planned","d":"Largest AI site by compute: 1.11M H100-equivalents. Epoch projects 1,531 MW by Feb 2027. Colossus 1 next door is leased to Anthropic."},{"n":"Helios, Dickens County, Texas","k":"p","st":"run","u":"CoreWeave, Galaxy","s":"1.6 GW approved power","d":"132 MW IT running (Epoch est.). 528 MW in 2029."},{"n":"Frontier, Shackelford County, Texas","k":"p","st":"con","u":"OpenAI, Oracle, Vantage","s":"1.4 GW, $25B+","d":"In construction."},{"n":"Saline Township, Michigan","k":"p","st":"con","u":"OpenAI, Oracle, Related Digital","s":"About 1.4 GW, $16B","d":"In construction."},{"n":"Stargate Abilene, Texas","k":"p","st":"run","u":"OpenAI, Oracle, Crusoe","s":"1.2 GW","d":"Running. About 824 MW IT live (Epoch est.), 618 MW confirmed by Oracle. A 900 MW extension goes to Microsoft."},{"n":"Milam County, Texas","k":"p","st":"con","u":"OpenAI, SB Energy","s":"1.2 GW","d":"In construction."},{"n":"Project Rainier, New Carlisle, Indiana","k":"p","st":"run","u":"Anthropic, AWS","s":"1,037 MW IT running (Epoch est.)","d":"About 18 of 30 buildings run. $13.8B spent. Epoch projects 1,925 MW by Mar 2028."},{"n":"Lighthouse, Port Washington, Wisconsin","k":"p","st":"con","u":"OpenAI, Oracle, Vantage","s":"About 1 GW IT, $15B","d":"In construction. Opens 2028."},{"n":"Prometheus, New Albany, Ohio","k":"p","st":"run","u":"Meta","s":"471 MW IT running (Epoch est.), 1 GW planned","d":"Epoch projects 1,022 MW by Jul 2028."},{"n":"El Paso, Texas","k":"p","st":"con","u":"Meta","s":"1 GW, $10B","d":"In construction. Online 2028."},{"n":"Lebanon, Indiana","k":"p","st":"con","u":"Meta","s":"1 GW, $10B+","d":"In construction."},{"n":"Armstrong County, Texas","k":"p","st":"con","u":"Google, Crusoe","s":"1,006 MW IT by Oct 2027 (Epoch est.)","d":"In construction."},{"n":"Project Spade, New Florence, Missouri","k":"p","st":"con","u":"Google","s":"1 GW+ contracted power, $15B","d":"In construction."},{"n":"Van Buren Township, Michigan","k":"p","st":"plan","u":"Google, Panattoni","s":"1 GW","d":"Site plan approved."},{"n":"Hamlet, North Carolina","k":"p","st":"con","u":"AWS","s":"About 1 GW, $10B","d":"In construction. Air permits issued."},{"n":"Fort Wayne, Indiana","k":"p","st":"con","u":"Google","s":"About 863 MW IT (Epoch est.)","d":"In construction."},{"n":"Childress, Texas","k":"p","st":"run","u":"Microsoft, IREN","s":"750 MW site, $9.7B contract","d":"Running in part."},{"n":"Cheyenne, Wyoming","k":"p","st":"plan","u":"Google","s":"702 MW fuel-cell plant, $17B","d":"Announced Nov 2026."},{"n":"Fairwater Atlanta, Fayetteville, Georgia","k":"p","st":"run","u":"Microsoft","s":"636 MW IT (Epoch est.)","d":"Running. 769,000 H100-equivalents."},{"n":"Cedar Rapids, Iowa","k":"p","st":"con","u":"Meta, QTS","s":"1,133 MW IT by Nov 2027 (Epoch est.)","d":"Commissioning the first buildings. Meta is the user in the Epoch file."},{"n":"Pryor, Oklahoma","k":"p","st":"run","u":"Google","s":"368 MW IT running (Epoch est.)","d":"Running. 637,000 H100-equivalents."},{"n":"Lake Mariner, Barker, New York","k":"p","st":"run","u":"Anthropic, Fluidstack, TeraWulf","s":"440 MW IT contracted","d":"210 MW IT running (Epoch est.). TeraWulf reported 102 MW at 30 Sep 2026."},{"n":"Hawesville, Kentucky","k":"p","st":"con","u":"Anthropic, TeraWulf","s":"401 MW, $19B lease over 20 years","d":"In construction. First capacity H2 2027. TeraWulf calls it the Justified campus. Google gives credit support."},{"n":"Polaris Forge 1, Ellendale, North Dakota","k":"p","st":"run","u":"CoreWeave, Applied Digital","s":"400 MW IT","d":"175 MW live (company, Jul 2026). Epoch counts 68 MW in use. Full 400 MW by Jun 2027."},{"n":"Fairwater, Mount Pleasant, Wisconsin","k":"p","st":"run","u":"Microsoft","s":"369 MW IT running (Epoch est.)","d":"Second building in construction. Epoch projects 2,263 MW by May 2028."},{"n":"Lordstown, Ohio","k":"p","st":"con","u":"OpenAI, SoftBank","s":"About 214 MW IT (Epoch est.)","d":"In construction."},{"n":"Red Clay, Lowndes County, Alabama","k":"p","st":"plan","u":"Lambda","s":"$33.1B, size not disclosed","d":"Proposed Nov 2026. Construction from Q1 2027. Dot size is a placeholder."},{"n":"Monarch Compute Campus, Mason County, West Virginia","k":"p","st":"plan","u":"Nscale. Anthropic takes 460 MW","s":"2 GW gross, 1.37 GW IT by H1 2028 (S-1)","d":"Acquired 31 Mar 2026. Anthropic pays up to $44.6B. Plan of 8 GW gross by 2031."},{"n":"Delta Forge 1, Boyce, Louisiana","k":"p","st":"plan","u":"Applied Digital, unnamed hyperscaler","s":"300 MW IT, $7.5B over 15 years","d":"Lease signed. Operations due in 2027."},{"n":"Polaris Forge 2, Harwood, North Dakota","k":"p","st":"con","u":"Applied Digital, unnamed hyperscaler","s":"200 MW IT in the first phase","d":"In construction."},{"n":"Denton, Texas","k":"p","st":"run","u":"CoreWeave, Core Scientific","s":"262 MW IT running (Epoch est.)","d":"Core Scientific bills CoreWeave for 485 MW across its sites."}],"eu":[{"n":"London","k":"m","st":"mk","u":"","s":"Vacancy 6.5% (Q3 2026)","d":"Largest hub, with 1,338 MW leased at Q1. 146 MW of new leased supply and 187 MW of take-up forecast for 2026."},{"n":"Frankfurt","k":"m","st":"mk","u":"","s":"1,222.5 MW leased (Q1 2026)","d":"Very little free stock. No new supply in Q3 2026. Take-up forecast of 119 MW for 2026, half of 2025. Grid connection takes 24 months or more."},{"n":"Paris","k":"m","st":"mk","u":"","s":"50 MW taken in Q3 2026","d":"Second highest take-up of the hubs in Q3. 48 MW of new supply in the quarter."},{"n":"Amsterdam","k":"m","st":"mk","u":"","s":"5 MW taken in Q3 2026","d":"No free supply. Groningen takes more in some quarters."},{"n":"Dublin","k":"m","st":"mk","u":"","s":"Most take-up of the hubs in Q3 2026","d":"One hyperscaler filled vacant space on one campus. Data centers used 23.2% of Irish metered electricity in 2025. A court challenge to the regulator slows new sites."},{"n":"Milan","k":"m","st":"mk","u":"","s":"255 MW of new supply in 2027 and 2028","d":"CBRE expects Milan to pass Dublin as the fifth largest market in 2028. It took 82% of secondary-market take-up in Q3 2026."},{"n":"Lisbon","k":"m","st":"mk","u":"","s":"Just over 50 MW","d":"Small market with rising interest from occupiers and developers (CBRE)."},{"n":"Campus IA, Fouju, France","k":"p","st":"plan","u":"MGX, Bpifrance, Mistral AI, Nvidia","s":"Up to 1.4 GW","d":"Planned. 12 buildings on 70 hectares."},{"n":"Sines Data Campus, Portugal","k":"p","st":"run","u":"Start Campus. Nscale for Microsoft","s":"33 MW IT live, 233 MW by Sep 2027 (Epoch est.). 1.2 GW planned","d":"Nscale bought the second building (200 MW) in Apr 2026 for Microsoft. 66,000+ Rubin GPUs from late 2027."},{"n":"Bosquel, France","k":"p","st":"plan","u":"SoftBank, Sesterce","s":"1 GW","d":"Planned. Announced 31 May 2026."},{"n":"Strängnäs, Sweden","k":"p","st":"plan","u":"Brookfield","s":"750 MW, $10B","d":"Announced."},{"n":"Escaudain, France","k":"p","st":"plan","u":"Data4 (Brookfield)","s":"700 MW, $5.8B","d":"Confirmed 15 Jun 2026. Studies run for a year."},{"n":"Seinäjoki, Finland","k":"p","st":"plan","u":"Pure DC","s":"550 MW+ IT","d":"Announced 14 Jul 2026. Access to 700 MVA of renewable power."},{"n":"North Lanarkshire, Scotland","k":"p","st":"plan","u":"DataVita","s":"500 MW","d":"AI Growth Zone designated."},{"n":"Narvik (Kvandal), Norway","k":"p","st":"con","u":"Nscale for Microsoft","s":"230 MW, option for 290 MW more","d":"In construction. Epoch projects 92 MW by the end of 2026. OpenAI did not sign. Microsoft took 30,000+ Rubin GPUs in Apr 2026."},{"n":"N01, Agder, Norway","k":"p","st":"run","u":"Bulk. CoreWeave for OpenAI","s":"42 MW IT live (Epoch est.), 300 MW planned","d":"CoreWeave runs the first load for OpenAI."},{"n":"Aragon AI campus, Spain","k":"p","st":"con","u":"Microsoft","s":"300 MW, $7.5B+","d":"In construction at mid-2026."},{"n":"Calatorao, Aragon, Spain","k":"p","st":"plan","u":"QTS (Blackstone)","s":"300 MW first phase","d":"First phase due to start in Q2 2026."},{"n":"Sollefteå, Sweden","k":"p","st":"plan","u":"atNorth","s":"300 MW","d":"Planned. Confirmed 23 Feb 2026."},{"n":"Borlänge, Sweden","k":"p","st":"con","u":"EcoDataCenter. Mistral AI leases $1.4B","s":"250 MW","d":"In construction. Epoch projects 48 MW for Mistral AI by Jun 2028."},{"n":"Béthune, France","k":"p","st":"con","u":"Nebius","s":"240 MW, $9.3B","d":"Phases from 2026."},{"n":"Skien, Norway","k":"p","st":"con","u":"Google","s":"240 MW","d":"In construction at mid-2026."},{"n":"Aragon campuses, Spain","k":"p","st":"run","u":"AWS","s":"$39B committed to Spain","d":"One site runs and is being extended. Power not published. Dot size is a placeholder."},{"n":"Lübbenau, Germany","k":"p","st":"con","u":"Schwarz Group","s":"Up to 100,000 GPUs, $12.8B","d":"In construction. Power not published. Dot size is a placeholder."},{"n":"Munich Industrial AI Cloud, Germany","k":"p","st":"run","u":"Deutsche Telekom, Nvidia","s":"10,000 GPUs, $1.2B","d":"Running since Q1 2026."},{"n":"Bruyères-le-Châtel, France","k":"p","st":"run","u":"Mistral AI, Eclairion","s":"40 MW","d":"Ramping up. Fluidstack left in Mar 2026."},{"n":"Loughton, Essex, UK","k":"p","st":"stop","u":"Nscale","s":"50 MW, up to 90 MW","d":"Microsoft left on 18 Oct 2026. Grid power may wait until the 2030s."},{"n":"Stargate UK, Cobalt Park, North Tyneside","k":"p","st":"stop","u":"OpenAI, Nscale","s":"8,000 to 31,000 GPUs","d":"Paused 9 Apr 2026. OpenAI cited energy cost and regulation."},{"n":"Blyth, Northumberland, UK","k":"p","st":"plan","u":"Blackstone","s":"$13.4B","d":"Proposed. Power not published. Dot size is a placeholder."},{"n":"Waltham Cross, Hertfordshire, UK","k":"p","st":"run","u":"Google","s":"88 MW IT running (Epoch est.)","d":"Operational."},{"n":"Mäntsälä, Finland","k":"p","st":"run","u":"Nebius. Microsoft is the user","s":"75 MW IT running, 145 MW by end 2027 (Epoch est.)","d":"Running, expanding."}],"me":[{"n":"Dubai and the UAE","k":"m","st":"mk","u":"","s":"More than 400 MW leased and in operation","d":"Build cost is about $11M per MW in the UAE and $13M in Saudi Arabia (451 Research)."},{"n":"Stargate UAE, Abu Dhabi","k":"p","st":"con","u":"G42 and Khazna. OpenAI, Oracle","s":"1 GW cluster inside a 5 GW campus","d":"No live load on 25 Nov 2026 (Epoch est.). 200 MW projected for Dec 2026 and 1,000 MW by Jan 2028."},{"n":"Khazna sites, Abu Dhabi","k":"p","st":"run","u":"Khazna (G42). Microsoft is a customer","s":"About 300 MW in operation","d":"Almost 370 MW more in construction and commissioning. Microsoft committed $15.2B to the UAE since 2023."},{"n":"Humain first sites, Riyadh and Dammam","k":"p","st":"con","u":"Humain (Saudi public fund)","s":"250 MW due by the end of 2026","d":"Targets: 1.7 GW in 2027, about 3 GW by 2030, 6 GW by 2034. Saudi Arabia had 467 MW in operation in Q1 2026. Also announced, places not stated: 500 MW for xAI, Project Halo (100 MW first), an AWS zone ($5B)."},{"n":"Oxagon, Red Sea coast, Saudi Arabia","k":"p","st":"plan","u":"Humain, DataVolt","s":"About 100 MW first phase","d":"Planned."},{"n":"Ankara, Turkey","k":"p","st":"plan","u":"Khazna","s":"100 MW","d":"Planned at mid-2026."}],"ap":[{"n":"Tokyo","k":"m","st":"mk","u":"","s":"1,473 MW operational (Knight Frank)","d":"CBRE counts 1,086 MW at Q1 2026 and 2,544 MW upcoming. Vacancy 6%."},{"n":"Singapore","k":"m","st":"mk","u":"","s":"1,118 MW operational","d":"Vacancy 2%. 200 MW of new capacity awarded."},{"n":"Sydney","k":"m","st":"mk","u":"","s":"917 MW operational","d":"Pipeline 2,134 MW (Cushman). DC Byte forecasts 7.8 GW. Vacancy 4.5%."},{"n":"Mumbai","k":"m","st":"mk","u":"","s":"890 MW operational","d":"Pipeline 1,726 MW."},{"n":"Greater Seoul","k":"m","st":"mk","u":"","s":"663 MW operational","d":"Vacancy 1.1%."},{"n":"Bangkok","k":"m","st":"mk","u":"","s":"134 MW operational","d":"859 MW in construction and 2,084 MW in the total pipeline."},{"n":"Jakarta","k":"m","st":"mk","u":"","s":"395 MW in construction","d":"1,699 MW in the total pipeline."},{"n":"Hong Kong","k":"m","st":"mk","u":"","s":"Vacancy 18%","d":"The highest vacancy of the main markets."},{"n":"Johor, Malaysia: four tracked sites","k":"p","st":"run","u":"DayOne, Bridge (ByteDance), YTL","s":"1,251 MW IT running (Epoch est.)","d":"DayOne Nusajaya 473 MW, DayOne Kempas 422 MW, Bridge MY06 243 MW for ByteDance, YTL Kulai 113 MW. Johor vacancy is 0.7%."},{"n":"VNET Bayin, Ulanqab, China","k":"p","st":"run","u":"VNET. ByteDance is the user","s":"221 MW IT running, 700 MW by Sep 2027 (Epoch est.)","d":"Running, expanding."},{"n":"Envision Galaxy, Ulanqab, China","k":"p","st":"run","u":"User not named","s":"118 MW IT running, 470 MW by Dec 2027 (Epoch est.)","d":"Running, expanding."},{"n":"Huawei Horinger, China","k":"p","st":"run","u":"Huawei","s":"170 MW IT running, 351 MW by Feb 2028 (Epoch est.)","d":"Running, expanding."},{"n":"Alibaba Zhangbei, China","k":"p","st":"run","u":"Alibaba","s":"169 MW IT running (Epoch est.)","d":"Running."},{"n":"Huawei Wuhu, China","k":"p","st":"run","u":"Huawei","s":"197 MW IT running, 453 MW by Dec 2027 (Epoch est.)","d":"Running, expanding."},{"n":"Batam, Indonesia","k":"p","st":"run","u":"Oracle. Tencent is the user","s":"72 MW IT running (Epoch est.)","d":"Running."},{"n":"Southgate, Melbourne, Australia","k":"p","st":"run","u":"Firmus","s":"41 MW IT running (Epoch est.)","d":"DC Byte forecasts 10.7 GW for Melbourne."},{"n":"Visakhapatnam AI hub, India","k":"p","st":"con","u":"Google, AdaniConneX","s":"1 GW, $15B over 2026 to 2030","d":"In construction."},{"n":"Visakhapatnam cluster, India","k":"p","st":"plan","u":"Reliance","s":"1.5 GW by 2030, $17B","d":"Announced Apr 2026."},{"n":"Jamnagar, India","k":"p","st":"plan","u":"Reliance. Meta leases 168 MW","s":"1 to 3 GW proposed","d":"168 MW in development. The dot is drawn at 1 GW."},{"n":"Ulsan, South Korea","k":"p","st":"con","u":"SK Group, AWS","s":"Plan of 1 GW, $5.2B","d":"In construction. Started at 100 MW. SK says it is near 900 MW."},{"n":"Tomakomai, Hokkaido, Japan","k":"p","st":"con","u":"SoftBank","s":"300 MW","d":"In construction. Opens in fiscal 2026."},{"n":"Sakai, Osaka, Japan","k":"p","st":"plan","u":"SoftBank, OpenAI","s":"150 MW, then 250 MW by 2028","d":"Reported Mar 2025."},{"n":"Akita, Japan","k":"p","st":"plan","u":"Owner not named","s":"300 to 500 MW, $12.6B","d":"Proposed."},{"n":"Kagoshima, Japan","k":"p","st":"plan","u":"GMI Cloud","s":"Gigawatt scale, $12B, by 2030","d":"Proposed. The dot is drawn at 1 GW."},{"n":"S7, Eastern Creek, Sydney","k":"p","st":"plan","u":"NextDC. OpenAI has a memorandum","s":"612 MW","d":"In planning."},{"n":"Kemps Creek, Sydney","k":"p","st":"plan","u":"AirTrunk","s":"1.2 GW","d":"Announced."},{"n":"Marsden Park, Sydney","k":"p","st":"plan","u":"CDC","s":"504 MW","d":"Approved."}],"g":{"d":["2024-01","2024-02","2024-03","2024-04","2024-05","2024-06","2024-07","2024-08","2024-09","2024-10","2024-11","2024-12","2025-01","2025-02","2025-03","2025-04","2025-05","2025-06","2025-07","2025-08","2025-09","2025-10","2025-11","2025-12","2026-01","2026-02","2026-03","2026-04","2026-05","2026-06","2026-07","2026-08","2026-09","2026-10","2026-11","2026-12","2027-01","2027-02","2027-03","2027-04","2027-05","2027-06","2027-07","2027-08","2027-09","2027-10","2027-11","2027-12","2028-01","2028-02","2028-03","2028-04","2028-05","2028-06","2028-07","2028-08","2028-09","2028-10","2028-11","2028-12"],"a":[534,534,534,841,888,935,1007,1200,1381,1506,1852,2015,2100,2376,2687,2774,2944,3954,4186,4263,4635,5603,5932,6757,7433,7605,8375,9268,10373,12172,12568,13393,14039,14697,15122,17080,17144,18682,19339,19519,19729,20327,20817,21287,22302,23384,24545,25026,28595,28869,30296,30436,32102,32299,32532,32703,33259,33539,33679,38176],"u":[473,473,473,780,827,874,946,1139,1320,1405,1698,1811,1852,2128,2365,2452,2460,3427,3579,3656,3855,4823,4961,5736,6058,6230,6885,7701,8749,10405,10801,11501,12048,12374,12640,14091,14155,15693,16350,16530,16740,17314,17687,18157,18493,19575,20736,20819,23588,23728,25155,25295,26961,27134,27367,27367,27923,28203,28343,32840],"now":34,"gl":30,"gr":80,"W":500},"weeks":["2026-05-25","2026-06-01","2026-06-08","2026-06-15","2026-06-22","2026-06-29","2026-07-06","2026-07-13","2026-07-20","2026-07-27","2026-08-03","2026-08-10","2026-08-17","2026-08-24","2026-08-31","2026-09-07","2026-09-14","2026-09-21","2026-09-28","2026-10-05","2026-10-12","2026-10-19","2026-10-26","2026-11-02","2026-11-09","2026-11-16"],"series":[{"n":"H100","v":[2.97,3,3,2.99,3,3.07,3.32,3.08,3.2,3.35,3.38,3.37,3.38,3.37,3.32,3.34,3.34,3.38,3.38,3.49,3.5,3.71,3.83,3.94,3.93,3.97]},{"n":"H200","v":[3.98,4,4,4.29,4.29,4.29,4.29,4.11,4,4.29,4.29,4.47,4.48,4.38,4.4,4.4,4.44,4.44,4.5,4.63,4.88,5,4.88,5,5,4.9]},{"n":"B200","v":[5.5,6.11,6.11,6.67,6.3,6.11,6.7,6.25,6.25,6.19,6.64,6.37,6.79,6.37,6.01,6.25,6.52,6.49,6.79,6.79,7.99,7.99,7.99,8.01,8.13,8.19]},{"n":"B300","v":[8.42,7.67,8.16,7.92,7.99,7.67,8.23,8.18,7.85,7.85,7.99,7.92,7.89,7.87,7.89,7.89,7.87,7.89,8.62,8.99,8.99,8.99,9.15,9.5,9.5,9.5]}],"ST":{"run":"Running, in whole or in part","con":"In construction","plan":"Planned or announced","stop":"Paused or tenant left","mk":"Leased market","mf":"Market or country figure"},"px":{"pl":34,"pr":92,"PW":500}}</script>
+<script>(function () {
+  var D = JSON.parse(document.getElementById('data').textContent);
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function all(sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); }
+
+  function show(map, i) {
+    var p = D[map][i]; if (!p) return;
+    var box = document.getElementById('detail-' + map);
+    if (!box) return;
+    box.textContent = '';
+    box.appendChild(el('h4', '', p.n));
+    var pill = el('span', 'pill');
+    pill.appendChild(el('i', 'sw sw-' + p.st));
+    pill.appendChild(document.createTextNode(D.ST[p.st]));
+    box.appendChild(pill);
+    if (p.u) box.appendChild(el('p', 'who', p.u));
+    box.appendChild(el('p', 'size', p.s));
+    box.appendChild(el('p', 'what', p.d));
+    all('[data-map="' + map + '"][data-i]').forEach(function (g) {
+      g.classList.toggle('sel', g.getAttribute('data-i') === String(i));
+    });
+  }
+
+  function filter(map, f) {
+    all('.pt[data-map="' + map + '"]').forEach(function (g) {
+      var p = D[map][+g.getAttribute('data-i')];
+      g.classList.toggle('off', f !== 'all' && p.k !== 'm' && p.st !== f);
+    });
+    all('[data-chips="' + map + '"] .chip').forEach(function (c) {
+      var on = c.getAttribute('data-f') === f;
+      c.classList.toggle('on', on); c.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  }
+
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest ? e.target.closest('[data-map][data-i]') : null;
+    if (t) {
+      show(t.getAttribute('data-map'), +t.getAttribute('data-i'));
+      if (t.tagName.toLowerCase() === 'tr') {
+        var m = document.getElementById('map-' + t.getAttribute('data-map'));
+        if (m && m.scrollIntoView) m.scrollIntoView({ block: 'center' });
+      }
+      return;
+    }
+    var c = e.target.closest ? e.target.closest('.chip') : null;
+    if (c) filter(c.parentNode.getAttribute('data-chips'), c.getAttribute('data-f'));
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    var t = e.target.closest ? e.target.closest('[data-map][data-i]') : null;
+    if (t) { e.preventDefault(); show(t.getAttribute('data-map'), +t.getAttribute('data-i')); }
+  });
+
+  function first(map, prefix) {
+    for (var i = 0; i < D[map].length; i++) if (D[map][i].n.indexOf(prefix) === 0) return i;
+    return 0;
+  }
+  show('us', first('us', 'Stargate Abilene'));
+  show('eu', first('eu', 'Sines'));
+  show('me', first('me', 'Stargate UAE'));
+  show('ap', first('ap', 'Johor'));
+  show('la', first('la', 'Scala'));
+  show('af', first('af', 'Teraco'));
+  show('ca', first('ca', 'Sturgeon'));
+
+  /* growth chart: crosshair and tooltip */
+  (function () {
+    var gs = document.getElementById('growth'), gh = document.getElementById('growth-hit');
+    var gxh = document.getElementById('gxh'), gt = document.getElementById('gtip'), G = D.g;
+    if (!gs || !gh || !G) return;
+    var mn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    function gmove(ev) {
+      var r = gs.getBoundingClientRect(); if (!r.width) return;
+      var k = G.W / r.width, n = G.d.length, span = G.W - G.gl - G.gr;
+      var i = Math.round(((ev.clientX - r.left) * k - G.gl) / span * (n - 1));
+      i = Math.max(0, Math.min(n - 1, i));
+      var X = G.gl + span * i / (n - 1);
+      gxh.setAttribute('x1', X); gxh.setAttribute('x2', X); gxh.setAttribute('visibility', 'visible');
+      gt.textContent = '';
+      gt.appendChild(el('b', '', mn[+G.d[i].slice(5, 7) - 1] + ' ' + G.d[i].slice(0, 4) + (i > G.now ? ', projected' : '')));
+      [['All sites', G.a, 's1'], ['US sites', G.u, 's2']].forEach(function (s) {
+        var row = el('span');
+        row.appendChild(el('i', 'sw ' + s[2]));
+        row.appendChild(document.createTextNode(s[0] + '  ' + (s[1][i] / 1000).toFixed(1) + ' GW'));
+        gt.appendChild(row);
+      });
+      gt.hidden = false;
+      var px = X / k, w = gt.offsetWidth || 130;
+      gt.style.left = (px + w + 16 > r.width ? Math.max(0, px - w - 10) : px + 10) + 'px';
+    }
+    function ghide() { gt.hidden = true; gxh.setAttribute('visibility', 'hidden'); }
+    gh.addEventListener('pointermove', gmove);
+    gh.addEventListener('pointerdown', gmove);
+    gh.addEventListener('pointerleave', ghide);
+  })();
+
+  /* price chart: crosshair and tooltip */
+  var svg = document.getElementById('price'), hit = document.getElementById('price-hit');
+  var xh = document.getElementById('xh'), tip = document.getElementById('tip');
+  var cls = ['s1', 's2', 's3', 's4'];
+  function fmtWeek(w) {
+    var m = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return 'Week of ' + (+w.slice(8, 10)) + ' ' + m[+w.slice(5, 7) - 1] + ' ' + w.slice(0, 4);
+  }
+  function move(ev) {
+    var r = svg.getBoundingClientRect(); if (!r.width) return;
+    var k = D.px.PW / r.width, n = D.weeks.length, span = D.px.PW - D.px.pl - D.px.pr;
+    var i = Math.round(((ev.clientX - r.left) * k - D.px.pl) / span * (n - 1));
+    i = Math.max(0, Math.min(n - 1, i));
+    var X = D.px.pl + span * i / (n - 1);
+    xh.setAttribute('x1', X); xh.setAttribute('x2', X); xh.setAttribute('visibility', 'visible');
+    tip.textContent = '';
+    tip.appendChild(el('b', '', fmtWeek(D.weeks[i])));
+    for (var s = D.series.length - 1; s >= 0; s--) {
+      var row = el('span');
+      row.appendChild(el('i', 'sw ' + cls[s]));
+      row.appendChild(document.createTextNode(D.series[s].n + '  $' + D.series[s].v[i].toFixed(2)));
+      tip.appendChild(row);
+    }
+    tip.hidden = false;
+    var px = X / k, w = tip.offsetWidth || 130;
+    tip.style.left = (px + w + 16 > r.width ? Math.max(0, px - w - 10) : px + 10) + 'px';
+  }
+  function hide() { tip.hidden = true; xh.setAttribute('visibility', 'hidden'); }
+  if (hit) {
+    hit.addEventListener('pointermove', move);
+    hit.addEventListener('pointerdown', move);
+    hit.addEventListener('pointerleave', hide);
+  }
+})();
+</script>
+<script>(function () {
+  function all(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
+  var tabs = all('.tab'), panels = all('.panel'), cur = 'epilogue';
+  var input = document.getElementById('q'), clearB = document.getElementById('qc'), count = document.getElementById('qn');
+  var mark = document.getElementById('barmark');
+  var names = panels.map(function (p) { return p.id.slice(2); });
+
+  function paint() {
+    panels.forEach(function (p) { p.hidden = p.id !== 'p-' + cur; });
+    tabs.forEach(function (t) {
+      var on = t.getAttribute('data-t') === cur;
+      t.classList.toggle('on', on); t.setAttribute('aria-selected', on ? 'true' : 'false');
+      if (on) { var box = t.parentNode; box.scrollLeft = Math.max(0, t.offsetLeft - (box.clientWidth - t.offsetWidth) / 2 - box.offsetLeft); }
+    });
+  }
+  function go(id, stay) {
+    if (names.indexOf(id) < 0) return false;
+    cur = id;
+    if (document.body.classList.contains('searching')) { input.value = ''; search(); }
+    paint();
+    if (!stay) window.scrollTo(0, mark ? mark.offsetTop : 0);
+    try { history.replaceState(null, '', '#' + id); } catch (e) {}
+    return true;
+  }
+
+  /* search across every paragraph, list item and table row */
+  function search() {
+    var q = input.value.trim().toLowerCase(), on = q.length >= 2;
+    document.body.classList.toggle('searching', on);
+    clearB.hidden = !input.value;
+    if (!on) { all('.hide').forEach(function (el) { el.classList.remove('hide'); }); count.textContent = ''; paint(); return; }
+    var n = 0, secs = 0;
+    panels.forEach(function (p) {
+      var pn = 0;
+      all('.sub', p).forEach(function (s) {
+        var sn = 0, head = s.querySelector('h4'), hm = !!head && head.textContent.toLowerCase().indexOf(q) >= 0;
+        all('p, li, tbody tr', s).forEach(function (el) {
+          var m = hm || el.textContent.toLowerCase().indexOf(q) >= 0;
+          el.classList.toggle('hide', !m); if (m) sn++;
+        });
+        all('.scroll, .rl', s).forEach(function (w) { w.classList.toggle('hide', !w.querySelector('tbody tr:not(.hide), li:not(.hide)')); });
+        s.classList.toggle('hide', !sn); pn += sn;
+      });
+      all('.doc', p).forEach(function (c) { c.classList.toggle('hide', !c.querySelector('.sub:not(.hide)')); });
+      p.hidden = !pn; if (pn) secs++; n += pn;
+    });
+    count.textContent = n ? n + (n === 1 ? ' match in ' : ' matches in ') + secs + (secs === 1 ? ' section' : ' sections') : 'No match. Try a company, a place or a figure.';
+  }
+  input.addEventListener('input', search);
+  clearB.addEventListener('click', function () { input.value = ''; search(); input.focus(); });
+
+  /* sortable tables */
+  function num(s) {
+    var t = s.replace(/,/g, ''), m = t.match(/-?\d+(\.\d+)?/);
+    if (!m || m.index > 14) return null;
+    var v = parseFloat(m[0]), r = t.slice(m.index + m[0].length, m.index + m[0].length + 10);
+    if (/^\s?GW/.test(r)) v *= 1000; else if (/^\s?(T\b|trillion)/.test(r)) v *= 1e6; else if (/^\s?(B\b|billion)/.test(r)) v *= 1000;
+    return v;
+  }
+  function sortBy(th) {
+    var table = th.closest('table'), idx = Array.prototype.indexOf.call(th.parentNode.children, th);
+    var tb = table.tBodies[0], rows = Array.prototype.slice.call(tb.rows);
+    var vals = rows.map(function (r, i) { var c = r.cells[idx], t = c ? c.textContent.trim() : ''; return { r: r, t: t, n: t ? num(t) : null, i: i }; });
+    var filled = vals.filter(function (v) { return v.t; }).length;
+    var numeric = filled > 0 && vals.filter(function (v) { return v.n !== null; }).length >= filled * 0.6;
+    var was = th.getAttribute('aria-sort'), dir = was ? (was === 'ascending' ? -1 : 1) : (numeric ? -1 : 1);
+    vals.sort(function (a, b) {
+      if (numeric) {
+        if (a.n === null && b.n === null) return a.i - b.i;
+        if (a.n === null) return 1; if (b.n === null) return -1;
+        return (a.n - b.n) * dir || a.i - b.i;
+      }
+      if (!a.t) return 1; if (!b.t) return -1;
+      return a.t.localeCompare(b.t) * dir || a.i - b.i;
+    });
+    all('th', th.parentNode).forEach(function (h) { h.removeAttribute('aria-sort'); });
+    th.setAttribute('aria-sort', dir === 1 ? 'ascending' : 'descending');
+    vals.forEach(function (v) { tb.appendChild(v.r); });
+  }
+
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest) return;
+    var t = e.target.closest('.tab,[data-go]');
+    if (t) { go(t.getAttribute('data-t') || t.getAttribute('data-go')); return; }
+    var sb = e.target.closest('.sortb');
+    if (sb) { sortBy(sb.parentNode); return; }
+    var a = e.target.closest('a');
+    if (a) { var h = a.getAttribute('href') || ''; if (h.charAt(0) === '#' && go(h.slice(1))) e.preventDefault(); }
+  });
+  window.addEventListener('hashchange', function () { var h = location.hash.slice(1); if (h && h !== cur) go(h); });
+
+  var start = location.hash.slice(1);
+  if (names.indexOf(start) >= 0) cur = start;
+  paint();
+})();
+(function () {
+  var root = document.getElementById('pc'); if (!root) return;
+  var rows = JSON.parse(document.getElementById('pcdata').textContent);
+  function $(id) { return document.getElementById(id); }
+  var chip = $('pc-chip'), num = $('pc-n'), dur = $('pc-d'), unit = $('pc-u'), type = $('pc-t'), bars = $('pc-bars');
+  var buy = $('pc-buy'), HW = {};
+  try { HW = JSON.parse($('pchw').textContent); } catch (e) {}
+  var chips = [];
+  rows.forEach(function (r) { if (chips.indexOf(r.c) < 0) chips.push(r.c); });
+  chips.forEach(function (c) { var o = document.createElement('option'); o.textContent = c; chip.appendChild(o); });
+  function money(v) {
+    if (v >= 1e9) return '$' + (v / 1e9).toFixed(2) + 'B';
+    if (v >= 1e7) return '$' + (v / 1e6).toFixed(1) + 'M';
+    if (v >= 100) return '$' + Math.round(v).toLocaleString('en-US');
+    return '$' + v.toFixed(2);
+  }
+  function short(v) { return v >= 1e9 ? '$' + (v / 1e9).toFixed(2) + 'B' : v >= 1e6 ? '$' + (v / 1e6).toFixed(2) + 'M' : money(v); }
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function draw() {
+    var g = Math.max(1, Math.floor(+num.value || 1)), d = Math.max(0, +dur.value || 0), hrs = d * +unit.value, gh = g * hrs;
+    var list = rows.filter(function (r) { return r.c === chip.value && (!type.value || r.t === type.value); }).sort(function (a, b) { return a.p - b.p; });
+    var uname = unit.options[unit.selectedIndex].textContent; if (d === 1) uname = uname.replace(/s$/, '');
+    var sum = g.toLocaleString('en-US') + (g === 1 ? ' GPU' : ' GPUs') + ' for ' + d.toLocaleString('en-US') + ' ' + uname + ' is ' + Math.round(gh).toLocaleString('en-US') + ' GPU-hours.';
+    if (hrs >= 8760 && type.value !== 'Reserved') sum += ' For a year or more, the Reserved rows fit best.';
+    if (hrs < 730 && type.value === 'Reserved') sum += ' Reserved prices need a term of about a year.';
+    $('pc-sum').textContent = sum;
+    bars.textContent = ''; buy.textContent = '';
+    if (!list.length) {
+      ['pc-lo', 'pc-md', 'pc-hi'].forEach(function (id) { $(id).textContent = 'No price'; });
+      ['pc-los', 'pc-mds', 'pc-his'].forEach(function (id) { $(id).textContent = 'for this chip and rental type'; });
+      return;
+    }
+    var n = list.length, lo = list[0], hi = list[n - 1], mp = n % 2 ? list[(n - 1) / 2].p : (list[n / 2 - 1].p + list[n / 2].p) / 2;
+    $('pc-lo').textContent = short(lo.p * gh); $('pc-los').textContent = 'Lowest: ' + lo.s;
+    $('pc-md').textContent = short(mp * gh); $('pc-mds').textContent = 'Median of ' + n + (n === 1 ? ' price' : ' prices') + ', $' + mp.toFixed(2) + ' an hour';
+    $('pc-hi').textContent = short(hi.p * gh); $('pc-his').textContent = 'Highest: ' + hi.s;
+    var hw = HW[chip.value];
+    if (!hw) buy.textContent = 'Buy instead: the report has no hardware price for this chip.';
+    else if (gh > 0) {
+      var one = hw.lo === hw.hi, n$ = function (v) { return '$' + Math.round(v).toLocaleString('en-US'); };
+      var m0 = hw.lo / (mp * 730), m1 = hw.hi / (mp * 730), mid = (hw.lo + hw.hi) / 2 * g;
+      buy.textContent = 'Buy instead: ' + g.toLocaleString('en-US') + (g === 1 ? ' GPU costs ' : ' GPUs cost ') + (one ? 'about ' + short(hw.lo * g) : short(hw.lo * g) + ' to ' + short(hw.hi * g)) +
+        ', at ' + (one ? n$(hw.lo) : n$(hw.lo) + ' to ' + n$(hw.hi)) + ' a GPU (' + hw.b + '). That is hardware only. At the median rent of $' + mp.toFixed(2) +
+        ' an hour, rent equals the purchase price after ' + (one ? m0.toFixed(1) : m0.toFixed(1) + ' to ' + m1.toFixed(1)) + ' months of full use. This rental is ' +
+        (100 * mp * gh / mid < 1 ? 'under 1' : Math.round(100 * mp * gh / mid)) + '% of the purchase price.';
+    }
+    list.forEach(function (r) {
+      var row = el('div', 'brow'), lab = el('span', 'bl', r.s + ' '), bt = el('span', 'bt'), i = el('i', /index|midpoint|^Market/i.test(r.s) ? 'b2' : 'b1');
+      lab.appendChild(el('span', 'bd', r.t + ', $' + r.p.toFixed(2) + ' an hour, ' + r.d));
+      i.style.width = (100 * r.p / hi.p).toFixed(1) + '%'; bt.appendChild(i);
+      row.appendChild(lab); row.appendChild(bt); row.appendChild(el('span', 'bv', money(r.p * gh)));
+      bars.appendChild(row);
+    });
+  }
+  [chip, num, dur, unit, type].forEach(function (x) { x.addEventListener('input', draw); x.addEventListener('change', draw); });
+  draw();
+})();
+(function () {
+  var root = document.getElementById('ph'); if (!root) return;
+  var box = document.getElementById('ph-svg'), read = document.getElementById('ph-read');
+  var META = [['vast', 'Vast.ai', 'hs1', 'line'], ['runpod_secure', 'RunPod Secure', 'hs2', 'step'], ['silicon', 'Silicon Data', 'hs3', 'pts'], ['ornn', 'Ornn', 'hs4', 'pts']];
+  var MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  function day(s) { return Date.UTC(+s.slice(0, 4), +s.slice(5, 7) - 1, +s.slice(8, 10)) / 864e5; }
+  function label(n) { var d = new Date(n * 864e5); return d.getUTCDate() + ' ' + MON[d.getUTCMonth()] + ' ' + d.getUTCFullYear(); }
+  function draw(data) {
+    var S = META.map(function (m) {
+      return { n: m[1], c: m[2], t: m[3], p: (data.series[m[0]] || []).filter(function (x) { return x && +x[1] > 0; }).map(function (x) { return [day(x[0]), +x[1]]; }).sort(function (a, b) { return a[0] - b[0]; }) };
+    }).filter(function (s) { return s.p.length; });
+    if (!S.length) return;
+    var t0 = Infinity, t1 = -Infinity, vmax = 0;
+    S.forEach(function (s) { s.p.forEach(function (p) { t0 = Math.min(t0, p[0]); t1 = Math.max(t1, p[0]); vmax = Math.max(vmax, p[1]); }); });
+    var W = 360, H = 210, L = 30, R = 8, T = 8, B = 22, y0 = 1, y1 = Math.max(5, Math.ceil(vmax));
+    function X(t) { return L + (W - L - R) * (t - t0) / (t1 - t0 || 1); }
+    function Y(v) { return T + (H - T - B) * (1 - (Math.max(y0, Math.min(y1, v)) - y0) / (y1 - y0)); }
+    var h = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Line chart of the H100 rental price by source, in dollars per GPU-hour">';
+    for (var v = y0; v <= y1; v++) h += '<line class="pg" x1="' + L + '" x2="' + (W - R) + '" y1="' + Y(v).toFixed(1) + '" y2="' + Y(v).toFixed(1) + '"/><text class="pt" x="' + (L - 5) + '" y="' + (Y(v) + 3.5).toFixed(1) + '" text-anchor="end">$' + v + '</text>';
+    var d = new Date(t0 * 864e5), m = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1));
+    while (m.getTime() / 864e5 <= t1) {
+      var x = X(m.getTime() / 864e5).toFixed(1);
+      h += '<line class="pg" x1="' + x + '" x2="' + x + '" y1="' + (H - B) + '" y2="' + (H - B + 4) + '"/><text class="pt" x="' + x + '" y="' + (H - 6) + '" text-anchor="middle">' + MON[m.getUTCMonth()] + '</text>';
+      m = new Date(Date.UTC(m.getUTCFullYear(), m.getUTCMonth() + 1, 1));
+    }
+    S.forEach(function (s) {
+      var path = '';
+      s.p.forEach(function (p, i) { var x = X(p[0]).toFixed(1), y = Y(p[1]).toFixed(1); path += i ? (s.t === 'step' ? 'H' + x + 'V' + y : 'L' + x + ' ' + y) : 'M' + x + ' ' + y; });
+      h += '<path class="pl ' + s.c + '" d="' + path + '"/>';
+      if (s.t === 'pts') s.p.forEach(function (p) { h += '<circle class="pm ' + s.c + '" cx="' + X(p[0]).toFixed(1) + '" cy="' + Y(p[1]).toFixed(1) + '" r="3.5"/>'; });
+    });
+    h += '<line class="px" id="ph-x" x1="0" x2="0" y1="' + T + '" y2="' + (H - B) + '" visibility="hidden"/></svg>';
+    box.innerHTML = h;
+    function at(s, t) { var v = null; for (var i = 0; i < s.p.length && s.p[i][0] <= t; i++) v = s.p[i][1]; return v; }
+    function say(t) { read.textContent = label(t) + '. ' + S.map(function (s) { var v = at(s, t); return v == null ? null : s.n + ' $' + v.toFixed(2); }).filter(Boolean).join('. ') + '.'; }
+    say(t1);
+    var svg = box.firstChild, xl = document.getElementById('ph-x');
+    function move(e) {
+      var r = svg.getBoundingClientRect(), px = (e.clientX - r.left) / r.width * W, t = Math.round(t0 + (px - L) / (W - L - R) * (t1 - t0));
+      t = Math.max(t0, Math.min(t1, t)); xl.setAttribute('x1', X(t)); xl.setAttribute('x2', X(t)); xl.setAttribute('visibility', 'visible'); say(t);
+    }
+    svg.addEventListener('pointermove', move); svg.addEventListener('pointerdown', move);
+    svg.addEventListener('pointerleave', function () { xl.setAttribute('visibility', 'hidden'); say(t1); });
+  }
+  var base = JSON.parse(document.getElementById('phdata').textContent);
+  draw(base);
+  if (/(^|\.)nazare\.io$/.test(location.hostname)) {
+    fetch('prices.json', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) { if (j && j.series && j.updated >= base.updated) draw(j); }).catch(function () {});
+  }
+})();
+(function () {
+  function all(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
+  function cell(t) { t = t.replace(/\s+/g, ' ').trim(); return /[",\n]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t; }
+  if (!/(^|\.)nazare\.io$/.test(location.hostname) && location.protocol !== 'file:') return;
+  all('table.dt').forEach(function (tb, i) {
+    var wrap = tb.closest('.scroll') || tb, sub = tb.closest('.sub'), h = sub && sub.querySelector('h4'), card = tb.closest('.card'), st = card && card.querySelector('.st');
+    var name = ((h && h.textContent) || (st && st.textContent) || 'table').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'csvb'; b.textContent = 'Download CSV';
+    b.addEventListener('click', function () {
+      var rows = all('tr', tb).map(function (tr) { return all('th,td', tr).map(function (c) { return cell(c.textContent); }).join(','); });
+      var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\ufeff' + rows.join('\r\n')], { type: 'text/csv;charset=utf-8' }));
+      a.download = 'nazare-compute-' + name + '-' + (i + 1) + '.csv'; document.body.appendChild(a); a.click();
+      setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 800);
+    });
+    wrap.parentNode.insertBefore(b, wrap.nextSibling);
+  });
+})();
+
+/* Nazare wave network behind the page, as on nazare.io. Desktop only, off for reduced motion. */
+(function () {
+  var c = document.getElementById('wv');
+  if (!c) return;
+  var small = window.matchMedia('(max-width: 768px), (hover: none) and (pointer: coarse)').matches;
+  var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (small || still || !c.getContext) { c.style.display = 'none'; return; }
+  var x = c.getContext('2d'), w = 0, h = 0, n = [], D = 160;
+  function size() { w = c.width = window.innerWidth; h = c.height = window.innerHeight; }
+  size(); window.addEventListener('resize', size);
+  for (var i = 0; i < 70; i++) n.push({ x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - .5) * .4, vy: (Math.random() - .5) * .4, r: 1.2 + Math.random() * 1.8, p: Math.random() * 6.28 });
+  function draw() {
+    if (document.hidden) { requestAnimationFrame(draw); return; }
+    x.clearRect(0, 0, w, h);
+    var t = Date.now() * .001;
+    for (var i = 0; i < n.length; i++) {
+      var a = n[i];
+      a.x += a.vx + Math.sin(t * .2 + a.p) * .25; a.y += a.vy + Math.cos(t * .15 + a.p * 1.3) * .25;
+      if (a.x < 0) a.x = w; if (a.x > w) a.x = 0; if (a.y < 0) a.y = h; if (a.y > h) a.y = 0;
+      for (var j = i + 1; j < n.length; j++) {
+        var b = n[j], dx = a.x - b.x, dy = a.y - b.y, d = Math.sqrt(dx * dx + dy * dy);
+        if (d < D) { x.beginPath(); x.moveTo(a.x, a.y); x.lineTo(b.x, b.y); x.strokeStyle = 'rgba(0,170,255,' + ((1 - d / D) * .25) + ')'; x.lineWidth = .6; x.stroke(); }
+      }
+      x.beginPath(); x.arc(a.x, a.y, a.r, 0, 6.2832); x.fillStyle = 'rgba(0,170,255,.45)'; x.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+</script>
+</body>
+</html>
