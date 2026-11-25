@@ -842,6 +842,7 @@ table.dt.fit{min-width:0}
 (function () {
   function all(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
   function cell(t) { t = t.replace(/\s+/g, ' ').trim(); return /[",\n]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t; }
+  if (!/(^|\.)nazare\.io$/.test(location.hostname) && location.protocol !== 'file:') return;
   all('table.dt').forEach(function (tb, i) {
     var wrap = tb.closest('.scroll') || tb, sub = tb.closest('.sub'), h = sub && sub.querySelector('h4'), card = tb.closest('.card'), st = card && card.querySelector('.st');
     var name = ((h && h.textContent) || (st && st.textContent) || 'table').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
