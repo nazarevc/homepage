@@ -295,6 +295,10 @@ a{color:var(--blue2)}
 .qa .qk{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--blue2);font-weight:500;margin:0 0 6px}
 .qa h3.st{font-size:22px;line-height:1.25;margin-top:0}
 .qa .qans{font-size:16px;line-height:1.6}
+details.more{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+details.more>summary{cursor:pointer;color:var(--blue2);font-size:14px;line-height:1.5}
+details.more[open]>summary{margin-bottom:8px}
+details.more h4{margin-top:16px}
 .foot{border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--ink2)}
 .tabs,.pager{display:none}
 </style>
@@ -521,6 +525,7 @@ a{color:var(--blue2)}
         s.classList.toggle('hide', !sn); pn += sn;
       });
       all('.doc', p).forEach(function (c) { c.classList.toggle('hide', !c.querySelector('.sub:not(.hide)')); });
+      all('details', p).forEach(function (d) { if (d.querySelector('p:not(.hide), li:not(.hide), tbody tr:not(.hide)')) d.open = true; });
       p.hidden = !pn; if (pn) secs++; n += pn;
     });
     count.textContent = n ? n + (n === 1 ? ' match in ' : ' matches in ') + secs + (secs === 1 ? ' section' : ' sections') : 'No match. Try a company, a place or a figure.';
