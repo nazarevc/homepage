@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Portfolio news | Nazaré Ventures</title><meta name="description" content="News from Nazaré Ventures portfolio companies: posts, articles and releases, newest first.">
 <link rel="icon" href="/favicon-32.png"><style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Playfair+Display:wght@500&display=swap');
 :root{--plane:#05070a;--surface:#0c111c;--ink:#e8ecf0;--ink2:#9aa3ae;--line:#18202e;--axis:#2e3748;--blue:#0088cc;--blue2:#00aaff;
 --s1:#1a9cf0;--s2:#e76624;--s3:#00a888;--serif:'Playfair Display',Georgia,serif;--font:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color-scheme:dark}
 *{box-sizing:border-box}
@@ -41,6 +41,29 @@ input[type=search]{flex:1;min-width:160px}
 .empty{color:var(--ink2);font-size:14px;margin:20px 0}
 .foot{font-size:12px;color:var(--ink2);margin-top:30px;border-top:1px solid var(--line);padding-top:12px}
 @media(min-width:760px){.hmark{top:80px;width:260px}}
+
+/* Unslop layer (27 Nov 2026). Rules: DESIGN_RULES.md */
+:root{--accent:#3b9eda}
+.brand::before,.hmark,.eyebrow::before{display:none}
+.eyebrow{text-transform:none;letter-spacing:0;color:var(--ink2);font-size:13px;font-weight:400}
+.bnav .bl{text-transform:none;letter-spacing:0;border:0;padding:0;font-size:13px}
+h1{font-size:clamp(30px,7vw,44px)}
+h1 .hl{font-style:normal;color:inherit}
+.lead{color:var(--ink2);font-size:15px}
+.tile,.card{background:transparent}
+.card::before{display:none}
+.tile b{font-family:var(--font);font-weight:500;font-size:22px;color:var(--ink)}
+.chip{border-color:var(--line);color:var(--ink2);transition:background-color .15s,color .15s}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.chip:active{transform:scale(.97)}
+b,strong,.co,.vt,th{font-weight:500}
+.month,h2{font-family:var(--font);font-weight:500;font-size:17px}
+.day{text-transform:none;letter-spacing:0;font-size:13px}
+.tag{border-color:var(--line)}
+.it,.it.c{border-left-color:var(--line)}
+.ok{color:var(--ink2);border-color:var(--line)}
+.wv{font-style:normal}
+a{color:var(--accent)}
 </style></head>
 <body><main>
 <header class="brand">

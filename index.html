@@ -951,6 +951,35 @@ footer span {
   flex-wrap: wrap;
   gap: 0 1.8rem;
 }
+
+/* ── Unslop layer (27 Nov 2026). Rules: DESIGN_RULES.md ── */
+:root{--accent:#3b9eda}
+#wave-canvas,.hero-glow,.hero-wave,.hero-mark,.closing-glow,.scroll-hint,.thesis-icon,.footer-dot,.label,.eyebrow{display:none!important}
+.fade-in,.fade-in.visible{opacity:1!important;transform:none!important;transition:none!important}
+h1{font-size:clamp(2.4rem,6vw,4.5rem);max-width:760px}
+h1 .highlight{background:none;-webkit-text-fill-color:currentColor;color:var(--fg)}
+h1 .italic{font-style:normal}
+.hero{min-height:auto;padding-top:7.5rem;padding-bottom:3.5rem}
+.btn{transition:background-color .15s,border-color .15s,color .15s;letter-spacing:0}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{transform:none;box-shadow:none;background:#4aa9e3}
+.nav-links a,.nav-cta{letter-spacing:0}
+.nav-cta:hover{background:transparent;border-color:var(--accent);color:var(--fg)}
+.thesis-card{transition:border-color .15s;background:transparent}
+.thesis-card:hover{transform:none;background:transparent;border-color:var(--dim2)}
+a.pcard::before{display:none}
+.pcard{transition:background-color .15s}
+.witem,.witem:hover{transition:background-color .15s}
+.witem:hover{padding-left:1.2rem;padding-right:1.2rem}
+.wcol .witem:hover{padding-left:0;padding-right:0}
+.witem:hover .warrow{transform:none;color:var(--fg)}
+.all-posts:hover,.founder-links a:hover,.closing-contact a:hover{color:var(--fg)}
+.wcol-title,.founder-role{text-transform:none;letter-spacing:0;font-size:.85rem}
+.founder-role{color:var(--muted);font-weight:400}
+.founder-avatar{background:var(--card)}
+.closing-tag{color:var(--muted)}
+.closing-quote{font-style:normal}
 </style>
 </head>
 <body>
@@ -967,7 +996,7 @@ footer span {
     <a href="#portfolio">Portfolio</a>
     <a href="#writing">Writing</a>
     <a href="#founder">Founder</a>
-    <a href="mailto:7@nazare.io" class="nav-cta">Get in Touch</a>
+    <a href="mailto:7@nazare.io" class="nav-cta">Get in touch</a>
   </div>
 </nav>
 
@@ -976,8 +1005,7 @@ footer span {
   <img class="hero-mark" aria-hidden="true" src="/assets/mark.png" alt="" aria-hidden="true" style="position:absolute;right:0;top:50%;transform:translateY(-50%);height:70%;width:auto;opacity:0.13;pointer-events:none;z-index:1;object-fit:contain;object-position:right;">
   <div class="hero-glow"></div>
   <div class="hero-inner">
-    <div class="eyebrow">Pre-Seed &amp; Seed · Agent-First AI</div>
-    <h1>
+        <h1>
       Agents are<br>
       <span class="highlight">the new users.</span>
     </h1>
@@ -985,8 +1013,8 @@ footer span {
       Agents need compute, memory, data and tools to do their work. Nazaré backs the companies that sell them those things, at pre-seed and seed.
     </p>
     <div class="actions">
-      <a href="https://nazare.io/deck" class="btn btn-primary" target="_blank" rel="noopener">View Fund Deck</a>
-      <a href="mailto:7@nazare.io" class="btn btn-ghost">Get in Touch</a>
+      <a href="https://nazare.io/deck" class="btn btn-primary" target="_blank" rel="noopener">View fund deck</a>
+      <a href="mailto:7@nazare.io" class="btn btn-ghost">Get in touch</a>
     </div>
   </div>
   <div class="scroll-hint">
