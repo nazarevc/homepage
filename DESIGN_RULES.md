@@ -6,7 +6,7 @@ Set on 27 Nov 2026 by an unslop pass. Each page carries an "Unslop layer" block 
 ## Never
 
 - Gradients on text, buttons, cards or backgrounds.
-- Glows, radial light behind headers, and animated or decorative backgrounds (the wave canvas, wave SVGs, watermark logo marks).
+- Glows and radial light behind headers.
 - All-caps labels, letter-spaced small caps, and eyebrow labels with a leading rule line. A section heading names the section; no label above it.
 - Italic or colored accent words inside headings.
 - Font weights other than 400 and 500.
@@ -25,7 +25,7 @@ Set on 27 Nov 2026 by an unslop pass. Each page carries an "Unslop layer" block 
 - Type scale: 12, 13, 15, 17, 22 px, and the page title at 30 to 46 px (home hero up to 72 px).
 - Corner radius 8 px on cards, 999 px on filter chips. Borders 1 px in the line color.
 - Motion: color and border transitions of 150 ms. Buttons press to 0.97 scale. Keyboard focus shows at once.
-- Brand marks kept: the nazaré wordmark in the top bar and the Playfair page title.
+- Brand marks kept (Steven, 27 Nov 2026): the nazaré wordmark in the top bar, the large nazaré logo mark behind the hero or header, the wave background (the home page canvas and wave shape, the report's wave line and desktop canvas), and the Playfair page title.
 
 ## Checks before shipping a page
 
