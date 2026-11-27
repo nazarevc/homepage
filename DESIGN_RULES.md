@@ -29,11 +29,24 @@ Set on 27 Nov 2026 by an unslop pass. Each page carries an "Unslop layer" block 
 - Color tokens only. Surfaces stay neutral: plane #05070a, surface #0c111c, line #18202e, ink #e8ecf0, secondary ink #9aa3ae.
 - One accent, #3b9eda, used only for links, the selected tab or filter, and the primary button.
 - Chart series colors are data, not decoration: #1a9cf0, #e76624, #00a888, #d28e05, in that fixed order.
-- Type: Playfair Display 500 for page titles (h1) and home-page section titles only. Inter 400 for body, Inter 500 for emphasis, numbers and subheads.
+- Type: Playfair Display 500 for page titles (h1) and home-page section titles only. Manrope 400 for body, Manrope 500 for emphasis, numbers and subheads. Never Inter, Roboto, Arial, Open Sans or Helvetica as the chosen face (they stay only as system fallbacks).
 - Type scale: 12, 13, 15, 17, 22 px, and the page title at 30 to 46 px (home hero up to 72 px).
 - Corner radius 8 px on cards, 999 px on filter chips. Borders 1 px in the line color.
 - Motion: color and border transitions of 150 ms. Buttons press to 0.97 scale. Keyboard focus shows at once.
 - Brand marks kept (Steven, 27 Nov 2026): the nazaré wordmark in the top bar, the large nazaré logo mark behind the hero or header, the wave background (the home page canvas and wave shape, the report's wave line and desktop canvas), and the Playfair page title.
+
+## Accessibility and behavior
+
+- The page header is a plain block, not a <header> inside <main>.
+- Every animation stops under prefers-reduced-motion. The home page wave draws one still frame in that case, and pauses when the tab is hidden.
+- Full-height blocks use 100dvh (with 100vh as fallback), never 100vh alone.
+- No window scroll listeners. Use IntersectionObserver for reveals.
+- Headings use text-wrap: balance; paragraphs and list items use text-wrap: pretty. No manual <br> in headings.
+
+## Decisions kept on purpose
+
+- The blue accent stays. It comes from the brand: Nazaré is named for the surf town and its wave, and the wordmark, logo mark and wave background are blue on near-black. This is a brand choice, not the default startup palette.
+- The wave background animates on desktop. It is the brand element Steven asked to keep (27 Nov 2026).
 
 ## Structure
 

@@ -7,11 +7,11 @@
 <meta name="robots" content="noindex">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Playfair+Display:wght@500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500&family=Playfair+Display:wght@500&display=swap');
 :root { --bg:#05070A; --fg:#E8ECF0; --muted:#889099; --blue:#0088CC; --blue-bright:#00AAFF; --bdr:#161C28; }
 * { box-sizing:border-box; margin:0; padding:0; }
-body { background:var(--bg); color:var(--fg); font-family:'Inter',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;
-       min-height:100vh; display:flex; flex-direction:column; -webkit-font-smoothing:antialiased; }
+body { background:var(--bg); color:var(--fg); font-family:'Manrope',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;
+       min-height:100vh; min-height:100dvh; display:flex; flex-direction:column; -webkit-font-smoothing:antialiased; }
 header { padding:1rem 2.5rem; border-bottom:1px solid var(--bdr); }
 header img { height:18px; display:block; }
 main { flex:1; display:flex; flex-direction:column; justify-content:center; padding:4rem 2.5rem; max-width:1100px; width:100%; margin:0 auto; }
@@ -25,6 +25,7 @@ p { margin-top:1.2rem; color:var(--muted); max-width:460px; line-height:1.7; }
 .btn-ghost { border:1px solid #3D4555; color:var(--fg); }
 .btn-ghost:hover { border-color:var(--muted); }
 @media (max-width:768px) { header, main { padding-left:1.4rem; padding-right:1.4rem; } }
+h1,h2,h3,h4{text-wrap:balance}p,li{text-wrap:pretty}
 </style>
 </head>
 <body>

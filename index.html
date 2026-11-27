@@ -31,7 +31,7 @@ gtag('config', 'G-PKQ3ER5JL9');
 </script>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap');
 
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -50,7 +50,7 @@ gtag('config', 'G-PKQ3ER5JL9');
   --card:     #0C111C;
   --card-hover: #111827;
   --serif:    'Playfair Display', 'Georgia', serif;
-  --sans:     'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  --sans:     'Manrope', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
 }
 
 html {
@@ -79,6 +79,7 @@ img { max-width: 100%; display: block; }
   top: 0; left: 0;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   z-index: 0;
   pointer-events: none;
   opacity: 0.5;
@@ -165,6 +166,7 @@ nav {
   position: relative;
   z-index: 1;
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   overflow: hidden;
@@ -981,6 +983,8 @@ a.pcard::before{display:none}
 .closing-tag{color:var(--muted)}
 .closing-quote{font-style:normal}
 
+/* Unslop pass 3: Manrope body, balanced headings */
+h1,h2,h3,h4{text-wrap:balance}p,li{text-wrap:pretty}
 /* Unslop pass 2 (27 Nov 2026) */
 .warrow{display:none}
 nav{background:var(--bg);backdrop-filter:none;-webkit-backdrop-filter:none}
@@ -1391,7 +1395,12 @@ function draw() {
   animId = requestAnimationFrame(draw);
 }
 
-if (!isMobile) draw();
+const still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+if (!isMobile) { draw(); if (still) cancelAnimationFrame(animId); }
+document.addEventListener('visibilitychange', () => {
+  if (isMobile || still) return;
+  if (document.hidden) cancelAnimationFrame(animId); else { cancelAnimationFrame(animId); draw(); }
+});
 
 // ── Reinitialize on window resize ──
 if (!isMobile) {
@@ -1400,23 +1409,10 @@ if (!isMobile) {
     resize();
     initNodes();
     draw();
+    if (still) cancelAnimationFrame(animId);
   });
 }
 
-// ── Nav background on scroll ──
-const nav = document.querySelector('nav');
-let lastScroll = 0;
-
-window.addEventListener('scroll', () => {
-  const currentScroll = window.pageYOffset;
-  if (currentScroll > 50) {
-    nav.style.background = 'rgba(5,7,10,0.95)';
-    nav.style.borderBottomColor = 'var(--bdr)';
-  } else {
-    nav.style.background = 'rgba(5,7,10,0.85)';
-  }
-  lastScroll = currentScroll;
-});
 </script>
 
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447"
