@@ -1,6 +1,6 @@
 # Design rules for nazare.io
 
-Applies to every page in this repo: the home page, /news/, /compute/, /compute/news/ and /compute/epilogue/.
+Applies to every page in this repo: the home page, /writing/, /news/, /compute/, /compute/news/ and /compute/epilogue/.
 Set on 27 Nov 2026 by an unslop pass. Each page carries an "Unslop layer" block at the end of its CSS that applies these rules.
 
 ## Never
