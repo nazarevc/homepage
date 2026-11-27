@@ -347,6 +347,17 @@ nav.jump a:hover,nav.jump a:focus-visible{border-color:var(--axis);color:var(--i
 h2{font-size:22px}
 .sortb,.gl b{font-weight:500}
 .eyebrow{letter-spacing:0;text-transform:none}.wl-h,.detail .size,th,.brow .bv,.endn{font-weight:500}
+/* Unslop pass 2 (27 Nov 2026) */
+.subtabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:8px 1px 2px}
+.subtabs::-webkit-scrollbar{display:none}
+.subtabs[hidden]{display:none}
+.stab{flex:none;font:inherit;font-size:13px;color:var(--ink2);background:transparent;border:0;border-bottom:1.5px solid transparent;padding:4px 2px;margin-right:10px;cursor:pointer;white-space:nowrap;transition:color .15s,border-color .15s}
+.stab:hover{color:var(--ink)}
+.stab.on{color:var(--ink);border-bottom-color:var(--accent)}
+.tile{border:0;padding-left:0;padding-right:0}
+.tiles{gap:14px}
+.frame{stroke-dasharray:none!important;stroke-opacity:.35;stroke-width:.8}
+.frame-link:hover .frame{stroke-opacity:.8}
 .foot{border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--ink2)}
 .tabs,.pager{display:none}
 </style>
@@ -368,7 +379,7 @@ h2{font-size:22px}
 <div id="barmark"></div>
 <div class="bar">
   <div class="find"><input id="q" type="search" placeholder="Search a company, place or figure" aria-label="Search the whole report" autocomplete="off" enterkeyhint="search"><button type="button" class="btn" id="qc" hidden>Clear</button></div>
-  <div class="tabs" role="tablist" aria-label="Sections"><button type="button" class="tab on" role="tab" id="t-epilogue" data-t="epilogue" aria-controls="p-epilogue" aria-selected="true">Epilogue</button></div>
+  <div class="tabs" role="tablist" aria-label="Sections"></div>
   <div class="count" id="qn" aria-live="polite"></div>
 </div>
 <section class="panel" id="p-epilogue" role="tabpanel" aria-labelledby="t-epilogue"><h2>Epilogue order book and other venues</h2><p class="hint">Disclosure: Nazaré Ventures is an investor in Epilogue, a market maker for compute, and in Vast.ai, a compute cloud.</p><div class="card viz">
@@ -548,8 +559,10 @@ h2{font-size:22px}
 
   function paint() {
     panels.forEach(function (p) { p.hidden = p.id !== 'p-' + cur; });
+    all('.stab').forEach(function (t) { t.classList.toggle('on', t.getAttribute('data-t') === cur); });
+    all('.subtabs').forEach(function (b) { b.hidden = !b.querySelector('[data-t="' + cur + '"]'); });
     tabs.forEach(function (t) {
-      var on = t.getAttribute('data-t') === cur;
+      var on = (' ' + (t.getAttribute('data-members') || t.getAttribute('data-t')) + ' ').indexOf(' ' + cur + ' ') >= 0;
       t.classList.toggle('on', on); t.setAttribute('aria-selected', on ? 'true' : 'false');
       if (on) { var box = t.parentNode; box.scrollLeft = Math.max(0, t.offsetLeft - (box.clientWidth - t.offsetWidth) / 2 - box.offsetLeft); }
     });
@@ -644,7 +657,7 @@ h2{font-size:22px}
 
   document.addEventListener('click', function (e) {
     if (!e.target.closest) return;
-    var t = e.target.closest('.tab,[data-go]');
+    var t = e.target.closest('.tab,.stab,[data-go]');
     if (t) { go(t.getAttribute('data-t') || t.getAttribute('data-go')); return; }
     var sb = e.target.closest('.sortb');
     if (sb) { sortBy(sb.parentNode); return; }

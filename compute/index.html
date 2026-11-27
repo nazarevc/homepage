@@ -347,6 +347,17 @@ nav.jump a:hover,nav.jump a:focus-visible{border-color:var(--axis);color:var(--i
 h2{font-size:22px}
 .sortb,.gl b{font-weight:500}
 .eyebrow{letter-spacing:0;text-transform:none}.wl-h,.detail .size,th,.brow .bv,.endn{font-weight:500}
+/* Unslop pass 2 (27 Nov 2026) */
+.subtabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:8px 1px 2px}
+.subtabs::-webkit-scrollbar{display:none}
+.subtabs[hidden]{display:none}
+.stab{flex:none;font:inherit;font-size:13px;color:var(--ink2);background:transparent;border:0;border-bottom:1.5px solid transparent;padding:4px 2px;margin-right:10px;cursor:pointer;white-space:nowrap;transition:color .15s,border-color .15s}
+.stab:hover{color:var(--ink)}
+.stab.on{color:var(--ink);border-bottom-color:var(--accent)}
+.tile{border:0;padding-left:0;padding-right:0}
+.tiles{gap:14px}
+.frame{stroke-dasharray:none!important;stroke-opacity:.35;stroke-width:.8}
+.frame-link:hover .frame{stroke-opacity:.8}
 .foot{border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--ink2)}
 </style>
 </head>
@@ -361,14 +372,13 @@ h2{font-size:22px}
   <h1>Data centers and compute: <span class="hl">the world report</span></h1>
   <p class="lead"><span class="lq">Is AI compute scarce, and for how long?</span> Scarce now. In North America it should stay scarce through 2028. The risk is delivery in 2027 and 2028, when the gigawatt campuses open.</p>
   <p class="meta"><a href="/compute/news/">Compute markets: the news, updated daily</a></p>
-  <p class="meta">16 sections and 99 tables, with maps and charts. Search covers every row.</p>
   </div>
   <svg class="hwave" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true"><path d="M0,26 C360,58 720,0 1080,26 C1260,38 1350,32 1440,26" fill="none" stroke="#00aaff" stroke-opacity=".35" stroke-width="1.5" vector-effect="non-scaling-stroke"/><path d="M0,40 C320,66 680,14 1040,40 C1220,52 1330,46 1440,40" fill="none" stroke="#0088cc" stroke-opacity=".22" stroke-width="1.2" vector-effect="non-scaling-stroke"/></svg>
 </header>
 <div id="barmark"></div>
 <div class="bar">
   <div class="find"><input id="q" type="search" placeholder="Search a company, place or figure" aria-label="Search the whole report" autocomplete="off" enterkeyhint="search"><button type="button" class="btn" id="qc" hidden>Clear</button></div>
-  <div class="tabs" role="tablist" aria-label="Sections"><button type="button" class="tab on" role="tab" id="t-overview" data-t="overview" aria-controls="p-overview" aria-selected="true">Overview</button><button type="button" class="tab" role="tab" id="t-world" data-t="world" aria-controls="p-world" aria-selected="false">World</button><button type="button" class="tab" role="tab" id="t-us" data-t="us" aria-controls="p-us" aria-selected="false">United States</button><button type="button" class="tab" role="tab" id="t-europe" data-t="europe" aria-controls="p-europe" aria-selected="false">Europe</button><button type="button" class="tab" role="tab" id="t-mideast" data-t="mideast" aria-controls="p-mideast" aria-selected="false">Middle East</button><button type="button" class="tab" role="tab" id="t-apac" data-t="apac" aria-controls="p-apac" aria-selected="false">Asia-Pacific</button><button type="button" class="tab" role="tab" id="t-other" data-t="other" aria-controls="p-other" aria-selected="false">Other regions</button><button type="button" class="tab" role="tab" id="t-sites" data-t="sites" aria-controls="p-sites" aria-selected="false">AI sites</button><button type="button" class="tab" role="tab" id="t-filings" data-t="filings" aria-controls="p-filings" aria-selected="false">Filings</button><button type="button" class="tab" role="tab" id="t-demand" data-t="demand" aria-controls="p-demand" aria-selected="false">Demand</button><button type="button" class="tab" role="tab" id="t-prices" data-t="prices" aria-controls="p-prices" aria-selected="false">Prices</button><button type="button" class="tab" role="tab" id="t-calc" data-t="calc" aria-controls="p-calc" aria-selected="false">Calculator</button><button type="button" class="tab" role="tab" id="t-balance" data-t="balance" aria-controls="p-balance" aria-selected="false">Balance</button><button type="button" class="tab" role="tab" id="t-constraints" data-t="constraints" aria-controls="p-constraints" aria-selected="false">Constraints</button><button type="button" class="tab" role="tab" id="t-gaps" data-t="gaps" aria-controls="p-gaps" aria-selected="false">Gaps</button><button type="button" class="tab" role="tab" id="t-sources" data-t="sources" aria-controls="p-sources" aria-selected="false">Sources</button></div>
+  <div class="tabs" role="tablist" aria-label="Sections"><button type="button" class="tab on" role="tab" id="g-overview" data-t="overview" data-members="overview" aria-selected="true">Overview</button><button type="button" class="tab" role="tab" id="g-regions" data-t="world" data-members="world us europe mideast apac other" aria-selected="false">Regions</button><button type="button" class="tab" role="tab" id="g-sites" data-t="sites" data-members="sites filings" aria-selected="false">Sites and filings</button><button type="button" class="tab" role="tab" id="g-prices" data-t="prices" data-members="prices calc" aria-selected="false">Prices</button><button type="button" class="tab" role="tab" id="g-demand" data-t="demand" data-members="demand balance constraints" aria-selected="false">Demand and supply</button><button type="button" class="tab" role="tab" id="g-gaps" data-t="gaps" data-members="gaps" aria-selected="false">Gaps</button><button type="button" class="tab" role="tab" id="g-sources" data-t="sources" data-members="sources" aria-selected="false">Sources</button></div><div class="subtabs" data-g="regions" hidden><button type="button" class="stab" data-t="world">World</button><button type="button" class="stab" data-t="us">United States</button><button type="button" class="stab" data-t="europe">Europe</button><button type="button" class="stab" data-t="mideast">Middle East</button><button type="button" class="stab" data-t="apac">Asia-Pacific</button><button type="button" class="stab" data-t="other">Other regions</button></div><div class="subtabs" data-g="sites" hidden><button type="button" class="stab" data-t="sites">AI sites</button><button type="button" class="stab" data-t="filings">Filings</button></div><div class="subtabs" data-g="prices" hidden><button type="button" class="stab" data-t="prices">Prices</button><button type="button" class="stab" data-t="calc">Calculator</button></div><div class="subtabs" data-g="demand" hidden><button type="button" class="stab" data-t="demand">Demand</button><button type="button" class="stab" data-t="balance">Balance</button><button type="button" class="stab" data-t="constraints">Constraints</button></div>
   <div class="count" id="qn" aria-live="polite"></div>
 </div>
 <section class="panel" id="p-overview" role="tabpanel" aria-labelledby="t-overview"><h2>Overview</h2><figure class="card map viz"><svg viewBox="0 0 500 220" role="img" aria-label="World map of data center capacity in service. United States 44 to 64 gigawatts. China 24 to 32. Asia-Pacific outside China about 15. Europe about 13. Latin America 2.5. Middle East 1.6. Canada 1.4. Africa 0.5.">
@@ -827,8 +837,10 @@ h2{font-size:22px}
 
   function paint() {
     panels.forEach(function (p) { p.hidden = p.id !== 'p-' + cur; });
+    all('.stab').forEach(function (t) { t.classList.toggle('on', t.getAttribute('data-t') === cur); });
+    all('.subtabs').forEach(function (b) { b.hidden = !b.querySelector('[data-t="' + cur + '"]'); });
     tabs.forEach(function (t) {
-      var on = t.getAttribute('data-t') === cur;
+      var on = (' ' + (t.getAttribute('data-members') || t.getAttribute('data-t')) + ' ').indexOf(' ' + cur + ' ') >= 0;
       t.classList.toggle('on', on); t.setAttribute('aria-selected', on ? 'true' : 'false');
       if (on) { var box = t.parentNode; box.scrollLeft = Math.max(0, t.offsetLeft - (box.clientWidth - t.offsetWidth) / 2 - box.offsetLeft); }
     });
@@ -923,7 +935,7 @@ h2{font-size:22px}
 
   document.addEventListener('click', function (e) {
     if (!e.target.closest) return;
-    var t = e.target.closest('.tab,[data-go]');
+    var t = e.target.closest('.tab,.stab,[data-go]');
     if (t) { go(t.getAttribute('data-t') || t.getAttribute('data-go')); return; }
     var sb = e.target.closest('.sortb');
     if (sb) { sortBy(sb.parentNode); return; }

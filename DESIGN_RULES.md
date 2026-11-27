@@ -14,7 +14,15 @@ Set on 27 Nov 2026 by an unslop pass. Each page carries an "Unslop layer" block 
 - Hover lifts (translateY), drop shadows on anything that does not float, and colored side bars that only decorate.
 - Motion longer than 300 ms, bounce easing, and staggered fade-in entrances.
 - Title Case in buttons and labels. Use sentence case ("View fund deck", "Get in touch").
-- Hype copy. State the fact.
+- Hype copy and closing slogans. State the fact.
+- Arrows or symbols in front of or after links (↗, ✉, →).
+- Rows of badge pills that restate a bio or a list.
+- Frosted-glass (backdrop blur) bars. Bars are solid.
+- Full stops at the end of headings.
+- A pill on every list item. Mark only the exception (for example "Checked"), not the default.
+- Bordered boxes inside bordered boxes. Stat tiles inside a card have no border.
+- Dashed outlines as decoration. Map frames are thin solid lines.
+- Subtitles that repeat the heading or describe the page's obvious behavior.
 
 ## Always
 
@@ -26,6 +34,10 @@ Set on 27 Nov 2026 by an unslop pass. Each page carries an "Unslop layer" block 
 - Corner radius 8 px on cards, 999 px on filter chips. Borders 1 px in the line color.
 - Motion: color and border transitions of 150 ms. Buttons press to 0.97 scale. Keyboard focus shows at once.
 - Brand marks kept (Steven, 27 Nov 2026): the nazaré wordmark in the top bar, the large nazaré logo mark behind the hero or header, the wave background (the home page canvas and wave shape, the report's wave line and desktop canvas), and the Playfair page title.
+
+## Structure
+
+- Report navigation has at most 7 top-level tabs. A tab that holds several sections shows them as a second row of plain text links.
 
 ## Checks before shipping a page
 
