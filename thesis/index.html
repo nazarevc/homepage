@@ -72,9 +72,17 @@ h2{font:500 17px/1.3 var(--font);margin:0 0 10px}
 ul.plain{margin:0;padding-left:18px;max-width:68ch}
 ul.plain li{margin:0 0 8px}
 .toc{list-style:none;margin:0;padding:0;border-top:1px solid var(--line);max-width:68ch}
-.toc li{display:grid;grid-template-columns:28px 1fr;gap:0 10px;padding:9px 0;border-bottom:1px solid var(--line)}
-.toc .n{color:var(--ink2);font-size:13px;padding-top:2px}
-.toc .part{display:block;grid-template-columns:none;color:var(--ink2);font-size:13px;padding:14px 0 6px;border-bottom:0}
+.toc .ch{padding:10px 0;border-bottom:1px solid var(--line)}
+.toc .row{display:grid;grid-template-columns:24px 1fr auto;gap:0 10px;align-items:baseline}
+.toc .n{color:var(--ink2);font-size:13px}
+.toc .pp{color:var(--ink2);font-size:13px;white-space:nowrap}
+.toc .part{color:var(--ink2);font-size:13px;padding:16px 0 6px}
+.secs{list-style:none;margin:6px 0 0 34px;padding:0}
+.secs li{margin:0}
+.secs a{display:grid;grid-template-columns:34px 1fr;font-size:13px;color:var(--ink2);padding:3px 0}
+.secs a:hover{color:var(--ink)}
+.sn{min-width:0}
+.hint{font-size:13px;color:var(--ink2);margin:-4px 0 10px;max-width:68ch}
 .papers{list-style:none;margin:0;padding:0;max-width:68ch}
 .papers li{padding:10px 0;border-bottom:1px solid var(--line)}
 .papers li:first-child{border-top:1px solid var(--line)}
@@ -93,8 +101,8 @@ ul.plain li{margin:0 0 8px}
   <p class="upd">PhD dissertation, University of Cambridge, 1997</p>
   <h1>Classification and Regression using Mixtures of Experts</h1>
   <p class="lead">Steven Waterhouse. Jesus College and the Department of Engineering, University of Cambridge. Supervised by Tony Robinson.</p>
-  <a class="btn" href="/thesis/waterhouse-1997-mixtures-of-experts.pdf">Read the thesis (PDF)</a>
-  <p class="meta">215 pages, 2.2 MB, about 62,000 words</p>
+  <a class="btn" href="/thesis/waterhouse-1997-mixtures-of-experts.pdf">Read the full thesis (PDF)</a>
+  <p class="meta">215 pages, 2.2 MB, about 62,000 words. <a href="#contents">Or read by chapter</a></p>
 </div>
 
 <section>
@@ -115,23 +123,127 @@ ul.plain li{margin:0 0 8px}
   </ul>
 </section>
 
-<section>
+<section id="contents">
   <h2>Contents</h2>
+  <p class="hint">Each chapter opens as its own PDF. Section links jump to the page in that chapter.</p>
   <ul class="toc">
-    <li><span class="n">1</span><span>Introduction</span></li>
-    <li><span class="n">2</span><span>Mixtures of Experts</span></li>
-    <li class="part">Part I: Classification and regression</li>
-    <li><span class="n">3</span><span>Introduction to Part I</span></li>
-    <li><span class="n">4</span><span>Mixtures of Experts for Classification and Regression</span></li>
-    <li><span class="n">5</span><span>Training Mixtures-of-Experts using Early Stopping</span></li>
-    <li><span class="n">6</span><span>Growing Mixtures of Experts</span></li>
-    <li><span class="n">7</span><span>Bayesian Methods for Mixtures of Experts</span></li>
-    <li><span class="n">8</span><span>Results on DELVE</span></li>
-    <li class="part">Part II: Speech recognition</li>
-    <li><span class="n">9</span><span>Introduction to Part II</span></li>
-    <li><span class="n">10</span><span>Speech Recognition using Mixtures of Multi-layer Perceptrons</span></li>
-    <li><span class="n">11</span><span>Speaker Adaptation using Mixtures of Recurrent Neural Networks</span></li>
-    <li><span class="n">12</span><span>Conclusions and Future Work</span></li>
+    <li class="ch"><div class="row"><span class="n"></span><a href="/thesis/chapters/front-matter.pdf">Front matter: preface, summary, contents, notation</a><span class="pp">17 pages</span></div>
+    </li>
+    <li class="ch"><div class="row"><span class="n">1</span><a href="/thesis/chapters/chapter-01.pdf">Introduction</a><span class="pp">8 pages</span></div>
+    </li>
+    <li class="ch"><div class="row"><span class="n">2</span><a href="/thesis/chapters/chapter-02.pdf">Mixtures of Experts</a><span class="pp">25 pages</span></div>
+      <ul class="secs">
+        <li><a href="/thesis/chapters/chapter-02.pdf#page=1"><span class="sn">2.1</span>Specification of the Mixtures-of-Experts Model</a></li>
+        <li><a href="/thesis/chapters/chapter-02.pdf#page=4"><span class="sn">2.2</span>Hierarchical Mixtures of Experts</a></li>
+        <li><a href="/thesis/chapters/chapter-02.pdf#page=9"><span class="sn">2.3</span>Training Mixtures and Hierarchical Mixtures-of-Experts</a></li>
+        <li><a href="/thesis/chapters/chapter-02.pdf#page=12"><span class="sn">2.4</span>Review of Related Literature</a></li>
+        <li><a href="/thesis/chapters/chapter-02.pdf#page=25"><span class="sn">2.5</span>Conclusions</a></li>
+      </ul>
+    </li>
+    <li class="part">Part I: Extensions of Mixtures-of-Experts and their Evaluation using DELVE</li>
+    <li class="ch"><div class="row"><span class="n">3</span><a href="/thesis/chapters/chapter-03.pdf">Introduction to Part I</a><span class="pp">17 pages</span></div>
+      <ul class="secs">
+        <li><a href="/thesis/chapters/chapter-03.pdf#page=2"><span class="sn">3.1</span>Issues in Comparing Learning Methods</a></li>
+        <li><a href="/thesis/chapters/chapter-03.pdf#page=4"><span class="sn">3.2</span>The DELVE Framework</a></li>
+        <li><a href="/thesis/chapters/chapter-03.pdf#page=6"><span class="sn">3.3</span>The Data Sets used in Part I</a></li>
+        <li><a href="/thesis/chapters/chapter-03.pdf#page=15"><span class="sn">3.4</span>Issues in Designing Learning Algorithms</a></li>
+        <li><a href="/thesis/chapters/chapter-03.pdf#page=17"><span class="sn">3.5</span>Outline of Part I</a></li>
+      </ul>
+    </li>
+    <li class="ch"><div class="row"><span class="n">4</span><a href="/thesis/chapters/chapter-04.pdf">Mixtures of Experts for Classification and Regression</a><span class="pp">13 pages</span></div>
+      <ul class="secs">
+        <li><a href="/thesis/chapters/chapter-04.pdf#page=1"><span class="sn">4.1</span>Introduction</a></li>
+        <li><a href="/thesis/chapters/chapter-04.pdf#page=1"><span class="sn">4.2</span>The E step - Posterior Propagation and Segmentation</a></li>
+        <li><a href="/thesis/chapters/chapter-04.pdf#page=4"><span class="sn">4.3</span>Choice of Expert and Gate Forms and Implementation of the M step</a></li>
+        <li><a href="/thesis/chapters/chapter-04.pdf#page=10"><span class="sn">4.4</span>Optimisation of Experts and Gates</a></li>
+        <li><a href="/thesis/chapters/chapter-04.pdf#page=12"><span class="sn">4.5</span>Initialisation</a></li>
+        <li><a href="/thesis/chapters/chapter-04.pdf#page=12"><span class="sn">4.6</span>Summary</a></li>
+      </ul>
+    </li>
+    <li class="ch"><div class="row"><span class="n">5</span><a href="/thesis/chapters/chapter-05.pdf">Training Mixtures-of-Experts using Early Stopping</a><span class="pp">5 pages</span></div>
+      <ul class="secs">
+        <li><a href="/thesis/chapters/chapter-05.pdf#page=1"><span class="sn">5.1</span>Introduction</a></li>
+        <li><a href="/thesis/chapters/chapter-05.pdf#page=1"><span class="sn">5.2</span>Avoiding Over-fitting</a></li>
+        <li><a href="/thesis/chapters/chapter-05.pdf#page=4"><span class="sn">5.3</span>Choosing the Number of Experts and Depth of Hierarchy</a></li>
+        <li><a href="/thesis/chapters/chapter-05.pdf#page=5"><span class="sn">5.4</span>Summary</a></li>
+      </ul>
+    </li>
+    <li class="ch"><div class="row"><span class="n">6</span><a href="/thesis/chapters/chapter-06.pdf">Growing Mixtures of Experts</a><span class="pp">16 pages</span></div>
+      <ul class="secs">
+        <li><a href="/thesis/chapters/chapter-06.pdf#page=1"><span class="sn">6.1</span>Introduction</a></li>
+        <li><a href="/thesis/chapters/chapter-06.pdf#page=2"><span class="sn">6.2</span>Design of the Growing Algorithm</a></li>
+        <li><a href="/thesis/chapters/chapter-06.pdf#page=13"><span class="sn">6.3</span>Related Work</a></li>
+        <li><a href="/thesis/chapters/chapter-06.pdf#page=16"><span class="sn">6.4</span>Summary</a></li>
+      </ul>
+    </li>
+    <li class="ch"><div class="row"><span class="n">7</span><a href="/thesis/chapters/chapter-07.pdf">Bayesian Methods for Mixtures of Experts</a><span class="pp">19 pages</span></div>
+      <ul class="secs">
+        <li><a href="/thesis/chapters/chapter-07.pdf#page=1"><span class="sn">7.1</span>Introduction</a></li>
+        <li><a href="/thesis/chapters/chapter-07.pdf#page=2"><span class="sn">7.2</span>Background Theory</a></li>
+        <li><a href="/thesis/chapters/chapter-07.pdf#page=15"><span class="sn">7.3</span>Method</a></li>
+        <li><a href="/thesis/chapters/chapter-07.pdf#page=18"><span class="sn">7.4</span>Related Work</a></li>
+        <li><a href="/thesis/chapters/chapter-07.pdf#page=19"><span class="sn">7.5</span>Summary</a></li>
+      </ul>
+    </li>
+    <li class="ch"><div class="row"><span class="n">8</span><a href="/thesis/chapters/chapter-08.pdf">Results on DELVE</a><span class="pp">18 pages</span></div>
+      <ul class="secs">
+        <li><a href="/thesis/chapters/chapter-08.pdf#page=1"><span class="sn">8.1</span>Introduction</a></li>
+        <li><a href="/thesis/chapters/chapter-08.pdf#page=3"><span class="sn">8.2</span>Results on Regression Tasks</a></li>
+        <li><a href="/thesis/chapters/chapter-08.pdf#page=12"><span class="sn">8.3</span>Results on Classification Tasks</a></li>
+        <li><a href="/thesis/chapters/chapter-08.pdf#page=13"><span class="sn">8.4</span>Conclusions</a></li>
+        <li><a href="/thesis/chapters/chapter-08.pdf#page=17"><span class="sn">8.5</span>Summary</a></li>
+      </ul>
+    </li>
+    <li class="part">Part II: Extensions of Mixtures-of-Experts and their Evaluation on Speech Recognition</li>
+    <li class="ch"><div class="row"><span class="n">9</span><a href="/thesis/chapters/chapter-09.pdf">Introduction to Part II</a><span class="pp">12 pages</span></div>
+      <ul class="secs">
+        <li><a href="/thesis/chapters/chapter-09.pdf#page=2"><span class="sn">9.1</span>Automatic Speech Recognition</a></li>
+        <li><a href="/thesis/chapters/chapter-09.pdf#page=4"><span class="sn">9.2</span>The ABBOT System</a></li>
+        <li><a href="/thesis/chapters/chapter-09.pdf#page=7"><span class="sn">9.3</span>Evaluating Speech Recognition Systems</a></li>
+        <li><a href="/thesis/chapters/chapter-09.pdf#page=11"><span class="sn">9.4</span>Previous Applications of Mixtures-of-Experts to Speech Recognition</a></li>
+        <li><a href="/thesis/chapters/chapter-09.pdf#page=11"><span class="sn">9.5</span>Outline of Part II</a></li>
+      </ul>
+    </li>
+    <li class="ch"><div class="row"><span class="n">10</span><a href="/thesis/chapters/chapter-10.pdf">Speech Recognition using Mixtures of Multi-layer Perceptrons</a><span class="pp">6 pages</span></div>
+      <ul class="secs">
+        <li><a href="/thesis/chapters/chapter-10.pdf#page=1"><span class="sn">10.1</span>Introduction</a></li>
+        <li><a href="/thesis/chapters/chapter-10.pdf#page=1"><span class="sn">10.2</span>Multi-Layer Perceptrons in ABBOT</a></li>
+        <li><a href="/thesis/chapters/chapter-10.pdf#page=3"><span class="sn">10.3</span>Mixtures of MLPs as Acoustic Models</a></li>
+        <li><a href="/thesis/chapters/chapter-10.pdf#page=4"><span class="sn">10.4</span>Results</a></li>
+        <li><a href="/thesis/chapters/chapter-10.pdf#page=6"><span class="sn">10.5</span>Conclusions</a></li>
+      </ul>
+    </li>
+    <li class="ch"><div class="row"><span class="n">11</span><a href="/thesis/chapters/chapter-11.pdf">Speaker Adaptation using Mixtures of Recurrent Neural Networks</a><span class="pp">12 pages</span></div>
+      <ul class="secs">
+        <li><a href="/thesis/chapters/chapter-11.pdf#page=1"><span class="sn">11.1</span>Introduction</a></li>
+        <li><a href="/thesis/chapters/chapter-11.pdf#page=1"><span class="sn">11.2</span>Speaker Adaptation</a></li>
+        <li><a href="/thesis/chapters/chapter-11.pdf#page=3"><span class="sn">11.3</span>Recurrent Neural Networks for Speech Recognition</a></li>
+        <li><a href="/thesis/chapters/chapter-11.pdf#page=5"><span class="sn">11.4</span>Speaker Adaptation within ABBOT</a></li>
+        <li><a href="/thesis/chapters/chapter-11.pdf#page=6"><span class="sn">11.5</span>Mixtures of Local Linear Transforms</a></li>
+        <li><a href="/thesis/chapters/chapter-11.pdf#page=8"><span class="sn">11.6</span>Results</a></li>
+        <li><a href="/thesis/chapters/chapter-11.pdf#page=11"><span class="sn">11.7</span>Conclusions</a></li>
+      </ul>
+    </li>
+    <li class="part">Part III: Conclusions, Appendices and References</li>
+    <li class="ch"><div class="row"><span class="n">12</span><a href="/thesis/chapters/chapter-12.pdf">Conclusions and Future Work</a><span class="pp">4 pages</span></div>
+    </li>
+    <li class="ch"><div class="row"><span class="n">A</span><a href="/thesis/chapters/appendix-a.pdf">Availability of Source Code and Results</a><span class="pp">1 page</span></div>
+    </li>
+    <li class="ch"><div class="row"><span class="n">B</span><a href="/thesis/chapters/appendix-b.pdf">Results on DELVE Regression Tasks</a><span class="pp">18 pages</span></div>
+      <ul class="secs">
+        <li><a href="/thesis/chapters/appendix-b.pdf#page=2"><span class="sn">B.1</span>Boston</a></li>
+        <li><a href="/thesis/chapters/appendix-b.pdf#page=3"><span class="sn">B.2</span>The Kin and Pumadyn families</a></li>
+      </ul>
+    </li>
+    <li class="ch"><div class="row"><span class="n">C</span><a href="/thesis/chapters/appendix-c.pdf">Results on DELVE Classification Tasks</a><span class="pp">4 pages</span></div>
+      <ul class="secs">
+        <li><a href="/thesis/chapters/appendix-c.pdf#page=2"><span class="sn">C.1</span>Image</a></li>
+        <li><a href="/thesis/chapters/appendix-c.pdf#page=3"><span class="sn">C.2</span>Letter</a></li>
+        <li><a href="/thesis/chapters/appendix-c.pdf#page=4"><span class="sn">C.3</span>Splice</a></li>
+      </ul>
+    </li>
+    <li class="ch"><div class="row"><span class="n"></span><a href="/thesis/chapters/bibliography.pdf">Bibliography</a><span class="pp">20 pages</span></div>
+    </li>
   </ul>
 </section>
 
