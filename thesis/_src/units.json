@@ -1,0 +1,481 @@
+[
+ {
+  "key": "front",
+  "label": "",
+  "title": "Front matter: preface, summary, contents, notation",
+  "file": "front-matter.pdf",
+  "pages": 17,
+  "printed": null,
+  "part": null,
+  "sections": [],
+  "size": 230673
+ },
+ {
+  "key": "1",
+  "label": "1",
+  "title": "Introduction",
+  "file": "chapter-01.pdf",
+  "pages": 8,
+  "printed": 1,
+  "part": null,
+  "sections": [],
+  "size": 161901
+ },
+ {
+  "key": "2",
+  "label": "2",
+  "title": "Mixtures of Experts",
+  "file": "chapter-02.pdf",
+  "pages": 25,
+  "printed": 9,
+  "part": null,
+  "sections": [
+   {
+    "n": "2.1",
+    "t": "Specification of the Mixtures-of-Experts Model",
+    "p": 1
+   },
+   {
+    "n": "2.2",
+    "t": "Hierarchical Mixtures of Experts",
+    "p": 4
+   },
+   {
+    "n": "2.3",
+    "t": "Training Mixtures and Hierarchical Mixtures-of-Experts",
+    "p": 9
+   },
+   {
+    "n": "2.4",
+    "t": "Review of Related Literature",
+    "p": 12
+   },
+   {
+    "n": "2.5",
+    "t": "Conclusions",
+    "p": 25
+   }
+  ],
+  "size": 395156
+ },
+ {
+  "key": "3",
+  "label": "3",
+  "title": "Introduction to Part I",
+  "file": "chapter-03.pdf",
+  "pages": 17,
+  "printed": 34,
+  "part": "Part I: Extensions of Mixtures-of-Experts and their Evaluation using DELVE",
+  "sections": [
+   {
+    "n": "3.1",
+    "t": "Issues in Comparing Learning Methods",
+    "p": 2
+   },
+   {
+    "n": "3.2",
+    "t": "The DELVE Framework",
+    "p": 4
+   },
+   {
+    "n": "3.3",
+    "t": "The Data Sets used in Part I",
+    "p": 6
+   },
+   {
+    "n": "3.4",
+    "t": "Issues in Designing Learning Algorithms",
+    "p": 15
+   },
+   {
+    "n": "3.5",
+    "t": "Outline of Part I",
+    "p": 17
+   }
+  ],
+  "size": 255953
+ },
+ {
+  "key": "4",
+  "label": "4",
+  "title": "Mixtures of Experts for Classification and Regression",
+  "file": "chapter-04.pdf",
+  "pages": 13,
+  "printed": 51,
+  "part": null,
+  "sections": [
+   {
+    "n": "4.1",
+    "t": "Introduction",
+    "p": 1
+   },
+   {
+    "n": "4.2",
+    "t": "The E step - Posterior Propagation and Segmentation",
+    "p": 1
+   },
+   {
+    "n": "4.3",
+    "t": "Choice of Expert and Gate Forms and Implementation of the M step",
+    "p": 4
+   },
+   {
+    "n": "4.4",
+    "t": "Optimisation of Experts and Gates",
+    "p": 10
+   },
+   {
+    "n": "4.5",
+    "t": "Initialisation",
+    "p": 12
+   },
+   {
+    "n": "4.6",
+    "t": "Summary",
+    "p": 12
+   }
+  ],
+  "size": 240963
+ },
+ {
+  "key": "5",
+  "label": "5",
+  "title": "Training Mixtures-of-Experts using Early Stopping",
+  "file": "chapter-05.pdf",
+  "pages": 5,
+  "printed": 64,
+  "part": null,
+  "sections": [
+   {
+    "n": "5.1",
+    "t": "Introduction",
+    "p": 1
+   },
+   {
+    "n": "5.2",
+    "t": "Avoiding Over-fitting",
+    "p": 1
+   },
+   {
+    "n": "5.3",
+    "t": "Choosing the Number of Experts and Depth of Hierarchy",
+    "p": 4
+   },
+   {
+    "n": "5.4",
+    "t": "Summary",
+    "p": 5
+   }
+  ],
+  "size": 169892
+ },
+ {
+  "key": "6",
+  "label": "6",
+  "title": "Growing Mixtures of Experts",
+  "file": "chapter-06.pdf",
+  "pages": 16,
+  "printed": 69,
+  "part": null,
+  "sections": [
+   {
+    "n": "6.1",
+    "t": "Introduction",
+    "p": 1
+   },
+   {
+    "n": "6.2",
+    "t": "Design of the Growing Algorithm",
+    "p": 2
+   },
+   {
+    "n": "6.3",
+    "t": "Related Work",
+    "p": 13
+   },
+   {
+    "n": "6.4",
+    "t": "Summary",
+    "p": 16
+   }
+  ],
+  "size": 345055
+ },
+ {
+  "key": "7",
+  "label": "7",
+  "title": "Bayesian Methods for Mixtures of Experts",
+  "file": "chapter-07.pdf",
+  "pages": 19,
+  "printed": 85,
+  "part": null,
+  "sections": [
+   {
+    "n": "7.1",
+    "t": "Introduction",
+    "p": 1
+   },
+   {
+    "n": "7.2",
+    "t": "Background Theory",
+    "p": 2
+   },
+   {
+    "n": "7.3",
+    "t": "Method",
+    "p": 15
+   },
+   {
+    "n": "7.4",
+    "t": "Related Work",
+    "p": 18
+   },
+   {
+    "n": "7.5",
+    "t": "Summary",
+    "p": 19
+   }
+  ],
+  "size": 343005
+ },
+ {
+  "key": "8",
+  "label": "8",
+  "title": "Results on DELVE",
+  "file": "chapter-08.pdf",
+  "pages": 18,
+  "printed": 104,
+  "part": null,
+  "sections": [
+   {
+    "n": "8.1",
+    "t": "Introduction",
+    "p": 1
+   },
+   {
+    "n": "8.2",
+    "t": "Results on Regression Tasks",
+    "p": 3
+   },
+   {
+    "n": "8.3",
+    "t": "Results on Classification Tasks",
+    "p": 12
+   },
+   {
+    "n": "8.4",
+    "t": "Conclusions",
+    "p": 13
+   },
+   {
+    "n": "8.5",
+    "t": "Summary",
+    "p": 17
+   }
+  ],
+  "size": 288649
+ },
+ {
+  "key": "9",
+  "label": "9",
+  "title": "Introduction to Part II",
+  "file": "chapter-09.pdf",
+  "pages": 12,
+  "printed": 122,
+  "part": "Part II: Extensions of Mixtures-of-Experts and their Evaluation on Speech Recognition",
+  "sections": [
+   {
+    "n": "9.1",
+    "t": "Automatic Speech Recognition",
+    "p": 2
+   },
+   {
+    "n": "9.2",
+    "t": "The ABBOT System",
+    "p": 4
+   },
+   {
+    "n": "9.3",
+    "t": "Evaluating Speech Recognition Systems",
+    "p": 7
+   },
+   {
+    "n": "9.4",
+    "t": "Previous Applications of Mixtures-of-Experts to Speech Recognition",
+    "p": 11
+   },
+   {
+    "n": "9.5",
+    "t": "Outline of Part II",
+    "p": 11
+   }
+  ],
+  "size": 202419
+ },
+ {
+  "key": "10",
+  "label": "10",
+  "title": "Speech Recognition using Mixtures of Multi-layer Perceptrons",
+  "file": "chapter-10.pdf",
+  "pages": 6,
+  "printed": 134,
+  "part": null,
+  "sections": [
+   {
+    "n": "10.1",
+    "t": "Introduction",
+    "p": 1
+   },
+   {
+    "n": "10.2",
+    "t": "Multi-Layer Perceptrons in ABBOT",
+    "p": 1
+   },
+   {
+    "n": "10.3",
+    "t": "Mixtures of MLPs as Acoustic Models",
+    "p": 3
+   },
+   {
+    "n": "10.4",
+    "t": "Results",
+    "p": 4
+   },
+   {
+    "n": "10.5",
+    "t": "Conclusions",
+    "p": 6
+   }
+  ],
+  "size": 154323
+ },
+ {
+  "key": "11",
+  "label": "11",
+  "title": "Speaker Adaptation using Mixtures of Recurrent Neural Networks",
+  "file": "chapter-11.pdf",
+  "pages": 12,
+  "printed": 140,
+  "part": null,
+  "sections": [
+   {
+    "n": "11.1",
+    "t": "Introduction",
+    "p": 1
+   },
+   {
+    "n": "11.2",
+    "t": "Speaker Adaptation",
+    "p": 1
+   },
+   {
+    "n": "11.3",
+    "t": "Recurrent Neural Networks for Speech Recognition",
+    "p": 3
+   },
+   {
+    "n": "11.4",
+    "t": "Speaker Adaptation within ABBOT",
+    "p": 5
+   },
+   {
+    "n": "11.5",
+    "t": "Mixtures of Local Linear Transforms",
+    "p": 6
+   },
+   {
+    "n": "11.6",
+    "t": "Results",
+    "p": 8
+   },
+   {
+    "n": "11.7",
+    "t": "Conclusions",
+    "p": 11
+   }
+  ],
+  "size": 254416
+ },
+ {
+  "key": "12",
+  "label": "12",
+  "title": "Conclusions and Future Work",
+  "file": "chapter-12.pdf",
+  "pages": 4,
+  "printed": 152,
+  "part": "Part III: Conclusions, Appendices and References",
+  "sections": [],
+  "size": 85575
+ },
+ {
+  "key": "A",
+  "label": "A",
+  "title": "Availability of Source Code and Results",
+  "file": "appendix-a.pdf",
+  "pages": 1,
+  "printed": 156,
+  "part": null,
+  "sections": [],
+  "size": 57669
+ },
+ {
+  "key": "B",
+  "label": "B",
+  "title": "Results on DELVE Regression Tasks",
+  "file": "appendix-b.pdf",
+  "pages": 18,
+  "printed": 157,
+  "part": null,
+  "sections": [
+   {
+    "n": "B.1",
+    "t": "Boston",
+    "p": 2
+   },
+   {
+    "n": "B.2",
+    "t": "The Kin and Pumadyn families",
+    "p": 3
+   }
+  ],
+  "size": 350711
+ },
+ {
+  "key": "C",
+  "label": "C",
+  "title": "Results on DELVE Classification Tasks",
+  "file": "appendix-c.pdf",
+  "pages": 4,
+  "printed": 175,
+  "part": null,
+  "sections": [
+   {
+    "n": "C.1",
+    "t": "Image",
+    "p": 2
+   },
+   {
+    "n": "C.2",
+    "t": "Letter",
+    "p": 3
+   },
+   {
+    "n": "C.3",
+    "t": "Splice",
+    "p": 4
+   }
+  ],
+  "size": 124628
+ },
+ {
+  "key": "bib",
+  "label": "",
+  "title": "Bibliography",
+  "file": "bibliography.pdf",
+  "pages": 20,
+  "printed": 179,
+  "part": null,
+  "sections": [],
+  "size": 195561
+ }
+]

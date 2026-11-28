@@ -1,0 +1,1038 @@
+[
+{
+"n": 1,
+"text": "Alpaydin, E. and Jordan, M. I. [1996], ‘Local linear perceptrons for classification’, IEEE Transactions on Neural Networks 7(3), 788–792."
+},
+{
+"n": 2,
+"text": "Amari, S. [1995a], ‘The EM algorithm and information geometry in neural-network learning’, Neural Computation 7(1), 13–18."
+},
+{
+"n": 3,
+"text": "Amari, S. I. [1995b], ‘Information geometry of the EM and em algorithms for neural networks’, Neural Networks 8(9), 1379–1408."
+},
+{
+"n": 4,
+"text": "Anand, R., Mehrotra, K., Mohan, C. K. and Ranka, S. [1995], ‘Efficient classification for multiclass problems using modular neural networks’, IEEE Transactions on Neural Networks 6(1), 117–124."
+},
+{
+"n": 5,
+"text": "Atal, B. S., Cuperman, V. and Gersho, A. [1991], Advances in Speech Coding, Kluwer Academic Publishers."
+},
+{
+"n": 6,
+"text": "Bahl, L. R., Jelinek, F. and Mercer, R. L. [1983], ‘A maximum-likelihood approach to continuous speech recognition’, IEEE Transactions on Pattern Analysis and Machine Intelligence 5(2), 179– 190."
+},
+{
+"n": 7,
+"text": "Barlow, T. W. [1995], ‘Feedforward neural networks for secondary structure prediction’, Journal of Molecular Graphics 13(3), 175–183."
+},
+{
+"n": 8,
+"text": "Baum, L. E. [1972], ‘An inequality and associated maximization in statistical estimation for probabilistic functions of Markov processes’, Inequalities 3, 1–8."
+},
+{
+"n": 9,
+"text": "Bengio, S., Fessant, F. and Collobert, D. [1996], ‘Use of modular architectures for time-series prediction’, Neural Processing Letters 3(2), 101–106."
+},
+{
+"n": 10,
+"text": "Bengio, Y. and Frasconi, P. [1996], ‘Input-output HMMs for sequence processing’, IEEE Transactions on Neural Networks 7(5), 1231–1249."
+},
+{
+"n": 11,
+"text": "Bennani, Y. [1995], ‘A modular and hybrid connectionist system for speaker identification’, Neural Computation 7(4), 791–798."
+},
+{
+"n": 12,
+"text": "Berger, J. [1985], Statistical Decision theory and Bayesian Analysis, Springer."
+},
+{
+"n": 13,
+"text": "Bernardo, J. M. and Smith, A. F. M. [1994], Bayesian Theory, Wiley."
+},
+{
+"n": 14,
+"text": "Bishop, C. M. [1995], Neural Networks for Pattern Recognition, Oxford University Press, Oxford."
+},
+{
+"n": 15,
+"text": "Bishop, C. M. and Nabney, I. T. [1996], ‘Modelling conditional-probability distributions for periodic variables’, Neural Computation 8(5), 1123–1133."
+},
+{
+"n": 16,
+"text": "Bourlard, H. A. and Morgan, N. [1993], ‘Continuous speech recognition by connectionist statistical-methods’, IEEE Transactions on Neural Networks 4(6), 893–909."
+},
+{
+"n": 17,
+"text": "Bourlard, H. A. and Morgan, N. [1994], Connectionist Speech Recognition: A Hybrid Approach, Kluwer Academic Publishers."
+},
+{
+"n": 18,
+"text": "Box, G. E. P. and Tiao, G. C. [1973], Bayesian inference in statistical analysis, Addison–Wesley."
+},
+{
+"n": 19,
+"text": "Bregler, C. and Malik, J. [1997], Learning appearance based models: mixtures of second moment experts, in Mozer et al. [148], pp. 845–851."
+},
+{
+"n": 20,
+"text": "Breiman, L. [1997], ‘The uncertainty principle in statistics’. Lecture notes from the Generalisation in Neural Networks and Machine Learning NATO ASI, at the Isaac Newton Institue for Mathematical Sciences, Cambridge University."
+},
+{
+"n": 21,
+"text": "Breiman, L., Friedman, J. H., Olshen, R. A. and Stone, C. J. [1984], Classification and Regression Trees, Wadsworth and Brooks/Cole, Monterey, CA."
+},
+{
+"n": 22,
+"text": "Breiman, L. and Meisel, W. S. [1976], ‘General estimates of the intrinsic variability of data in nonlinear regression models’, Journal of the American Statistical Association 71(354), 301–307."
+},
+{
+"n": 23,
+"text": "Bridle, J. S. [1989], Probabilistic interpretation of feedforward classification network outputs, with relationships to statistical pattern recognition, in F. Fougelman-Soulie and J. Hérault, eds, ‘Neurocomputing: Algorithms, Architectures and Applications’, Springer-Verlag, pp. 227–236."
+},
+{
+"n": 24,
+"text": "Brodley, C. E. [1995], ‘Recursive automatic bias selection for classifier construction’, Machine Learning 20(1-2), 63–94."
+},
+{
+"n": 25,
+"text": "Brodley, C. E. and Smyth, P. [1997], ‘Applying classification algorithms in practice’, Statistics and Computing 7(1), 45–56."
+},
+{
+"n": 26,
+"text": "Brodley, C. E. and Utgoff, P. E. [1995], ‘Multivariate decision trees’, Machine Learning 19(1), 45– 77."
+},
+{
+"n": 27,
+"text": "Buntine, W. L. [1994], ‘Operations for learning with graphical models’, Journal of Artificial Intelligence Research 2, 159–225."
+},
+{
+"n": 28,
+"text": "Buntine, W. L. [1995], Graphical models for discovering knowledge, in Fayyad, Piatetsky-Shapiro, Smyth and Uthurusamy [52], chapter 3, pp. 59–83. URL: http://www.ultimode.com/wray/"
+},
+{
+"n": 29,
+"text": "Buntine, W. L. and Weigend, A. S. [1991], ‘Bayesian back–propagation’, Complex Systems 5, 603– 643."
+},
+{
+"n": 30,
+"text": "Cacciatore, T. W. and Nowlan, S. J. [1994], Mixtures of controllers for jump linear and nonlinear plants, in J. D. Cowan, G. Tesauro and J. Alspector, eds, ‘Advances in Neural Information Processing Systems 6’, Morgan Kaufmann, San Francisco, CA, pp. 719–726."
+},
+{
+"n": 31,
+"text": "Carter, C. and Catlett, J. [1987], ‘Assessing credit card applications using machine learning’, IEEE Expert 2(3), 71–79."
+},
+{
+"n": 32,
+"text": "Chaer, W. S., Bishop, R. H. and Ghosh, J. [1997], ‘A mixture-of-experts framework for adaptive Kalman filtering’, IEEE Transactions on Systems, Man, and Cybernetics, Part B 27(3), 452–464."
+},
+{
+"n": 33,
+"text": "Cheeseman, P. and Stutz, J. [1995], Bayesian classification (AutoClass): theory and results, in Fayyad, Piatetsky-Shapiro, Smyth and Uthurusamy [52], chapter 6, pp. 153–180."
+},
+{
+"n": 34,
+"text": "Chen, K., Xie, D. H. and Chi, H. S. [1996a], ‘A modified HME architecture for text-dependent speaker identification’, IEEE Transactions on Neural Networks 7(5), 1309–1313."
+},
+{
+"n": 35,
+"text": "Chen, K., Xie, D. H. and Chi, H. S. [1996b], ‘Speaker identification using time-delay HMEs’, International Journal of Neural Systems 7(1), 29–43."
+},
+{
+"n": 36,
+"text": "Cheng, B. and Titterington, D. M. [1994], ‘Neural networks - a review from a statistical perspective’, Statistical Science 9(1), 2–30."
+},
+{
+"n": 37,
+"text": "Cohen, P. R. [1995], Empirical Methods for Artificial Intelligence, MIT Press."
+},
+{
+"n": 38,
+"text": "Cook, G. D. [1997], Data Selection and Model Combination in Connectionist Speech Recognition, PhD thesis, Cambridge University Engineering Department."
+},
+{
+"n": 39,
+"text": "Cook, G. D. and Robinson, A. J. [1995], Utterance clustering for large vocabulary continuous speech recognition, in ‘Proceedings of the European Conference on Speech Technology’, Vol. I, pp. 219–22. URL: http://svr-www.eng.cam.ac.uk/ gdc/papers/eurospeech95.ps.Z"
+},
+{
+"n": 40,
+"text": "Cook, G. D. and Robinson, A. J. [1996], Boosting the performance of connectionist largevocabulary speech recognition, in ‘Proceedings of the International Conference on Spoken Language Processing’. URL: http://svr-www.eng.cam.ac.uk/ gdc/papers/icslp96-preprint.ps.Z"
+},
+{
+"n": 41,
+"text": "Csiszár, I. and Tusnády, G. [1983], Information geometry and alternating minimization procedures, in e. a. E. J. Dudewicz, ed., ‘Recent Results in Estimation Theory and Related Topics’, Statistics and Decisions, Supplement Issue No. 1, 1984, Oldenburg Verlag, Munich."
+},
+{
+"n": 42,
+"text": "Davis, S. B. and Mermelstein, P. [1980], ‘Comparison of parametric representations for monosyllabic word recognition in continuously spoken sentences’, IEEE Transactions on Acoustics, Speech, and Signal Processing 28(4), 357–66."
+},
+{
+"n": 43,
+"text": "Dayan, P., Hinton, G. E., Neal, R. M. and Zemel, R. S. [1995], ‘The Helmholtz machine’, Neural Computation 7(5), 889–904."
+},
+{
+"n": 44,
+"text": "Dayan, P. and Zemel, R. S. [1995], ‘Competition and multiple cause models’, Neural Computation 7(3), 565–579."
+},
+{
+"n": 45,
+"text": "Dempster, A. P., Laird, N. M. and Rubin, D. B. [1977], ‘Maximum likelihood from incomplete data via the EM algorithm’, Journal of the Royal Statistical Society, Series B 39, 1–38."
+},
+{
+"n": 46,
+"text": "Dietterich, T. [1995], ‘Overfitting and undercomputing in machine learning’, ACM Computing Surveys 27(3), 326–327. URL: ftp://ftp.cs.orst.edu/pub/tgd/papers/cs95.ps.gz"
+},
+{
+"n": 47,
+"text": "Dietterich, T. G., Hild, H. and Bakiri, G. [1995], ‘A comparison of ID3 and backpropagation for English text-to-speech mapping’, Machine Learning 18(1), 51–80. URL: ftp://ftp.cs.orst.edu/pub/tgd/papers/mlj-nettalk.ps.gz"
+},
+{
+"n": 48,
+"text": "Drucker, H., Cortes, C., Jackel, L. D., LeCun, Y. and Vapnik, V. [1994], ‘Boosting and other ensemble methods’, Neural Computation 6, 1289–1301."
+},
+{
+"n": 49,
+"text": "Duda, R. O. and Hart, P. E. [1974], Pattern Classification and Scene Analysis, John Wiley and Sons, New York."
+},
+{
+"n": 50,
+"text": "Elman, J. L. [1990], ‘Finding structure in time’, Cognitive Science 14, 179–211."
+},
+{
+"n": 51,
+"text": "Fayyad, U. M., Piatetsky-Shapiro, G. and Smyth, P. [1995], From data-mining to knowledge discovery: An overview., in Fayyad, Piatetsky-Shapiro, Smyth and Uthurusamy [52], chapter 1, pp. 1–37."
+},
+{
+"n": 52,
+"text": "Fayyad, U. M., Piatetsky-Shapiro, G., Smyth, P. and Uthurusamy, R., eds [1995], Knowledge Discovery in Data Bases II, AAAI Press / The MIT Press, Menlo Park, CA."
+},
+{
+"n": 53,
+"text": "Fletcher, R. [1987], Practical Methods of Optimization, Wiley, New York."
+},
+{
+"n": 54,
+"text": "Flexer, A. [1996], Statistical evaluation of neural network experiments: minimum requirements and current practice, in T. R., ed., ‘Cybernetics and Systems. Proceedings of the 13th European meeting on Cybernetics and Systems Research.’, Austrian Society for Cybernetic Studies, Vienna, pp. 1005–1008."
+},
+{
+"n": 55,
+"text": "Foley, J. and van Dam A. [1982], Fundamentals of interactive computer graphics, Addison-Wesley, London."
+},
+{
+"n": 56,
+"text": "Frey, P. W. and Slate, D. J. [1991], ‘Letter recognition using Holland-style adaptive classifiers’, Machine Learning 6(2), 161–182."
+},
+{
+"n": 57,
+"text": "Friedman, J. H. [1979], A tree structured approach to nonparametric multiple regression, in T. H. Gasser and M. Rosenblatt, eds, ‘Smoothing techniques for curve estimation’, number 757 in ‘Lecture notes in mathematics’, Springer-Verlag, chapter 1, pp. 5–22."
+},
+{
+"n": 58,
+"text": "Friedman, J. H. [1991], ‘Multivariate adaptive regression splines’, Annals of Statistics 19(1), 1–67."
+},
+{
+"n": 59,
+"text": "Friedman, J. H. and Stuetzle, W. [1981], ‘Projection pursuit regression’, Journal of the American Statistical Association 76(376), 817–823."
+},
+{
+"n": 60,
+"text": "Fritsch, J. [1996], Modular neural networks for speech recognition, Master’s thesis, University of Karlsruhe, Germany. URL: ftp://reports.adm.cs.cmu.edu/usr/anon/1996/CMU-CS-96-203.ps.gz"
+},
+{
+"n": 61,
+"text": "Fritsch, J. and Finke, M. [1997], Improving performance on Switchboard by combining hybrid HME/HMM and mixture of Gaussians acoustic models, in ‘Proceedings of the European Conference on Speech Technology’. URL: http://werner.ira.uka.de/ fritsch/"
+},
+{
+"n": 62,
+"text": "Fritsch, J., Finke, M. and Waibel, A. [1997a], Adaptively growing hierarchical mixtures of experts, in Mozer et al. [148], pp. 459–465. URL: http://werner.ira.uka.de/ fritsch/fritsch-nips96.ps.gz"
+},
+{
+"n": 63,
+"text": "Fritsch, J., Finke, M. and Waibel, A. [1997b], Context-dependent hybrid HME/HMM speech recognition using polyphone clustering decision trees, in ‘Proceedings of the IEEE International Conference on Acoustics, Speech, and Signal Processing’. URL: http://werner.ira.uka.de/ fritsch/fritsch-icassp97.ps"
+},
+{
+"n": 64,
+"text": "Furui, S. [1986], ‘Speaker-independent isolated word recognition using dynamic features of speech spectrum’, IEEE Transactions on Acoustics, Speech, and Signal Processing 34(1), 52–59."
+},
+{
+"n": 65,
+"text": "Gales, M. J. F. [1995], Model-based techniques for noise robust speech recognition, PhD thesis, Cambridge University Engineering Department."
+},
+{
+"n": 66,
+"text": "Gauvian, J.-L. and Lee, C.-H. [1994], ‘Maximum a posteriori estimation for multivariate Gaussian mixture observations of Markov chains’, IEEE Transactions on Acoustics, Speech, and Signal Processing 2(2), 291–298."
+},
+{
+"n": 67,
+"text": "Gelman, A., Carlin, J. B., Stern, H. S. and Rubin, D. B. [1995], Bayesian Data Analysis, Chapman & Hall, New York."
+},
+{
+"n": 68,
+"text": "Geman, S. and Geman, D. [1984], ‘Stochastic relaxation, Gibbs distributions, and the Bayesian restoration of images’, IEEE Transactions on Pattern Analysis and Machine Intelligence 6(6), 721– 741."
+},
+{
+"n": 69,
+"text": "Ghahramani, Z. [1996a], ‘The kin datasets’. URL: http://www.cs.utoronto.ca/ delve/data/kin/kin.ps.gz"
+},
+{
+"n": 70,
+"text": "Ghahramani, Z. [1996b], ‘The pumadyn datasets’. URL: http://www.cs.utoronto.ca/ delve/data/pumadyn/pumadyn.ps.gz"
+},
+{
+"n": 71,
+"text": "Ghahramani, Z. and Jordan, M. I. [1994], Learning from incomplete data, Technical Report CBCL 108, Massachusetts Institute of Technology."
+},
+{
+"n": 72,
+"text": "Ghahramani, Z. and Jordan, M. I. [1996], Factorial hidden Markov models, in Touretzky et al. [226], pp. 472–478."
+},
+{
+"n": 73,
+"text": "Ghahramani, Z. and Wolpert, D. M. [1997], ‘Modular decomposition in visuomotor learning’, Nature 386(6623), 392–395."
+},
+{
+"n": 74,
+"text": "Gillick, L. and Cox, S. [1989], Some statistical issues in the comparison of speech recognition algorithms, in ‘Proceedings of the IEEE International Conference on Acoustics, Speech, and Signal Processing’, pp. 532–535."
+},
+{
+"n": 75,
+"text": "Godfrey, J. J., Holliman, E. C. and McDaniel, J. [1992], SWITCHBOARD: Telephone speech corpus for research and development, in ‘Proceedings of the IEEE International Conference on Acoustics, Speech, and Signal Processing’, pp. 517–520."
+},
+{
+"n": 76,
+"text": "Hamilton, J. D. [1990], ‘Analysis of time-series subject to changes in regime’, Journal of Econometrics 45(1-2), 39–70."
+},
+{
+"n": 77,
+"text": "Hampshire, J. B. and Waibel, A. [1992], ‘The meta-Pi network - building distributed knowledge representations for robust multisource pattern-recognition’, IEEE Transactions on Pattern Analysis and Machine Intelligence 14(7), 751–769."
+},
+{
+"n": 78,
+"text": "Harrison, D. and Rubinfeld, D. [1978], ‘Hedonic prices and the demand for clean air’, Journal of Environmental Economics & Management 5, 81–102."
+},
+{
+"n": 79,
+"text": "Hartley, M. [1978], ‘Comment on Quandt and Ramsey [184]’, Journal of the American Statistical Association 73(364), 730–752."
+},
+{
+"n": 80,
+"text": "Hastie, T. J. and Tibshirani, R. J. [1990], Generalised Additive Models, Chapman and Hall, London."
+},
+{
+"n": 81,
+"text": "Hathaway, R. J. [1985], ‘A constrained formulation of maximum-likelihood estimation for normal mixture distributions’, Annals of Statistics 13(2), 795–800."
+},
+{
+"n": 82,
+"text": "Hathaway, R. J. [1986], ‘Another interpretation of the EM algorithm for mixture distributions’, Statistics & Probability Letters 4(2), 53–56."
+},
+{
+"n": 83,
+"text": "Hering, K., Haupt, R. and Villmann, T. [1996], Hierarchical strategy of model partitioning for VLSI-design using an improved mixture of experts approach, in ‘Tenth Workshop on Parallel and Distributed Simulation - PADS 96, Proceedings’, pp. 106–113. URL: http://www.informatik.uni-leipzig.de/ifi/abteilungen/ti/pers/PAPER/pads96.ps"
+},
+{
+"n": 84,
+"text": "Herman J.M. Steeneken, D. A. V. L. [1995], Multi-lingual assessment of speaker independent large vocabulary speech-recognition systems: the SQALE project (speech recognition quality assessment for language engineering), in ‘Proceedings of the European Conference on Speech Technology’."
+},
+{
+"n": 85,
+"text": "Hermansky, H. [1990], ‘Perceptual linear predictive (PLP) analysis of speech’, Journal of the Acoustical Society of America 87(4), 1738–1752."
+},
+{
+"n": 86,
+"text": "Hinton, G. E. and Sejnowski, T. J. [1986], Learning and relearning in Boltzmann machines, in D. E. Rumelhart and J. E. McClelland, eds, ‘Parallel Distributed Processing’, MIT Press, Cambridge Mass., pp. 282–317."
+},
+{
+"n": 87,
+"text": "Hinton, G. E. and van Camp, D. [1993], Keeping neural networks simple by minimizing the description length of the weights, in ‘Proceedings of the 6th Annual conference on Computational Learning Theory’, ACM Press, New York, NY, pp. 5–13."
+},
+{
+"n": 88,
+"text": "Hinton, G., Revow, M. and Dayan, P. [1995], Recognizing handwritten digits using mixtures of linear models, in Tesauro et al. [218]."
+},
+{
+"n": 89,
+"text": "Hochberg, M., Cook, G., Renals, S. and Robinson, A. J. [1994], Connectionist model combination for large vocabulary speech recognition, in ‘Proceedings of the IEEE Workshop on Neural Networks for Signal Processing’, IEEE Press, Long Beach, CA, pp. 269–278."
+},
+{
+"n": 90,
+"text": "Hoerl, A. E. and Kennard, R. W. [1970], ‘Ridge regression: biased estimation for nonorthogonal problems’, Technometrics 12, 55–67."
+},
+{
+"n": 91,
+"text": "Holmstrom, L., Koistinen, P., Laaksonen, J. and Oja, E. [1997], ‘Neural and statistical classifiers taxonomy and two case studies’, IEEE Transactions on Neural Networks 8(1), 5–17."
+},
+{
+"n": 92,
+"text": "Holte, R. C. [1993], ‘Very simple classification rules perform well on most commonly used datasets’, Machine Learning 11(1), 63–91."
+},
+{
+"n": 93,
+"text": "Hu, Y. H., Palreddy, S. and Tompkins, W. J. [1995], Customized ECG beat classifier using mixture of experts, in ‘Proceedings of the IEEE Workshop on Neural Networks for Signal Processing’, IEEE Press, Long Beach, CA, pp. 459–464."
+},
+{
+"n": 94,
+"text": "Huang, X. D., Ariki, Y. and Jack, M. A. [1990], Hidden Markov models for speech recognition, Edinburgh University Press, Edinburgh."
+},
+{
+"n": 95,
+"text": "Jaakkola, T. S. and Jordan, M. I. [1996a], Bayesian logistic regression: a variational approach, Technical report, MIT. URL: ftp://psyche.mit.edu/pub/tommi/jaak-bayes.ps.Z"
+},
+{
+"n": 96,
+"text": "Jaakkola, T. S. and Jordan, M. I. [1996b], Computing upper and lower bounds on likelihoods in intractable networks, in ‘Proceedings of the Twelfth Conference on Uncertainty in AI’, Morgan Kaufmann. URL: ftp://psyche.mit.edu/pub/tommi/jaak-ul-bounds.ps.Z"
+},
+{
+"n": 97,
+"text": "Jacobs, R. A. [1988], ‘Increased rates of convergence through learning rate adaptation’, Neural Networks 1(4), 295–307."
+},
+{
+"n": 98,
+"text": "Jacobs, R. A. [1990], Task composition through competition in a modular connectionist architecture, PhD thesis, University of Massachusetts, Department of Computer and Information Science."
+},
+{
+"n": 99,
+"text": "Jacobs, R. A. [1995], ‘Methods for combining experts probability assessments’, Neural Computation 7(5), 867–888."
+},
+{
+"n": 100,
+"text": "Jacobs, R. A. [1997], ‘Bias/variance analyses of mixtures-of-experts architectures’, Neural Computation 9(2), 369–383."
+},
+{
+"n": 101,
+"text": "Jacobs, R. A. and Jordan, M. I. [1991], A competitive modular connectionist architecture, in Lippmann et al. [131], pp. 767–773."
+},
+{
+"n": 102,
+"text": "Jacobs, R. A. and Jordan, M. I. [1993], ‘Learning piecewise control strategies in a modular neuralnetwork architecture’, IEEE Transactions on Systems, Man, and Cybernetics 23(2), 337–345."
+},
+{
+"n": 103,
+"text": "Jacobs, R. A., Jordan, M. I. and Barto, A. G. [1991], ‘Task decomposition through competition in a modular connectionist architecture - the What and Where vision tasks’, Cognitive Science 15(2), 219–250."
+},
+{
+"n": 104,
+"text": "Jacobs, R. A., Jordan, M. I., Nowlan, S. J. and Hinton, G. E. [1991], ‘Adaptive mixtures of local experts’, Neural Computation 3(1), 79–87."
+},
+{
+"n": 105,
+"text": "Jacobs, R. A., Peng, F. C. and Tanner, M. A. [1997], ‘A Bayesian approach to model selection in hierarchical mixtures-of-experts architectures’, Neural Networks 10(2), 231–241."
+},
+{
+"n": 106,
+"text": "Jensen, F. V. [1996], An introduction to Bayesian networks, University College London Press."
+},
+{
+"n": 107,
+"text": "Jordan, M. I. [1986], Serial order: A parallel distributed processing approach, ICS Report 8604, Institute for Cognitive Science, University of California, San Diego."
+},
+{
+"n": 108,
+"text": "Jordan, M. I. [1994], A statistical approach to decision tree modelling, in N.Warmuth, ed., ‘Proceedings of the Seventh Annual ACM Conference on Computational Learning Theory’, ACM Press."
+},
+{
+"n": 109,
+"text": "Jordan, M. I. and Bishop, C. M. [1996], ‘Neural networks’, ACM Computing Surveys 28(1), 73– 75."
+},
+{
+"n": 110,
+"text": "Jordan, M. I., Ghahramani, Z. and Saul, L. K. [1997], Hidden Markov decision trees, in Mozer et al. [148], pp. 501–507."
+},
+{
+"n": 111,
+"text": "Jordan, M. I. and Jacobs, R. A. [1992], Hierarchies of adaptive experts, in J. E. Moody, S. J. Hanson and R. P. Lippmann, eds, ‘Advances in Neural Information Processing Systems 4’, Morgan Kaufmann, San Mateo, California, pp. 985–992."
+},
+{
+"n": 112,
+"text": "Jordan, M. and Jacobs, R. [1994], ‘Hierarchical mixtures of experts and the EM algorithm’, Neural Computation 6(2), 181–214."
+},
+{
+"n": 113,
+"text": "Jordan, M. and Xu, L. [1995], ‘Convergence results for the EM approach to mixtures of experts architectures’, Neural Networks 8(9), 1409–1431."
+},
+{
+"n": 114,
+"text": "Kang, K. and Oh, J. [1997], Statistical mechanics of the mixture of experts, in Mozer et al. [148], pp. 183–189."
+},
+{
+"n": 115,
+"text": "Kang, K., Oh, J. H. and Kwon, C. [1997], ‘Learning by a population of perceptrons’, Physical Review E 55(3PtB), 3257–3261."
+},
+{
+"n": 116,
+"text": "Kecman, V. [1996], ‘System identification using modular neural network with improved learning’, Proceedings of International Workshop on Neural Networks for Identification, Control, Robotics, and Signal/Image Processing, NICROSP pp. 40–48."
+},
+{
+"n": 117,
+"text": "Kehagias, A. and Petridis, V. [1997], ‘Predictive modular neural networks for time series classification’, Neural Networks 10(1), 31–49."
+},
+{
+"n": 118,
+"text": "Kershaw, D. J., Robinson, A. J., Renals, S. J. and Hochberg, M. M. [1996], The 1995 ABBOT LVCSR system, in ‘Proceedings of the ARPA Speech Recognition Workshop’, Morgan Kauffman, 340 Pine St, 6th Floor, San Fransisco, CA, 94104."
+},
+{
+"n": 119,
+"text": "King, R. D., Feng, C. and Sutherland, A. [1995], ‘STATLOG - comparison of classification algorithms on large real-world problems’, Applied Artificial Intelligence 9(3), 289–333."
+},
+{
+"n": 120,
+"text": "Knill, K. and Young, S. [1997], Hidden Markov models in speech and language processing, in S. Young and G. Bloothooft, eds, ‘Corpus-Based Methods in Language and Speech Processing’, Kluwer Academic Publishers, chapter 2, pp. 27–68."
+},
+{
+"n": 121,
+"text": "Kosaka, T. and Sagayama, S. [1994], Tree structured speaker clustering for fast speaker adaptation, in ‘Proceedings of the IEEE International Conference on Acoustics, Speech, and Signal Processing’, Vol. 1, pp. 245–248."
+},
+{
+"n": 122,
+"text": "Kubala, F. [1995], Design of the 1994 CSR benchmark tests, in ‘Proceedings of the ARPA Speech Recognition Workshop’, Morgan Kaufmann, 340 Pine St, 6th Floor, San Fransisco, CA, 94104, pp. 41–6."
+},
+{
+"n": 123,
+"text": "Kullback, S. and Liebler, R. A. [1951], ‘On Information and Sufficiency’, Annals of Mathematics and Statistics 22, 79–86."
+},
+{
+"n": 124,
+"text": "Lamel, L. F., Kasel, R. H. and Seneff, S. [1987], Speech database development: design and analysis of the acoustic-phonetic corpus, in ‘Proceedings of the DARPA Speech Recognition Workshop’, Morgan Kaufmann, 340 Pine St, 6th Floor, San Fransisco, CA, 94104, pp. 26–32."
+},
+{
+"n": 125,
+"text": "Lau, K. N., Yang, C. H. and Post, G. V. [1996], ‘Stochastic preference modeling within a switching regression framework’, Computers & Operations Research 23(12), 1163–1169."
+},
+{
+"n": 126,
+"text": "Lauritzen, S. L. [1996], Graphical Models, Oxford Statistical Science Series, Clarendon Press, Oxford."
+},
+{
+"n": 127,
+"text": "Leggetter, C. J. [1993], Maximum Likelihood Linear Regression for Speaker Adaptation of Continuous Density HMMs, PhD thesis, Cambridge University Engineering Department."
+},
+{
+"n": 128,
+"text": "Leggetter, C. J. and Woodland, P. C. [1995], ‘Maximum likelihood linear regression for speaker adaptation of continuous density HMMs’, Computer Speech and Language 9, 171–186."
+},
+{
+"n": 129,
+"text": "Leite, J. A. F. and Hancock, E. R. [1997], ‘Iterative curve organisation with the EM algorithm’, Pattern Recognition Letters 18(2), 143–155."
+},
+{
+"n": 130,
+"text": "Levinson, S. E., Rabiner, L. R. and Sondhi, M. M. [1983], ‘An introduction to the application of the theory of probabilistic functions of a Markov process to automatic speech recognition’, The Bell System Technical Journal 62(4), 1035–74."
+},
+{
+"n": 131,
+"text": "Lippmann, R. P., Moody, J. and Touretzky, D. S., eds [1991], Advances in Neural Information Processing Systems 3, Morgan Kaufmann, Redwood City, CA."
+},
+{
+"n": 132,
+"text": "MacKay, D. J. C. [1992a], ‘The evidence framework applied to classification networks’, Neural Computation 4(5), 720–736."
+},
+{
+"n": 133,
+"text": "MacKay, D. J. C. [1992b], ‘A practical Bayesian framework for backpropagation networks’, Neural Computation 4(3), 448–472."
+},
+{
+"n": 134,
+"text": "MacKay, D. J. C. [1995a], Developments in probabilistic modelling with neural networks— ensemble learning, in ‘Neural Networks: Artificial Intelligence and Industrial Applications. Proceedings of the 3rd Annual Symposium on Neural Networks, Nijmegen, Netherlands, 14-15 September 1995’, Springer, Berlin, pp. 191–198."
+},
+{
+"n": 135,
+"text": "MacKay, D. J. C. [1995b], ‘Probable networks and plausible predictions - a review of practical Bayesian methods for supervised neural networks’, Network-Computation in Neural Systems 6(3), 469–505."
+},
+{
+"n": 136,
+"text": "MacKay, D. J. C. [1997], ‘Comparison of approximate methods for handling hyperparameters’, Neural Computation . In press. URL: ftp://wol.ra.phy.cam.ac.uk/pub/mackay/abstracts/alpha.html"
+},
+{
+"n": 137,
+"text": "Macphee, K. and MacKay, D. J. C. [1996], ‘Ensemble learning for hidden Markov models’. URL: ftp://wol.ra.phy.cam.ac.uk/pub/mackay/ensemblePaper.ps.gz"
+},
+{
+"n": 138,
+"text": "Makhoul, J. [1975], ‘Linear prediction. A tutorial review’, Proceedings of the IEEE 63(4), 561– 580."
+},
+{
+"n": 139,
+"text": "Martin, A. [1997], Statistical significance tests for speech recognition benchmark tests. Unpublished draft. (email: alvin.martin@nist.gov)."
+},
+{
+"n": 140,
+"text": "McCullagh, P. and Nelder, J. A. [1989], Generalised Linear Models, Monographs on Statistics and Applied Probability, second edn, Chapman and Hall, London."
+},
+{
+"n": 141,
+"text": "Meilă, M. and Jordan, M. I. [1996], Learning fine motion by Markov mixtures of experts, in Touretzky et al. [226], pp. 1003–1009."
+},
+{
+"n": 142,
+"text": "Meng, X. L. and van Dyk, D. [1997], ‘The EM algorithm - an old folk-song sung to a fast new tune’, Journal of the Royal Statistical Society, Series B 59(3), 511–540."
+},
+{
+"n": 143,
+"text": "Merz, C. and Murphy, P. [1996], ‘UCI Repository of machine learning databases, Irvine, CA: University of California, Department of Information and Computer Science.’. URL: http://www.ics.uci.edu/ mlearn/MLRepository.html"
+},
+{
+"n": 144,
+"text": "Michie, D., Spiegelhalter, D. J. and Taylor, C. C., eds [1994], Machine Learning, Neural and Statistical Classification, Ellis Horwood, New York."
+},
+{
+"n": 145,
+"text": "Miller, D. and Rose, K. [1996], ‘Hierarchical unsupervised learning with growing phase transitions’, Neural Computation 8, 425–450."
+},
+{
+"n": 146,
+"text": "Miller, D. and Uyar, S. [1997], A mixture of experts classifier with learning based on both labelled and unlabelled data, in Mozer et al. [148], pp. 571–578."
+},
+{
+"n": 147,
+"text": "Morgan, N. and Bourlard, H. A. [1990], Generalization and parameter estimation in feedforward nets: some experiments, in D. Touretzky, ed., ‘Advances in Neural Information Processing Systems 2’, Morgan Kaufmann, San Mateo, CA, pp. 630–637."
+},
+{
+"n": 148,
+"text": "Mozer, M. C., Jordan, M. I. and Petsche, T., eds [1997], Advances in Neural Information Processing Systems 9, MIT Press, 55 Hayward St., Cambridge, MA, 02142-1399."
+},
+{
+"n": 149,
+"text": "Murata, N., Yoshizawa, S. and Amari, S. [1994], ‘Network information criterion - determining the number of hidden units for an artificial neural network’, IEEE Transactions on Neural Networks 5(6), 865–872."
+},
+{
+"n": 150,
+"text": "Murray-Smith, R. and Johansen, T. A. [1997], Multiple model approaches to modelling and control, Taylor and Francis, London. URL: http://www.itk.ntnu.no/SINTEF/ansatte/Johansen Tor.Arne/mmamc/mmamc book.html"
+},
+{
+"n": 151,
+"text": "Nadas, A. [1995], ‘Binary classification by stochastic neural nets’, IEEE Transactions on Neural Networks 6(2), 488–491."
+},
+{
+"n": 152,
+"text": "Neal, R. M. [1991], Bayesian mixture modelling, in C. R. Smith, G. J. Erickson and P. O. Neudorfer, eds, ‘Maximum Entropy and Bayesian Methods, Seattle 1991’, Kluwer, Dordrecht, pp. 197– 211."
+},
+{
+"n": 153,
+"text": "Neal, R. M. [1996], Bayesian learning for neural networks, Springer-Verlag."
+},
+{
+"n": 154,
+"text": "Neal, R. M. and Hinton, G. E. [1993], ‘A new view of the EM algorithm that justifies incremental and other variants’. URL: http://www.cs.toronto.edu/ radford/"
+},
+{
+"n": 155,
+"text": "Neto, J., Almeida, L., Hochberg, M. M., Martins, C., Nunes, L., Renals, S. J. and Robinson, A. J. [1995], Speaker-adaptation for hybrid HMM-ANN continuous speech recognition system, in ‘Proceedings of the European Conference on Speech Technology’, pp. 2171–4."
+},
+{
+"n": 156,
+"text": "Nikovski, D. [1995], Adaptive computation techniques for time series prediction, Master’s thesis, Department of Computer Science, Southern Illinois University at Carbondale. URL: http://www.cs.cmu.edu/ danieln/thesis.ps.Z"
+},
+{
+"n": 157,
+"text": "Nikovski, D. and Zargham, M. [1996], Comparison of two learning networks for time series prediction, in ‘Proceedings of the Ninth International Conference IEA/AIE 96 (Industrial and Engineering Applications of Artificial Intelligence and Expert Systems), Fukuoka, Japan’, pp. 531–555. URL: http://www.cs.cmu.edu/ danieln/hmerbf.ps.Z"
+},
+{
+"n": 158,
+"text": "Noordewier, M. O., Towell, G. G. and Shavlik, J. W. [1991], Training knowledge-based neural networks to recognize genes in DNA sequences, in Lippmann et al. [131], pp. 530–536."
+},
+{
+"n": 159,
+"text": "Nowlan, S. J. [1991], Soft competitive adaptation: neural network learning algorithms based on fitting statistical mixtures, PhD thesis, Carnegie Mellon University. CS–91–126."
+},
+{
+"n": 160,
+"text": "Nowlan, S. J. and Hinton, G. E. [1991], Evaluation of adaptive mixtures of competing experts, in Lippmann et al. [131]."
+},
+{
+"n": 161,
+"text": "Nowlan, S. J. and Hinton, G. E. [1992], ‘Simplifying neural networks by soft weight-sharing’, Neural Computation 4(4), 473–493."
+},
+{
+"n": 162,
+"text": "Ó Ruanaidh, J. J. K. and Fitzgerald, W. J. [1996], Numerical Bayesian methods applied to signal processing, Springer Verlag, New York."
+},
+{
+"n": 163,
+"text": "Page, E. S. [1955], ‘A test for a change in a parameter occurring at an unknown point’, Biometrika 42, 523–527."
+},
+{
+"n": 164,
+"text": "Page, E. S. [1957], ‘On problems in which a change in a parameter occurs at an unknown point’, Biometrika 44, 248–52."
+},
+{
+"n": 165,
+"text": "Pallett, D. S., Fiscus, J. G., Fisher, W. M., Garofolo, J. S., Lund, B. A., Martin, A. and Przybocki, M. A. [1995], 1994 benchmark test for the ARPA spoken language program, in ‘Proceedings of the ARPA Spoken Language Systems Technology Workshop’, Morgan Kauffman, 340 Pine St, 6th Floor, San Fransisco, CA, 94104."
+},
+{
+"n": 166,
+"text": "Pallett, D. S., Fiscus, J. G., Fisher, W. M., Garofolo, J. S., Lund, B. A. and Pryzbocki, M. A. [1994], 1993 benchmark tests for the ARPA spoken language program, in ‘Proceedings of the ARPA Workshop on Human Language Technology’, Morgan Kauffman, pp. 51–73. Merrill Lynch Conference Center, Plainsboro, NJ."
+},
+{
+"n": 167,
+"text": "Pallett, D. S., Fiscus, J. G., Fisher, W. M., Garoforo, J. S., Martin, A. F. and Przybocki, M. A. [1996], 1995 Hub-3 NIST multiple microphone corpus benchmark tests, in ‘Proceedings of the ARPA Speech Recognition Workshop’, Morgan Kauffman, 340 Pine St, 6th Floor, San Fransisco, CA, 94104."
+},
+{
+"n": 168,
+"text": "Parisi, G. [1988], Statistical Field Theory, Addison-Wesley, Redwood City, CA."
+},
+{
+"n": 169,
+"text": "Paul, D. B. [1992], An efficient A* stack decoder algorithm for continuous speech recognition with a stochastic language model, in ‘Proceedings of the IEEE International Conference on Acoustics, Speech, and Signal Processing’, Vol. 1, pp. 25–28."
+},
+{
+"n": 170,
+"text": "Paul, D. B. and Baker, J. M. [1992], The design for the Wall Street Journal-based CSR corpus, in ‘Proceedings of the DARPA Speech Recognition Workshop’, Morgan Kaufmann, 340 Pine St, 6th Floor, San Fransisco, CA, 94104, pp. 357–62."
+},
+{
+"n": 171,
+"text": "Pawelzik, K., Kohlmorgen, J. and Muller, K. R. [1996], ‘Annealed competition of experts for a segmentation and classification of switching dynamics’, Neural Computation 8(2), 340–356."
+},
+{
+"n": 172,
+"text": "Peng, F. C., Jacobs, R. A. and Tanner, M. A. [1996], ‘Bayesian-inference in mixtures-of-experts and hierarchical mixtures- of-experts models with an application to speech recognition’, Journal of the American Statistical Association 91(435), 953–960."
+},
+{
+"n": 173,
+"text": "Penny, W. D. and Roberts, S. J. [1997], Neural network predictions with error bars. Submitted to IEEE Transactions on Neural Networks."
+},
+{
+"n": 174,
+"text": "Perrone, M. P. and Cooper, L. N. [1993], When networks disagree: Ensemble methods for hybrid neural networks, in ‘Neural Networks for Speech and Image Processing’, Chapman-Hall."
+},
+{
+"n": 175,
+"text": "Peterson, G. E. and Barney, H. L. [1952], ‘Control methods used in a study of vowels’, Journal of the Acoustical Society of America 24, 175–184."
+},
+{
+"n": 176,
+"text": "Petridis, V. and Kehagias, A. [1996], ‘Modular neural networks for MAP classification of timeseries and the partition algorithm’, IEEE Transactions on Neural Networks 7(1), 73–86."
+},
+{
+"n": 177,
+"text": "Plate, T., Bert, J., Grace, J. and Band, P. [1997], A comparison between neural networks and other statistical techniques for modelling the relationship between tobacco and alcohol and cancer, in M. Mozer, M. Jordan and T. Petsche, eds, ‘Advances in Neural Information Processing 9 (NIPS*96)’, MIT Press."
+},
+{
+"n": 178,
+"text": "Prechelt, L. [1995], ‘Some notes on neural learning algorithm benchmarking’, Neurocomputing 9(3), 343–347."
+},
+{
+"n": 179,
+"text": "Prechelt, L. [1996], ‘A quantitative study of experimental evaluations of neural-network learning algorithms - current research practice’, Neural Networks 9(3), 457–462."
+},
+{
+"n": 180,
+"text": "Press, W. H., Flannery, B. P., Teukolsky, S. A. and Vetterling, W. T. [1988], Numerical Recipes in C, Cambridge."
+},
+{
+"n": 181,
+"text": "Price, P., Fisher, W. M., Bernstein, J. and Pallett, D. S. [1988], The DARPA 1000-word Resource Management database for continuous speech recognition, in ‘Proceedings of the IEEE International Conference on Acoustics, Speech, and Signal Processing’, Vol. 1, pp. 651–654."
+},
+{
+"n": 182,
+"text": "Quandt, R. E. [1958], ‘The estimation of the parameters of a linear regression system obeying two separate regimes’, Journal of the American Statistical Association 53, 873–80."
+},
+{
+"n": 183,
+"text": "Quandt, R. E. [1972], ‘A new approach to estimating switching regressions’, Journal of the American Statistical Association 67, 306–310."
+},
+{
+"n": 184,
+"text": "Quandt, R. E. and Ramsey, J. B. [1978], ‘Estimating mixtures of normal distributions and switching regressions’, Journal of the American Statistical Association 73(364), 730–752."
+},
+{
+"n": 185,
+"text": "Quinlan, J. R. [1986], ‘Induction of decision trees’, Machine Learning 1, 81–106."
+},
+{
+"n": 186,
+"text": "Quinlan, J. R. [1993], C4. 5: Programs for Machine Learning, Morgan Kaufmann, San Mateo, CA."
+},
+{
+"n": 187,
+"text": "Ramamurti, V. and Ghosh, J. [1997a], ‘Structural adaptation in mixtures of experts’. URL: ftp://ftp.lans.ece.utexas.edu/pub/papers/struct adapt ICPR96.ps.Z"
+},
+{
+"n": 188,
+"text": "Ramamurti, V. and Ghosh, J. [1997b], ‘Structurally adaptive modular networks for non-stationary environments’. Submitted to the IEEE Transactions on Neural Networks. URL: ftp://ftp.lans.ece.utexas.edu/pub/papers/struct adapt IEEETNN.ps.Z"
+},
+{
+"n": 189,
+"text": "Rasmussen, C. E. [1996], Evaluation of Gaussian Processes and other methods for non-linear regression, PhD thesis, University of Toronto. URL: http://www.cs.toronto.edu/ carl/"
+},
+{
+"n": 190,
+"text": "Rasmussen, C. E., Neal, R. M., Hinton, G. E., van Camp, D., Revow, M., Ghahramani, Z., Kustra, R. and Tibshirani, R. [1996], The DELVE manual, (version 1.1), Technical report, University of Toronto. URL: http://www.cs.utoronto.ca/ delve/"
+},
+{
+"n": 191,
+"text": "Renals, S. and Hochberg, M. [1997], Decoder technology for connectionist large vocabulary speech recognition, Technical Report CS-95-17 (revised), Dept. of Computer Science, University of Sheffield."
+},
+{
+"n": 192,
+"text": "Renals, S. J. and MacKay, D. J. C. [1993], Bayesian regularisation methods in a hybrid MLPHMM system, in ‘Proceedings of the European Conference on Speech Technology’."
+},
+{
+"n": 193,
+"text": "Ripley, B. D. [1993], Statistical aspects of neural networks, in O. E. Barndorff-Nielsen, J. L. Jensen and W. S. Kendall, eds, ‘Networks and Chaos—Statistical and Probabilistic Aspects’, Chapman & Hall, London, pp. 40–123."
+},
+{
+"n": 194,
+"text": "Ripley, B. D. [1994], ‘Neural networks and related methods for classification’, Journal of the Royal Statistical Society, Series B 56(3), 409–437."
+},
+{
+"n": 195,
+"text": "Ripley, B. D. [1996], Pattern Recognition and Neural Networks, Cambridge University Press, Cambridge."
+},
+{
+"n": 196,
+"text": "Rissanen, J. [1983], ‘A universal prior for integers and estimation by minimum description length’, Annals of Statistics 11(2), 416–431."
+},
+{
+"n": 197,
+"text": "Robinson, A. J. [1989], Dynamic Error Propagation Networks, PhD thesis, Cambridge University Engineering Department."
+},
+{
+"n": 198,
+"text": "Robinson, A. J. [1994], ‘An application of recurrent nets to phone probability estimation’, IEEE Transactions on Neural Networks 5(2), 298–305."
+},
+{
+"n": 199,
+"text": "Robinson, A. J., Hochberg, M. and Renals, S. [1995], The use of recurrent neural networks in continuous speech recognition, in C. H. Lee, K. K. Paliwal and F. K. Soong, eds, ‘Automatic Speech and Speaker Recognition – Advanced Topics’, Kluwer Academic Publishers, chapter 19, pp. 159– 184."
+},
+{
+"n": 200,
+"text": "Roy, H. S. [1995], Sharp, reliable predictions using supervised mixture models, PhD thesis, Department of Computer Science, Stanford University. Tech report number CS-95-1547. URL: http://forumweb.stanford.edu/Abstracts/CSD/CSD-1547.html"
+},
+{
+"n": 201,
+"text": "Rumelhart, D. E., Hinton, G. E. and Williams, R. J. [1986], Learning internal representations by error propagation, in D. E. Rumelhart and J. L. McClelland, eds, ‘Parallel Distributed Processing: Explorations in the Microstructure of Cognition’, Vol. I: Foundations, MIT Press/Bradford Books, Cambridge, MA, pp. 318–362."
+},
+{
+"n": 202,
+"text": "Russell, S. J. and Norvig, P. [1995], Artificial Intelligence. A Modern Approach, Prentice-Hall, Englewood Cliffs, NJ."
+},
+{
+"n": 203,
+"text": "Sabes, P. N. and Jordan, M. I. [1996], Reinforcement learning by probability matching, in Touretzky et al. [226]."
+},
+{
+"n": 204,
+"text": "Saito, K. and Nakano, R. [1996], A constructive learning algorithm for an HME, in ‘Proceedings of the IEEE International Conference on Neural Networks’, pp. 1268–1273."
+},
+{
+"n": 205,
+"text": "Salzberg, S. L. [1997], ‘On comparing classifiers: pitfalls to avoid and a recommended approach’, Data Mining and Knowledge Discovery 1(3). URL: http://www.cs.bham.ac.uk/ anp/TheDataMine.html"
+},
+{
+"n": 206,
+"text": "Saul, L. and Jordan, M. I. [1994], ‘Learning in Boltzmann trees’, Neural Computation 6(6), 1174– 1184."
+},
+{
+"n": 207,
+"text": "Saul, L. K., Jaakkola, T. and Jordan, M. I. [1996], ‘Mean-field theory for sigmoid belief networks’, Journal of Artificial Intelligence Research 4, 61–76."
+},
+{
+"n": 208,
+"text": "Saul, L. K. and Jordan, M. I. [1995], Boltzmann chains and hidden Markov models, in Tesauro et al. [218], pp. 435–442."
+},
+{
+"n": 209,
+"text": "Saul, L. K. and Jordan, M. I. [1996], Exploiting tractable substructures in intractable networks, in Touretzky et al. [226], pp. 486–492."
+},
+{
+"n": 210,
+"text": "Schaal, S. and Atkeson, C. G. [1996], From isolation to cooperation: an alternative view of a system of experts, in Touretzky et al. [226], pp. 486–492."
+},
+{
+"n": 211,
+"text": "Schiffmann, W., Joost, M. and Werner, R. [1992], Optimization of the backpropagation algorithm for training multilayer perceptrons, Technical report, University of Koblenz."
+},
+{
+"n": 212,
+"text": "Sejnowski, T. J. and Rosenberg, C. R. [1986], ‘Parallel networks that learns to pronounce English text’, Complex Systems 1, 145–168."
+},
+{
+"n": 213,
+"text": "Shavlik, J. W., Mooney, R. J. and Towell, G. G. [1991], ‘Symbolic and neural learning algorithms - an experimental comparison’, Machine Learning 6(2), 111–143."
+},
+{
+"n": 214,
+"text": "Singh, S. P. [1992], ‘Transfer of learning by composing solutions of elemental sequential tasks’, Machine Learning 8(3-4), 323–339."
+},
+{
+"n": 215,
+"text": "Spiegelhalter, D. J., Dawid, A. P., Lauritzen, S. L. and Cowell, R. G. [1993], ‘Bayesian analysis in expert systems’, Statistical Science 8(3), 219–283."
+},
+{
+"n": 216,
+"text": "Stone, M. [1974], ‘Cross-validatory choice and assessment of statistical predictions (with discussion)’, Journal of the Royal Statistical Society, Series B 36, 111–147."
+},
+{
+"n": 217,
+"text": "Sutton, R. S. [1992], ‘Introduction - the challenge of reinforcement learning’, Machine Learning 8(3-4), 225–227."
+},
+{
+"n": 218,
+"text": "Tesauro, G., Touretzky, D. S. and Leen, T. K., eds [1995], Advances in Neural Information Processing Systems 7, MIT Press, 55 Hayward St., Cambridge, MA, 02142-1399."
+},
+{
+"n": 219,
+"text": "Tham, C. K. [1995a], On-line learning using hierarchical mixtures of experts, in ‘IEE Conference on Artificial Neural Networks’, pp. 347–351."
+},
+{
+"n": 220,
+"text": "Tham, C. K. [1995b], ‘Reinforcement learning of multiple tasks using a hierarchical CMAC architecture’, Robotics and Autonomous Systems 15(4), 247–274."
+},
+{
+"n": 221,
+"text": "Thodberg, H. H. [1996], ‘Review of Bayesian neural networks with an application to near- infrared spectroscopy’, IEEE Transactions on Neural Networks 7(1), 56–72."
+},
+{
+"n": 222,
+"text": "Thomas, A., Spiegelhalter, D. J. and Gilks, W. R. [1992], BUGS: A program to perform Bayesian inference using Gibbs sampling, in J. M. Bernardo, J. O. Berger, A. P. Dawid and A. F. M. Smith, eds, ‘Bayesian Statistics 4’, Clarendon Press, Oxford, pp. 837–842."
+},
+{
+"n": 223,
+"text": "Tichy, W. F., Lukowicz, P., Prechelt, L. and Heinz, E. A. [1995], ‘Experimental evaluation in computer-science - a quantitative study’, Journal of Systems and Software 28(1), 9–18."
+},
+{
+"n": 224,
+"text": "Titterington, D. M., Smith, A. F. M. and Makov, U. E. [1985], Statistical Analysis of Finite Mixture Distributions, John Wiley, New York."
+},
+{
+"n": 225,
+"text": "Tong, H. and Lim, K. S. [1980], ‘Threshold autoregression, limit cycles and cyclical data’, Journal of the Royal Statistical Society, Series B 42, 245–292."
+},
+{
+"n": 226,
+"text": "Touretzky, D. S., Mozer, M. C. and Hasselmo, M. E., eds [1996], Advances in Neural Information Processing Systems 8, MIT Press, 55 Hayward St., Cambridge, MA, 02142-1399."
+},
+{
+"n": 227,
+"text": "Tresp, V., Hollatz, J. and Ahmad, S. [1997], ‘Representing probabilistic rules with networks of Gaussian basis functions’, Machine Learning 27(2), 173–200."
+},
+{
+"n": 228,
+"text": "Utsugi, A. [1996], ‘Topology selection for self-organizing maps’, Network-Computation in Neural Systems 7(4), 727–740."
+},
+{
+"n": 229,
+"text": "Utsugi, A. [1997], ‘Hyperparameter selection for self-organizing maps’, Neural Computation 9(3), 623–635."
+},
+{
+"n": 230,
+"text": "Waibel, A., Finke, M., Gates, D., Gavalda, M., Kemp, T., Lavie, A., Levin, L., Maier, M., L., M., McNair, A., Rogina, I., Shima, A., Sloboda, T., Woszczyna, M., Zeppenfeld, T. and Zhan, P. [1996], JANUS-II - Advances in spontaneous speech translation, in ‘Proceedings of the IEEE International Conference on Acoustics, Speech, and Signal Processing’, pp. 409–412."
+},
+{
+"n": 231,
+"text": "Waibel, A., Sawai, H. and Shikano, K. [1989], ‘Modularity and scaling in large phonemic neural networks’, IEEE Transactions on Acoustics, Speech, and Signal Processing 37(12), 1888–97."
+},
+{
+"n": 232,
+"text": "Waterhouse, S. R. [1993], Speech recognition using hierarchical mixtures of experts, Master’s thesis, Cambridge University Engineering Department, Trumpington Street, Cambridge CB2 1PZ, UK."
+},
+{
+"n": 233,
+"text": "Waterhouse, S. R. and Cook, G. D. [1997], Ensemble methods for phoneme classification, in Mozer et al. [148], pp. 800–806."
+},
+{
+"n": 234,
+"text": "Waterhouse, S. R., Kershaw, D. J. and Robinson, A. J. [1996], Smoothed local adaptation of connectionist systems, in ‘Proceedings of the International Conference on Spoken Language Processing’."
+},
+{
+"n": 235,
+"text": "Waterhouse, S. R., MacKay, D. J. C. and Robinson, A. J. [1996], Bayesian methods for mixtures of experts, in Touretzky et al. [226], pp. 351–357."
+},
+{
+"n": 236,
+"text": "Waterhouse, S. R. and Robinson, A. J. [1994], Classification using hierarchical mixtures of experts, in ‘Proceedings of the IEEE Workshop on Neural Networks for Signal Processing’, IEEE Press, Long Beach, CA, pp. 177–186."
+},
+{
+"n": 237,
+"text": "Waterhouse, S. R. and Robinson, A. J. [1995], Non-linear prediction of acoustic vectors using hierarchical mixtures of experts, in Tesauro et al. [218], pp. 835–842."
+},
+{
+"n": 238,
+"text": "Waterhouse, S. R. and Robinson, A. J. [1996], Constructive algorithms for hierarchical mixtures of experts, in Touretzky et al. [226], pp. 584–590."
+},
+{
+"n": 239,
+"text": "Wawrzynek, J., Asanovic, K., Kingsbury, B., Beck, J., Johnson, D. and Morgan, N. [1996], SPERT-II: A vector microprocessor system and its application to large problems in backpropagation training, in Touretzky et al. [226]."
+},
+{
+"n": 240,
+"text": "Weigend, A. S. [1996], ‘Time series analysis and prediction using gated experts with application to energy demand forecasts’, Applied Artificial Intelligence 10(6), 583–624."
+},
+{
+"n": 241,
+"text": "Weigend, A. S., Huberman, B. A. and Rumelhart, D. E. [1992], Predicting sunspots and exchange rates with connectionist networks, in M. Casdagli and S. Eubank, eds, ‘Nonlinear Modelling and Forecasting’, Addison-Wesley, pp. 395–432."
+},
+{
+"n": 242,
+"text": "Weigend, A. S., Mangeas, M. and Srivastava, A. N. [1995], ‘Nonlinear gated experts for timeseries - discovering regimes and avoiding overfitting’, International Journal of Neural Systems 6(4), 373–399."
+},
+{
+"n": 243,
+"text": "Weiss, Y. and Adelson, E. H. [1995], ‘Motion estimation and segmentation using a recurrent mixture of experts architecture’, Proceedings of the IEEE Workshop on Neural Networks for Signal Processing pp. 293–302."
+},
+{
+"n": 244,
+"text": "Werbos, P. J. [1974], Beyond Regression: New Tools for Regression and Analysis in the Behavioral Sciences, PhD thesis, Harvard University, Division of Engineering and Applied Physics."
+},
+{
+"n": 245,
+"text": "Werbos, P. J. [1990], ‘Backpropagation through time: What it does and how to do it’, Proceedings of the IEEE 78(10), 1550–1560."
+},
+{
+"n": 246,
+"text": "Wolberg, W. H., Tanner, M. A., Loh, W. Y. and Vanichsetakul, N. [1987], ‘Statistical approach to fine needle aspiration diagnosis of breast masses’, Acto Cytologica 31, 737–741."
+},
+{
+"n": 247,
+"text": "Woodland, P., Leggetter, C., an d V. Valtchev, J. O. and Young, S. [1995], The development of the 1994 HTK large vocabulary speech recognition system, in ‘Spoken Language Systems Technology Workshop’, pp. 104–9."
+},
+{
+"n": 248,
+"text": "Xu, L., Hinton, G. and Jordan, M. I. [1995], An alternative model for mixtures of experts, in Tesauro et al. [218], pp. 633–640."
+},
+{
+"n": 249,
+"text": "Xu, L. and Jordan, M. I. [1993], EM learning of a generalized finite mixture model for combining multiple classifiers, in ‘Proceedings of the World Congress on Neural Networks’, pp. 227–230."
+},
+{
+"n": 250,
+"text": "Young, S. J., Jansen, J., Odell, J. J., Ollason, D. and Woodland, P. C. [1995], The HTK Hidden Markov Model Toolkit Book, Entropic Cambridge Research Laboratory. URL: http://www.entropic.com/htk.html"
+},
+{
+"n": 251,
+"text": "Yuille, A. L. and Kosowsky, J. J. [1994], ‘Statistical physics algorithms that converge’, Neural Computation 6(3), 341–356."
+},
+{
+"n": 252,
+"text": "Yuille, A., Stolorz, P. and Utans, J. [1994], ‘Statistical physics, mixtures of distributions, and the EM algorithm’, Neural Computation 6(2), 334–340."
+},
+{
+"n": 253,
+"text": "Zangwill, W. [1969], Nonlinear programming: a unified approach, Prentice-Hall, Englewood Cliffs, New Jersey."
+},
+{
+"n": 254,
+"text": "Zeevi, A. J., Meir, R. and Adler, R. J. [1997a], Non-linear models for time series using mixtures of experts, Technical Report CC-150, Faculty of Electrical Engineering, Technion, Haifa 32000, Israel. URL: http://www.ee.technion.ac.il/publications/Neural-Networks/tseries.ps"
+},
+{
+"n": 255,
+"text": "Zeevi, A. J., Meir, R. and Maiorov, V. [1997], Error bounds for functional approximation and estimation using mixtures of experts, Technical Report CC-132, Faculty of Electrical Engineering, Technion, Haifa 32000, Israel. URL: http://www.ee.technion.ac.il/publications/Neural-Networks/mix experts.ps"
+},
+{
+"n": 256,
+"text": "Zeevi, A., Meir, R. and Adler, R. [1997b], Time series prediction using mixtures of experts, in Mozer et al. [148], pp. 309–315."
+},
+{
+"n": 257,
+"text": "Zhao, Y. [1994], ‘An acoustic-phonetic based speaker adaptation technique for improving speaker independent continuous speech recognition’, IEEE Transactions on Acoustics, Speech, and Signal Processing 2(3), 380–394."
+},
+{
+"n": 258,
+"text": "Zhao, Y., Schwartz, R., Sroka, J. and Makhoul, J. [1995], Hierarchical mixtures of experts methodology applied to continuous speech recognition, in Tesauro et al. [218]."
+},
+{
+"n": 259,
+"text": "Zhu, H. Y. and Rohwer, R. [1996], ‘Bayesian regression filters and the issue of priors’, Neural Computing & Applications 4(3), 130–142. URL: ftp://cs.aston.ac.uk/neural/zhuh/reg fil prior.ps.Z"
+}
+]
