@@ -1,0 +1,31 @@
+number: 12
+title: Conclusions and Future Work
+pdf: chapter-12.pdf
+first_page: 153
+---
+{p153}
+This thesis has described the mixtures-of-experts framework and investigated its application to small, medium and large real world problems. A mixtures-of-experts model using generalised linear models as experts and gates was described in Part I of the thesis. Two extensions of this model were proposed: one based on a constructive algorithm and one based on Bayesian methods. These extensions were compared empirically with the standard model and with other statistical models on data sets from the DELVE archive. The results of these comparisons indicate that whilst mixtures-of-experts are not always the *best* model to choose for a task, they are *competitive* with other models on regression tasks, and amongst the best studied on classification tasks. In Part II a larger scale task was investigated: automatic speech recognition using the mixtures-of-experts as an acoustic model within the ABBOT system. The mixtures-of-experts framework was used to motivate two new acoustic models based on mixtures of multi-layer perceptrons and mixtures of recurrent neural networks. These models were compared empirically with existing acoustic models on speech recognition and speaker adaptation tasks, and shown to give significant improvements. These studies indicate first that the mixtures-of-experts framework can be applied successfully to large, real world problems such as speech recognition, and second, that significant performance improvements can be realised. Overall the thesis has presented mixtures-of-experts in context with other statistical models and shown empirically that they can be applied successfully to problems in classification and regression.
+
+## Future Work
+
+A number of possibilities for future work into mixtures-of-experts have been described in each chapter of this thesis. These, and other suggestions are described below.
+
+### Empirical comparisons
+
+The results presented in Part I of the thesis on the DELVE archive give a number of insights into the performance of mixtures-of-experts models in comparison with other models. Further research in this area should focus on the extension of these comparisons to more models and more data sets. In particular, more comparisons on medium to large real world problems would allow {p154}us to discover the types of tasks that mixtures-of-experts models will, in general, perform well on. Many of the applications of mixtures-of-experts have so far been on time series prediction or speech recognition, as discussed in Chapter 2 and Chapter 9. Comparisons on these types of data sets would therefore be potentially enlightening.
+
+### Constructive models
+
+The constructive algorithm for hierarchical mixtures-of-experts described in Chapter 6 was shown to be successful on regression and classification tasks in Chapter 8. Future work in this direction should focus on further connections with existing tree growing literature. In particular, there should be further investigation into making pruning successful in these algorithms. In addition, the incorporation of Bayesian methods might allow some indication of the usefulness of a particular node in the model, as was done by Jacobs et al. [105].
+
+### Bayesian methods
+
+The Bayesian methods described in Chapter 7 were motivated by an empirical Bayesian perspective, which uses approximations to the posterior distributions in the model. An alternative approach would be to use Monte Carlo techniques to sample from these posterior distributions. Since the mixtures-of-experts has an interpretation as a belief network, the framework of Thomas et al. [222] could be used to perform Gibbs sampling, in a similar way to that done by Peng et al. [172].
+
+### Speech Recognition
+
+The results presented in Part II of the thesis indicate that the mixtures-of-experts framework is an effective tool for acoustic modelling in connectionist speech recognition. The approach taken in this thesis was to use mixtures of existing, previously successful, networks. Alternatively, much larger mixtures of small networks could be used, for example mixtures of generalised linear models such as those described in Part I. Other researchers have used a similar approach, as described in Chapter 9, including Zhao et al. [258] and Fritsch [60]. Potentially the most effective acoustic model, given the effectiveness of the recurrent networks used in ABBOT, might be a recurrent mixtures-of-experts model such as the IOHMM of Bengio and Frasconi [10]. Given the results presented in this thesis, there is now clear scope to extend the recurrent network of ABBOT in this direction.
+
+### Alternative models
+
+In Chapter 2 some of the connections between mixtures-of-experts and other statistical models were described. I believe further exploration of these connections would be of benefit in designing alternative models based on the mixtures-of-experts framework. For example, one possible line of research is to consider reducing the number of input attributes in the experts and gates in the spirit of a multivariate decision tree [26]. Such models would be more interpretable, and potentially more efficient in parameters and training times. An alternative approach would be to use *different* types of models for each expert, *e.g.,* using multi-layer perceptrons and MARS models as experts in the same mixture. The mixture of such models could be successful when neither model alone is successful, or, as is often the case, when the best model for a task is unknown. This approach {p155}is reminiscent of Brodley's model class selection system [24], with the difference that Brodley used simple models such as logistic regression and $k$ nearest neighbours as leaves in a decision tree. Potentially the smoothing of the boundaries between models, as performed in the mixtures-of-experts, might provide an added advantage over Brodley's approach.
