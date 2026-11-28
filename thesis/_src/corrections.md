@@ -19,3 +19,8 @@ Changes from the 1997 text. Typographical slips fixed silently are listed too, s
 - 4.4: "solving the a set of linear equations" -> "solving a set of linear equations".
 - 5.4, Figure 5.2 step 7: "go to 2" -> "go to 4" (step 2 would start a new committee member; the loop repeats the EM step).
 - Em dashes in the original are set as colons or commas.
+- 6.1: "split into a a pair" -> "split into a pair"; "the EM described in Chapter 4" -> "the EM algorithm described in Chapter 4".
+- 6.2: "1st interquartile position" / "3rd interquartile position" -> "1st quartile" / "3rd quartile".
+- 6.2: a sentence pointing to Figure 6.7 is added after the speed comparison; the original never cites Figure 6.7 in the text.
+- 6.2, Figure 6.3: "weighted by $\zeta^{(n)}$" -> "weighted by $\zeta_p^{(n)}$" (the parent's posterior, as defined in the same figure).
+- 6.2, Figure 6.4 caption: "(shown with dots) is which is" -> "(shown with dots), which is".

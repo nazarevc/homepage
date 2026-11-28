@@ -1,0 +1,247 @@
+number: 6
+title: Growing Mixtures of Experts
+pdf: chapter-06.pdf
+first_page: 69
+---
+{p69}
+## 6.1 Introduction
+
+In Chapter 5 two learning methods for classification and regression tasks using mixtures-of-experts were described. These methods used a prior choice of architecture based on balancing the number of parameters in the model to the number of data points in the training set. This choice of architecture is crude, however, since it fails to take account of the complexity of the tasks. In some cases the number of parameters in the models may be too large, resulting in potentially overly complex functions, whilst in other cases, there may be too few parameters, resulting in *under-fitting* of the data. Indeed, given an arbitrary complex function, there is no reason to expect that increasing the number of samples from the function should require more parameters to model it, and such a rule is also therefore likely to produce models that will tend to overfit the data. In the previous chapter these problems were addressed by the use of committees of models trained by early stopping on validation sets. This method was mostly successful, as will be shown on regression and classification tasks in Chapter 8, but suggests further refinements which are investigated in this chapter.
+
+This chapter approaches the problem of architecture selection via a recursive procedure which recursively adds parameters to a model in the fashion of a tree growing algorithm [21]. At each step of the growing algorithm a terminal node is split into a pair of terminal nodes and a gate. Nodes are split in a best first manner, with the node that increases the likelihood of the model by the greatest amount retained. After each addition to the tree, the whole tree is retrained using the EM algorithm described in Chapter 4.
+
+Complexity control of the growing algorithm is achieved as in Chapter 5 by the use of a committee whose members are trained by early stopping on validation sets. In the growing algorithm, however, the search for the minimum of the validation set takes on an extra dimension: a search over architecture sizes. In standard tree growing algorithms, this method has not been found to result in good performance. Both CART and C4.5 grow trees to convergence on the training data and subsequently prune back nodes to select the optimal rooted subtree on a validation set. In this chapter I describe why this pruning algorithm is not appropriate for growing an HME, and give empirical justification for the early stopping method.
+
+{p70}
+:::figure fig-6-1 | Figure 6.1: **Tree growing for HME models.** Two schematic diagrams of hierarchical mixtures-of-experts models are shown. Each terminal node of the trees contains an expert network, and each non-terminal node contains a gate. The original tree (a) has been extended to give the new tree (b) by splitting terminal node 3 into a pair of terminal nodes 15 and 16.
+
+## 6.2 Design of the Growing Algorithm
+
+In this section I describe the development of the `hme-grow-1` algorithm. In summary, this algorithm constructs a hierarchical mixture of experts from data, learning both the structure (or *architecture*) of the hierarchy as well as the parameters of the gates and experts. This is in contrast to the `me-ese-1` and `hme-ese-1` methods which have predetermined architectures based purely on number of attributes and cases in a data set. `hme-grow-1` starts from a single expert (either linear regression or multinomial logit models) and makes a split of this expert into a mixture of 2 experts and a gate. How this split is made is described in the next section. This mixture is subsequently retrained to convergence and another split of each expert made. At this point, the split which results in the largest *local* improvement in the auxiliary function is kept and the overall architecture retrained. For node $\E_i$, the difference between the auxiliary function after a split, $R_i^2$, and the auxiliary function before the split was made, $R_i^1$, is given by:
+
+$$ \delta R_i = R_i^2 - R_i^1 $$ (6.1)
+
+where
+
+$$ \begin{aligned} R_i^1 &= \sum_n \zeta_i^{(n)} \left( \log P(\by^{(n)}|\bx^{(n)}, \E_i, An(\E_i), \bw_i) + \log P(\E_i, An(\E_i)|\bx^{(n)}, \theta) \right) \\ R_i^2 &= \sum_n \sum_{j \in Ch(\E_i)} \zeta_j^{(n)} \left( \log P(\by^{(n)}|\bx^{(n)}, \E_j, An(\E_j), \bw_j) + \log P(\E_j, An(\E_j)|\bx^{(n)}, \theta) \right). \end{aligned} $$ (6.2)
+
+The splitting process continues by alternately retraining the model and making splits of the terminal nodes. Since it is impractical to search over all possible tree shapes the search is confined to binary trees. {p71}The overall growing algorithm for `hme-grow-1` can be summarised as:
+
+1. Train whole tree to convergence using standard algorithm `ml-train`.
+2. Choose a node to split.
+3. Split the chosen node and train.
+4. If the training error has converged then exit, else, go to (1).
+
+This growing algorithm is used to generate a model which fits the training data well. In order to control the complexity of the model, early stopping using a validation set is used. I now describe the components of this general algorithm, starting with the method used to choose a node to split.
+
+### Choosing a node to split
+
+In deciding which node to split, the growing algorithm must decide which node will give, in the short term at least, the best improvement in likelihood when it is split. There are two different methods that have been explored in the literature to decide how to choose the node to split: those based on statistics gathered before the split is made (prior-stats methods), and those based on iterative search through all possible splits (iterative-search). Most recursive partitioning methods [*e.g.,* 21, 58] utilise the iterative-search method. In other HME growing algorithms, Waterhouse and Robinson [238] used an iterative-search method, whilst Saito and Nakano [204] and Fritsch et al. [62] used prior-stats methods. Critics of the iterative-search method have pointed out that the computational cost of evaluating each split can be large if the parameters of each split have to be trained in order to be evaluated. However, the major problem with the prior-stats methods seems to be the lack of guarantee of choosing the best node, *i.e.,* the one which will give the best local improvement in the performance of the model. In this chapter I use the iterative-search method, which I have found empirically to be the most robust method for choosing which node to split. In summary, to choose a node to split, `hme-grow-1` splits *all* terminal nodes, evaluates the benefit of each split, and keeps the best. I now turn to how exactly a split is made in this algorithm.
+
+### How to make a split?
+
+In previous work on growing HME models [*e.g.,* 238, 204, 62], there has been little discussion of how to actually make a split of a node. Most of the description has focussed on the choice of node, as discussed in the previous section. Previously, in order to split a node, the following method was used:
+
+- Replace the original expert network with a pair of expert networks and a gate.
+- Initialise the parameters of the expert networks with copies of the original expert network parameters, optionally corrupted with random noise.
+- Initialise the parameters of the new gate with random values in a pre-specified range.
+
+{p72}
+The use of randomly perturbed versions of the previous expert's parameters is to break symmetry. Clearly if the same values were used, the resulting mixture would not differ from the original expert, even if the gate was initialised with random values.
+
+I investigated the performance of this algorithm for creating splits, but found a number of problems with it. The degree of perturbation of the expert's parameters has a large effect on the success of the split (where success is defined as a split which improves upon the original expert). If the random perturbation is too small, the new experts fail to break out of the symmetric solution, and end up with the same parameters as the original expert. If the random perturbation is too large, it dominates the expert parameters and the training suffers from the same problems of random initialisation as described in Section 4.5. Indeed, I found that random initialisation of the posterior probabilities of the new experts and appropriate scaling by the parent posterior probabilities gave more stable results than the use of random perturbation of expert and gate parameters. This is disappointing since it ignores all that has been learnt by the previous expert about the region.
+
+#### A geometric argument
+
+One alternative to the use of random perturbations of expert parameters is to appeal to a geometric argument. In this method, the two new expert parameters are initialised by a deterministic adjustment of the original expert parameters, according to the rule:
+
+$$ \bw_{left} = \bw_{orig} + \delta\bw, \quad \bw_{right} = \bw_{orig} - \delta\bw, $$ (6.3)
+
+where $\delta\bw$ is computed via a geometric argument. In this, the original parameter vector is rotated about its mid point relative to the data local to the expert. The angle of rotation is related to the noise level $\sigma_i^2$ for the expert, and is used to define $\delta\bw$ using trigonometric rules.
+
+Empirical results on simple 1-d functions (not shown) failed to show that the geometrical argument could generate good splits. Analysis of the training after initialisation suggested that the new parameter vectors were too close to the original parameter vector. Retraining of these vectors therefore caused them to revert to the original rather than diverge towards new configurations. This suggests that more radical adjustment of the parameter vectors is required. Ideally, a full search through all adjustment angles would be preferred. This is clearly impractical even in the case of 1-d functions. In the case of higher dimensional problems, the geometric argument also appears impractical even if a good adjustment could be found.
+
+#### A threshold search method
+
+Empirical investigation of both the random perturbation and geometric methods failed to show good performance for either algorithm. In this section a more successful technique for splitting nodes is described, which is based on techniques of recursive partitioning. A good introduction to recursive partitioning is given by Breiman et al. [21]. The algorithm I use, `best-split`, is described in Figure 6.2. For each terminal node in an existing tree, `best-split` investigates making a split into a pair of terminal nodes. First the data local to each node $i$ is determined by sorting the data $D = \{\bx^{(n)}, \by^{(n)}\}_1^N$ into a
+{p73}local sub-region $D_s$ if the joint posterior probability of the node $\zeta_i^{(n)}$ is greater than 0.01. This sub-region is then divided into two regions. The division is made by using a threshold on one of the attributes of $\bx$, *e.g.,*
+
+$$ \begin{aligned} &\text{if } x_j < t_j \text{ then put } \bx \text{ into left region;} \\ &\text{else put } \bx \text{ into right region.} \end{aligned} $$ (6.4)
+
+To find the best attribute of $\bx$ on which to make the division, and the best threshold, the following procedure is used. For each element $j$ of $\bx$ the data is sorted^[The sorting was performed using the QuickSort algorithm [180].]. Given this sorted data, each possible threshold may be tested. For the $n^{th}$ data point in the sorted data the threshold $t_j^{(n)}$ tested is the mid point of the current and next data point:
+
+$$ t_j^{(n)} = \frac{x_j^{(n+1)} + x_j^{(n)}}{2}. $$ (6.5)
+
+Each threshold defines a possible division into left and right regions of the data. Ideally, we would like to fit the two regions using linear regression experts. However, this would be computationally very expensive since for a sub-region with $N_s$ points in it, $2N_s$ linear fits would need to be computed. Therefore, two approximations are made: either to fit each of the two regions using piecewise constant functions and compare the resulting error on the sub-region with a single constant fit, or to consider a smaller number of sub-regions than $N_s$ and to fit linear regressions to the splits made in these sub-regions. In both approximations the best split is selected and a pair of experts and a gate trained on this split. The trade offs between these two methods are discussed in the next section. Given the new experts, the increase in local likelihood made by this split is computed. For each terminal node the attribute and threshold which give the largest increase in local likelihood are retained. Comparison of the increases for each terminal node then gives the best node to split.
+
+Once the best node to split has been found, the `best-split` algorithm terminates, returning the best feature and associated threshold to use. These are then used to initialise the gate and pair of experts of the new split. This initialisation is performed by dividing the data into two regions and defining the posterior probabilities of the left and right experts according to the division. These posterior probabilities provide targets for the gate and weighting factors for the experts in the usual way. However, as will be shown in the following sections, division of the data via a hard threshold can lead to undesirable behaviour, and so a smoothing operation is performed on the posterior probabilities of the new experts.
+
+##### Making a test split
+
+In order to make the algorithm above practical, it is necessary to make each test split and its evaluation as efficient as possible, since there are $N_s \times d$ splits to be evaluated, where $N_s$ is the number of training examples in the reduced data set $D_s$ for each node and $d$ the dimension of $\bx$, for each node. I chose two methods to do this, one based on exact evaluation of a reduced set of possible splits, and the other based on approximate evaluation of the full set of splits.
+
+{p74}
+:::algo fig-6-2 | Figure 6.2: **The `best-split` algorithm.**
+- For the node to be split, create a sub-region of data specific to this node, $D_s$, which represents the data most likely to be used by this split. This is done by filtering the data according to the joint probability of the node $\zeta_p^{(n)}$:
+  - For all $\bx^{(n)}, \by^{(n)}$:
+  - If $\zeta_p^{(n)} > 0.01$, put $\bx^{(n)}, \by^{(n)}$ into the sub-region $D_s$ for this node,
+  - else discard $\bx^{(n)}, \by^{(n)}$.
+- For each attribute $j$ of $\bx^{(n)}$, apply the following algorithm:
+  - Sort $D_s$ along the attribute $j$.
+  - For all examples $x_j^{(n)}$ in $D_s$:
+    - Set the threshold $t_j = (x_j^{(n)} + x_j^{(n+1)})/2$.
+    - Generate a test split using the threshold $t_j$ and record the score of this split.
+- Record the best split, characterised by the best feature $j^*$ and best threshold $t_j^*$.
+
+In the reduced set method, I divide the sorted data into 4 regions. In each region I make a split into two sub-regions, setting the threshold at the mid point of the region. I then use this threshold to initialise a complete pair of experts and a gate, using the algorithm of the next section. I choose the split out of the 4 possible splits that gives the best increase in likelihood.
+
+In the full set method, I evaluate splits at all possible thresholds $t_j$, but use an approximate method to evaluate the improvement that each split makes. Each approximate split is a pair of piecewise constant functions, with values computed by the average of the targets to the left and right of the threshold, weighted by the posterior probabilities $\zeta_p^{(n)}$ of the original expert in each case, and normalised by the sum of posterior probabilities:
+
+$$ \hat{\by}_{left}^{(n)} = \sum_{n_{left}} \zeta_p^{(n)} \by^{(n)} \Big/ \sum_{n_{left}} \zeta_p^{(n)} $$ (6.6)
+
+$$ \hat{\by}_{right}^{(n)} = \sum_{n_{right}} \zeta_p^{(n)} \by^{(n)} \Big/ \sum_{n_{right}} \zeta_p^{(n)} $$ (6.7)
+
+where $\{n_{left}\}$ and $\{n_{right}\}$ are the set of examples lying to the left and right of the threshold $t_j$. This gives a fast but approximate method of computing the increase that would be made by splitting the node into a pair of experts and a gate, but without actually doing so. This is the method I use in `hme-grow-1` in preference to the reduced set method since it is less computationally demanding and still leads to good splits in practice.
+
+{p75}
+:::algo fig-6-3 | Figure 6.3: **The `split-posts` algorithm.**
+- For all data points, $\{\bx^{(n)}\}$, $$\text{if } x_j^{(n)} < t_j, \ \text{set } \varphi_0^{(n)} = 1, \varphi_1^{(n)} = 0, \zeta_0^{(n)} = \zeta_p^{(n)}, \zeta_1^{(n)} = 0, \qquad (6.10)$$ $$\text{else set } \varphi_0^{(n)} = 0, \varphi_1^{(n)} = 1, \zeta_0^{(n)} = 0, \zeta_1^{(n)} = \zeta_p^{(n)}. \qquad (6.11)$$ where $\zeta_p^{(n)}$ is the joint posterior probability of the expert which was split to generate the mixture (and hence the joint posterior probability of the parent of experts $\E_0$ and $\E_1$). The subscripts 0 and 1 denote the left and right experts in the split $\E_0$ and $\E_1$.
+- Use posteriors $\{\varphi_0^{(n)}, \varphi_1^{(n)}\}$ as targets for gate in the maximum likelihood equations, weighted by $\zeta_p^{(n)}$.
+- Use posteriors $\{\zeta_0^{(n)}, \zeta_1^{(n)}\}$ as weights for the experts $\E_0$ and $\E_1$ in the maximum likelihood equations.
+
+##### From rules to gates
+
+The search algorithm, described in the previous section, over all attributes generates a threshold $t_j$ for a particular attribute $x_j$. This implies a rule:
+
+$$ \text{if } x_j < t_j \quad \text{use left expert} $$ (6.8)
+
+$$ \text{else} \quad \text{use right expert} $$ (6.9)
+
+which could in principle be used as the gate in a mixture of experts. In this case, the mixture would be more akin to a recursive partitioning model such as CART. In this work, however, rather than using the rule *as* the gate, I use it to *initialise* the gate and pair of experts of the new split.
+
+A rule such as Equation 6.9 can be visualised as a Heaviside or *step* function. This defines a segmentation of the data around the threshold $t_j$. I use this segmentation to generate posterior probabilities $\zeta_0^{(n)}$ and $\zeta_1^{(n)}$ for the left and right experts of the new split as described in algorithm `split-posts` shown in Figure 6.3. The posterior probabilities resulting from the rule are used as targets in conjunction with the training data to initialise the gate and experts.
+
+##### Smoothing the split
+
+The algorithm described above to generate posterior probabilities of nodes from rules was successful at reducing the error rate on training data, but led to "spiky" functions in its predictions. This effect is shown in Figure 6.4. These spiky functions are piecewise linear in form, a mode which is at one end of the model space for the mixture of experts. Clearly the search bias imposed by the split initialisation algorithm has encouraged this extreme of the model space.
+
+{p76}
+:::figure fig-6-4 | Figure 6.4: **Splitting using hard targets.** A "spiky" function resulting from the growing algorithm using hard targets in `split-posts`. The prediction (solid line) is a poor representation of the underlying function (dashed line) used to generate the training data (shown with dots), which is the artificial data set introduced in Chapter 3.
+
+I believe the spiky functions are less representative of true functions than a smooth function would be. This belief represents a prior on smooth functions which I would prefer to see as predictions of the model. Whether this prior is a good one will depend on the type of underlying functions in the training set. In this work I encourage smooth functions by altering the search method in the split initialisation of `split-posts`. In order to smooth the split implied by the rule $x_j^{(n)} < t_j$, I consider the probabilistic interpretation of the rule, *i.e.,*
+
+$$ \text{if} \quad x_j^{(n)} < t_j, \quad P(\E_0|\bx^{(n)}) = 1, \quad P(\E_1|\bx^{(n)}) = 0 $$ (6.12)
+
+$$ \text{else} \quad P(\E_0|\bx^{(n)}) = 0, \quad P(\E_1|\bx^{(n)}) = 1, $$ (6.13)
+
+where $P(\E_0|\bx^{(n)})$ is the probability that $\E_0$ generated the data $\bx^{(n)}$. Since the outputs of the gate are given by $P(\E_0|\bx^{(n)}, \bv)$, and $P(\E_1|\bx^{(n)}, \bv)$, in order to *compile* the rule into a gate, a method for setting the parameter vector $\bv$ is required. In the previous section I used the posterior probabilities implied by the rule as targets to train the gate parameter vector. The neater solution described in the sequel also yields the smoother functions desired by the prior described previously.
+
+Direct conversion of the rule into the parameter vector is not possible, since in order to represent the step function exactly, the parameter vector must have terms approaching infinity. This can be seen by consideration of the sigmoid function represented by the gate. The gate output $P(\E_0|\bx^{(n)}, \bv)$ has the following form:
+
+$$ P(\E_0|\bx^{(n)}, \bv) = \frac{1}{1 + \exp(-a)} $$ (6.14)
+
+{p77}where $a = \sum_{l=1}^{d} v_l x_l^{(n)} + v_0$. For a particular attribute $x_j$ only, $a$ reduces to $a = v_j x_j^{(n)} + v_0$. However, rearrangement of Equation 6.14 gives another expression for $a$:
+
+$$ a = \log\left(\frac{p}{1-p}\right) $$ (6.15)
+
+where $p = P(\E_0|\bx^{(n)}, \bv)$. Values for $p$ of 1.0 and 0.0 give values for $a$ of $\infty$ and $-\infty$ respectively. At the boundary of the rule ($x_j^{(n)} = t_j, p = 0.5$), the value of $a$ is 0.0.
+
+In order to get a smooth function for $p$, I convert the rule into a sigmoid function in the following manner. The data in the region of the node is sorted into a data set $D_s$. The following conditions are then used for $p$, the probability of the left expert $\E_0$:
+
+- $p = 0.95$ at $x_{left}$, the 1st quartile position of $D_s$;
+- $p = 0.5$ at $x_{mid}$, the median of $D_s$;
+- $p = 0.05$ at $x_{right}$, the 3rd quartile position of $D_s$.
+
+Using the fact that $a = v_j x_j^{(n)} + v_0$ together with these conditions gives the following simultaneous equations for $v_j$ and $v_0$:
+
+$$ v_j x_{left} + v_0 = \log\left(\frac{0.95}{1.0 - 0.95}\right); $$ (6.16)
+
+$$ v_j x_{mid} + v_0 = \log\left(\frac{0.5}{0.5}\right). $$ (6.17)
+
+Note that the condition at $x_{right}$ is not used since the smooth is symmetrical about $x_{mid}$. These values for the gate parameters are used to generate probabilities for the left and right experts and to set the values of the conditional posterior probabilities $\varphi_0^{(n)}$ and $\varphi_1^{(n)}$:
+
+$$ p = \frac{1}{1 + \exp[-(v_0 + v_j x_j^{(n)})]} $$ (6.18)
+
+$$ \varphi_0^{(n)} = p, \quad \varphi_1^{(n)} = (1 - p) $$ (6.19)
+
+$$ \zeta_0^{(n)} = p \times \zeta_p^{(n)}, \quad \zeta_1^{(n)} = (1 - p) \times \zeta_p^{(n)}. $$ (6.20)
+
+These posterior probabilities are then used in conjunction with the data to train the experts and gate. The use of this initialisation for the gate within `split-posts` gives smoother functions, as shown in Figure 6.5.
+
+### Pruning or Early Stopping
+
+In order to control the complexity of the models built by the tree growing procedure I investigated two methods: *pruning* and *early stopping*. The pruning method works as follows. The training data is divided into a training set and a validation set. The tree growing algorithm is iterated till convergence {p78}on the training set, resulting in a large tree that typically overfits the training set. This large tree is then *pruned* using the validation set. Pruning involves selecting the optimal rooted sub-tree that gives the minimum error on the validation set.
+
+:::figure fig-6-5 | Figure 6.5: **Growing a smoother function.** Each sub-figure (a-d) shows the prediction of the model as a solid line, the generating function as a dashed line and the training data as dots. The predictions shown in each of the sub-figures are generated from models with successively more nodes. Sub-figure (a) shows the prediction of the initial model: a single linear regression expert. After one cycle of the growing algorithm, a mixture of 2 experts is obtained whose prediction is shown in sub-figure (b). Sub-figures (c) and (d) show the predictions after 3 and 4 terminal nodes have been grown onto the model. After 4 terminal nodes there is no significant decrease in the training error.
+
+During pruning, each non-terminal node of the tree is iteratively replaced by a terminal node which is retrained using the posterior probabilities of the non-terminal node and training set. I also investigated retraining new terminals using the validation set and the relevant posteriors inferred from it. Since the search space of possible sub-trees is large, only the best non-terminal / terminal replacement is retained at each stage of the pruning algorithm. This procedure is iterated until no further improvement on the validation set is found by pruning.
+
+Unfortunately, although the pruning algorithm was somewhat successful on small simulations, it was not successful on real world or realistic problems, as shown in Table 6.1. On many of the training sets of the `Boston` data, for example, the pruning algorithm failed to reduce the size of the grown tree at all, resulting in an over-trained model which generalised poorly. One possible reason for the failure of the pruning algorithm lies in the distinction between conventional decision and regression tree algorithms and the HME and its growing algorithm. In conventional tree growing, once a decision about a split has been made (and retained in the tree), this decision is kept fixed. Only lower levels of the tree are then updated according to the growing algorithm. During pruning, therefore, the merging of terminal nodes together yields models which could have also been grown, since the lower levels of the tree are {p79}independent of the higher levels during growing. In contrast, the HME growing algorithm (and general training algorithm) updates *all* parameters of the tree during training, and after each new node is added to the tree. To understand this, consider for example, the case of two experts in a mixture with the regions of influence of each expert overlapping significantly. Now let us split both of the experts in turn. If the left expert gives a much better improvement than the right expert, it will be retained. As a result, the gate will reallocate the regions so that the left node has more importance over the right expert and the degree of overlap will reduce. In this way, by splitting lower levels of the tree, the upper levels have been affected. Simply replacing a non-terminal node by a terminal node will therefore not be a reversal of the growing procedure, without retraining of the whole tree.
+
+:::table tab-6-1 | Table 6.1: **Pruning HME models.** A comparison of squared error loss for methods `me-ese-1` and `hme-grow-0` on two tasks `Boston` and `Kin-8nm` using different numbers of training examples (Size). `hme-grow-0` is the growing algorithm for HME models using pruning to control complexity. The $p$-values in the fifth column are the results of pairwise $t$ or $F$ tests between `hme-grow-0` and `me-ese-1`. $p$-values less than 0.05 indicate that the `hme-grow-0` method was significantly outperformed at the 95% level by the `me-ese-1` method. Only the `Boston` data with 32 data points shows no significant difference between the methods.
+| Data Set | Size | `me-ese-1` | `hme-grow-0` | $p$-value |
+| `Boston` | 32 | 0.366 | 0.402 | 0.274 |
+| `Boston` | 64 | 0.234 | 0.525 | 0.033 |
+| `Boston` | 128 | 0.160 | 0.216 | 0.086 |
+| `Kin-8nm` | 64 | 0.597 | 0.659 | 0.006 |
+| `Kin-8nm` | 128 | 0.489 | 0.525 | 0.054 |
+| `Kin-8nm` | 256 | 0.387 | 0.440 | 1.1e-5 |
+| `Kin-8nm` | 512 | 0.301 | 0.395 | 8.7e-13 |
+| `Kin-8nm` | 1024 | 0.230 | 0.385 | 2.7e-5 |
+
+Because of the failure of the pruning algorithm I used an early stopping method for controlling the size of the trees. The early stopping algorithm for `hme-grow-1` is similar to that of `me-ese-1` and `hme-ese-1`. The division of the training data into training and validation sets is random, with 2/3 for training and 1/3 for validation. A series of committee members are generated by training and validating on different training and validation sets. The predictions of the committee members on out of sample data are then averaged.
+
+There are two aspects to the search for the minimum on the validation set. After a split has been made to the tree and retained, the training algorithm is applied to the tree. The minimum on the validation set is then found and this model is saved. As was done for `me-ese-1` and `hme-ese-1`, the speed of the conjugate gradient algorithm `macopt` was reduced by setting *itmax* to 3. Training proceeds until convergence on the training set is achieved, at which point a new split is made to the tree. In order to avoid stopping when too simple a model is found, the tree growing is allowed to proceed for at least 3 iterations. A new split is made if the best error on the validation set for the current tree shape is less than the best error for the previous tree shape. A maximum of 50 iterations are allowed. In order to place a limit on the number of committee members, once again a minimum number of 3 members are allowed.
+
+{p80}
+:::figure fig-6-6 | Figure 6.6: **Growing using early stopping.** The two figures show the evolution of the tree growing algorithm on the `Boston` data using a training set of 128 points. The top figure shows the evolution of the validation set squared error against the iterations of the training algorithm, while the lower figure shows the evolution of the training set squared error. The plots are divided into 5 regions, $R1$ to $R5$, which signify different sizes of trees grown. $R1$ is the initial tree shape with only one expert. $R2$ is the tree after one split has been made and so on. On the training set the error decreases monotonically each time a split is made and subsequently levels out to 0.05. A new split is made when the training error for a fixed tree size has converged. On the validation set the error also decreases from $R1$ to $R2$ and $R3$, but increases after an initial drop when $R4$ is entered, and steadily increases in $R5$. The minimum error is achieved in $R4$ at around iteration 230, and so this size tree is chosen as the final model. One interesting point is the jump in validation set error between $R2$ and $R3$ followed by the settling down of this error after 10 iterations to a lower value. This noisiness in the validation error demonstrates the need for appropriate search heuristics, such as used here, when using validation sets to choose model complexity rather than stopping when the validation set error increases.
+
+If the overall time elapsed is less than $1.8765 \times N$ a new committee member is trained, up to a maximum of 50 committee members. An example of a run of the growing algorithm using early stopping is shown in Figure 6.6.
+
+The growing algorithm behaves in an interesting manner on the `Pumadyn` data sets as shown in Figure 6.8. The histograms show the distribution of different sized trees in the committees formed for each of the `Pumadyn` tasks. The behaviour of the algorithm is markedly different for the 32 dimensional tasks than for the 8 dimensional tasks. For the 32 dimensional tasks smaller trees are built and the most frequent trees contain only 1 expert. For the 8 dimensional tasks the most frequent trees are still the ones with 1 expert but there are more trees with up to 10 experts in them and the distributions are less peaked towards most trees have one expert only. Another point of interest is that the number of larger trees increases as the non-linearity of the task increases and the level of the noise decreases. This implies
+{p81}that the growing algorithm allocates more resources to modelling non-linear data but reverts to simpler trees for higher noise / more linear problems.
+
+:::algo fig-6-7 | Figure 6.7: **The `hme-grow-1` method.**
+1. Start with a single expert in the model. Set *iter* to 1.
+2. Train the model to convergence on the training set, storing the best performing model on the validation set $M^{(iter)}$. If the validation error of current model $VE(M^{(iter)})$ is less than the currently best overall model $VE(M^*)$, replace $M^*$ by $M^{(iter)}$.
+3. If ($iter > 3$) and $VE(M^{(iter)}) > VE(M^{(iter-1)})$ (*i.e.,* no improvement has been made from the last model to the current), terminate.
+4. For each terminal node in the model, find the best threshold and attribute using algorithm `best-split`. Generate posterior probabilities for the test split using algorithm `split-posts`. Train a new gate and pair of terminals using these posterior probabilities and record the increase in auxiliary function $\delta R_i$ for the node that was split.
+5. Keep the split which gives the biggest increase in auxiliary function and delete all other test splits.
+6. Set $iter = iter + 1$.
+7. Go to 2.
+
+Comparison of the speed of `hme-grow-1` on 32 dimensional data sets with its speed on 8 dimensional data sets indicates that it takes 1.8 times longer on average on the 32 dimensional data than on the 8 dimensional data. This compares with a figure of 1.5 times longer for the methods `me-ese-1` and `hme-ese-1`. The growing algorithm is therefore slightly slower as the dimensionality of the data increases, as might be expected from the nature of the search algorithm employed. The complete `hme-grow-1` method is summarised in Figure 6.7.
+
+## 6.3 Related Work
+
+Model selection for mixture of experts has also been considered by a number of authors. Zeevi, Meir and Adler [254] used a recursive procedure based on incrementally adding more experts in a flat mixture to an original configuration of 2 experts. If, after retraining, the new expert parameters are sufficiently different, the new expert is retained in the model, otherwise the algorithm is terminated. This somewhat ad-hoc procedure (which has no description of how to decide when the experts are sufficiently different) did yield good performance in their studies of time series prediction on sunspots and Canadian Lynx series. A companion paper [255] presented a theoretical analysis of error bounds of mixture of experts models, and suggested the use of an information criterion similar to the Network Information Criterion (NIC) [149].
+
+Jacobs et al. [105] use a Bayesian approach to perform model selection in hierarchical mixtures of experts architectures. Their approach starts with initially complex HME architectures which are pruned {p82}
+
+:::figure fig-6-8 | Figure 6.8: **Distribution of tree size for the growing algorithm.** The plots show the distribution of the number of terminal nodes (experts) in the committees of trees for each of the `Pumadyn` data sets. The vertical axis is the relative frequency which is the number of trees in each of the bins normalised by the total number of trees in all the bins.
+
+{p83}using *worth indices* for experts computed using Gibbs sampling. The worth index for an expert is defined as:
+
+$$ \text{worth index for expert } \E_i = \frac{1}{N} \sum_{n=1}^{N} z_i^{(n)} $$ (6.21)
+
+*i.e.,* the normalised sum of random indicator variables $z_i^{(n)}$. The worth indices are realised using simulated values from a Gibbs sampler and give an indication of how useful an expert is in a model. Jacobs et al. [105] use them to either prune away experts from a model or to indicate that a more complex model should be trained. The approach was shown to be successful by Jacobs et al. [105] at selecting architectures for two classification tasks: breast cancer [246] and phoneme classification [175]^[The breast cancer and phoneme data sets are available at the UCI Repository [143].]. One disadvantage of this approach, however, is the high degree of computational cost apparent in the Gibbs sampling process. Results by Rasmussen [189], however, suggest that even when computational resources are fixed, MLPs and Gaussian processes implemented using Markov chain Monte Carlo techniques outperformed those trained by other methods. Whether this result will extend to other models, such as mixtures of experts, and other data sets will surely be the subject of future research in this area.
+
+Other approaches to *tree growing* in hierarchical mixtures of experts have been proposed. In work which predates this chapter, I investigated the properties of tree growing on a small simulated classification task, the parity data set [238]. The method used was similar to the one described in this chapter, consisting of evaluation of the maximal increase in node likelihood after splitting of every terminal node. The splitting method was not robust, however, consisting of randomisation of the gate parameters, and random perturbation of the split expert parameters. In addition, no method for complexity control was discussed (the parity data is an exact classification problem).
+
+Fritsch et al. [62] suggested an alternative approach to tree growing in HME models [see also 60]. Their method used *expert dependent scaled likelihoods* computed during training to select the terminal node to split. For expert $\E_i$, the scaled likelihood is given by:^[This differs slightly from the formulation of Fritsch et al. [62] and Fritsch [60], who appear to use the probabilities $P(\E_i, An(\E_i)|\bx^{(n)}, \bth)$ in place of $P(\E_i, An(\E_i)|\bx^{(n)}, \by^{(n)}, \bth)$, but then describe the probability that they use as "the probability that expert $k$ is responsible for generating the observed data" which is clearly the latter function.]
+
+$$ l_k = \sum_n P(\E_i, An(\E_i)|\bx^{(n)}, \by^{(n)}, \bth) \log[P(\by^{(n)}|\bx^{(n)}, \E_i)]. $$ (6.22)
+
+The expert with the minimum $l_k$ was selected from the tree, and split using random parameters for the gate, and random perturbation of the expert parameters to give a pair of new experts, in a similar manner to Waterhouse and Robinson [236]. The new tree is then trained till a minimum error is found on a validation set, at which point a new tree shape is hypothesised. The growing algorithm is evaluated on a phoneme classification task [175] and on a portion of Switchboard [75], a large vocabulary speech recognition task as part of the JANUS [230] speech recogniser. The growing method for HME models outperformed fixed architecture HME models on both tasks, although the results on Switchboard {p84}were at least 20% worse than the state of the art systems, which brings into question the validity of the comparisons.
+
+Saito and Nakano [204] also consider a constructive algorithm for HME architectures. In their method, the expert with the largest error on the training set is selected and split into 2 experts and a gate. The parameters of the new experts are initialised to the previous expert parameters, whilst the gate parameters are set to random values between $-1$ and $+1$. The authors evaluate this method on two simulated examples: a piecewise linear regression problem and classification of 8-bit parity strings.
+
+Growing using the localised mixture of experts model [248] has also been investigated by Ramamurti and Ghosh [187] [see also 188]. In their approach the experts are ranked using the following weighted mean squared error score obtained on a *validation* data set:
+
+$$ E_j = \sum_n \zeta_j^{(n)} (y^{(n)} - \hat{y}_j^{(n)})^2 \Big/ \sum_n \zeta_j^{(n)}. $$ (6.23)
+
+The experts are ranked in order of increasing error $E_j$ and the expert with highest error selected for splitting. If this split does not decrease the error on the validation set it is rejected and the expert with next highest rank selected. The splitting algorithm works by copying the expert parameters into 2 new experts, whilst initialising the gate parameters using a weighted $k$-means algorithm in the locality of the original expert. The use of the localised mixture allows this neat initialisation method for the gate. Results of this method were given on simulated regression data sets and on two real world examples: classification of patient data into heart disease risk categories and prediction of energy demand for a building. Initial results for this method were impressive, and the authors also extended the method to an on-line algorithm which they use to model time varying regression functions.
+
+## 6.4 Summary
+
+In this chapter I have described a learning method based on a hierarchical mixtures-of-experts model which determines its structure in a recursive manner. This growing algorithm has been motivated from recursive partitioning ideas used frequently in decision and regression trees. Unlike most tree growing algorithms however, the method used here does not prune back branches after growing to exhaustion, but instead uses early stopping. I have demonstrated the behaviour of the growing algorithm on a simple task and on some of the DELVE data sets. Initial results suggest that the method makes sensible use of resources according to the complexity of the problem. Whether this behaviour translates into good performance will be seen in Chapter 8.
