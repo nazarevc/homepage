@@ -50,3 +50,10 @@ Changes from the 1997 text. Typographical slips fixed silently are listed too, s
 - 11.1: "using a recurrent neural network as the acoustic" -> "as the acoustic model"; chapter outline now mentions Section 11.2.
 - 11.2: "attempts to the mimic" -> "attempts to mimic"; "the remained of this chapter" -> "remainder"; "the adaptation begins to adapt itself" -> "the system begins to adapt itself"; "Gauvian and Lee" -> "Gauvain and Lee".
 - 11.6: "this process is known as" -> "This process"; Table 11.3 caption listed "2 and 4 experts (MLIN_2, MLIN_4)" but the table also has MLIN_5; caption updated.
+- Appendix A: "The source code the five" -> "The source code for the five". A dated note for the web edition flags that the 1997 addresses are as printed.
+- Appendix B and C: "The results for the best performing method ... is shown" -> "The result ... is shown"; p-value range restated as percentages, as in 8.2.
+- Appendix C: "This chapter contains" -> "This appendix contains"; "There are four data sets in total" -> "three" (Image, Letter, Splice); "squared error loss" -> "loss" (the classification losses are zero-one).
+- Appendix C, Table C.2: the training size column printed as "790" is set as 780, matching Table 3.2 and Chapter 3.
+- Tables in Appendices B and C are set from the PDF text layer; bold marks the lowest loss in each column, as in the original.
+- Front matter: "some of the chapters, were inspired" -> "some of the chapters were inspired"; "som abuses of notation" -> "some abuses"; the transpose of x was printed as $x^{(n)T}$ and is set as $x^T$; "Cambridge Univeristy" -> "University"; "Defence Advanced Research Projects Agency" -> "Defense"; "National Institute for Standards" -> "of Standards".
+- Bibliography: page ranges are set with hyphens rather than en dashes.

@@ -63,6 +63,8 @@ h1,h2,h3,h4{text-wrap:balance}p,li{text-wrap:pretty}
 .btn{position:relative;display:inline-block;margin:22px 0 0;background:var(--accent);color:#fff;border-radius:8px;padding:10px 16px;font-weight:500;transition:background-color .15s}
 .btn:hover{color:#fff;background:#2f8bc4}
 .btn:active{transform:scale(.98)}
+.btn2{position:relative;display:inline-block;margin:22px 0 0 8px;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:9px 15px;font-weight:500;transition:border-color .15s}
+.btn2:hover{border-color:var(--accent);color:var(--ink)}
 .meta{position:relative;font-size:13px;color:var(--ink2);margin:10px 0 0}
 section{margin-top:34px}
 h2{font:500 17px/1.3 var(--font);margin:0 0 10px}
@@ -103,8 +105,8 @@ ul.plain li{margin:0 0 8px}
   <p class="upd">PhD dissertation, University of Cambridge, 1997</p>
   <h1>Classification and Regression using Mixtures of Experts</h1>
   <p class="lead">Steven Waterhouse. Jesus College and the Department of Engineering, University of Cambridge. Supervised by Tony Robinson.</p>
-  <a class="btn" href="/thesis/waterhouse-1997-mixtures-of-experts.pdf">Read the full thesis (PDF)</a>
-  <p class="meta">215 pages, 2.2 MB, about 62,000 words. <a href="#contents">Or read by chapter</a></p>
+  <a class="btn" href="/thesis/preface/">Read the thesis online</a> <a class="btn2" href="/thesis/waterhouse-1997-mixtures-of-experts.pdf">Full PDF</a>
+  <p class="meta">215 pages, about 62,000 words. Full PDF 2.2 MB. <a href="#contents">Contents</a></p>
 </div>
 
 <section>
@@ -127,9 +129,9 @@ ul.plain li{margin:0 0 8px}
 
 <section id="contents">
   <h2>Contents</h2>
-  <p class="hint">Chapters marked PDF open as a PDF until their web page is ready. Section links jump to the section.</p>
+  <p class="hint">Each chapter opens as a web page. Its PDF, with a cover page, is beside it. Section links jump to the section.</p>
   <ul class="toc">
-    <li class="ch"><div class="row"><span class="n"></span><a href="/thesis/chapters/front-matter.pdf">Front matter: preface, summary, contents, notation</a><span class="pp">17 pages, PDF</span></div>
+    <li class="ch"><div class="row"><span class="n"></span><a href="/thesis/preface/">Front matter: preface, summary, contents, notation</a><span class="pp"><a class="pdf" href="/thesis/chapters/front-matter.pdf">PDF</a> · 17 pages</span></div>
     </li>
     <li class="ch"><div class="row"><span class="n">1</span><a href="/thesis/chapter-1/">Introduction</a><span class="pp"><a class="pdf" href="/thesis/chapters/chapter-01.pdf">PDF</a> · 8 pages</span></div>
     </li>
@@ -229,19 +231,19 @@ ul.plain li{margin:0 0 8px}
     <li class="part">Part III: Conclusions, Appendices and References</li>
     <li class="ch"><div class="row"><span class="n">12</span><a href="/thesis/chapter-12/">Conclusions and Future Work</a><span class="pp"><a class="pdf" href="/thesis/chapters/chapter-12.pdf">PDF</a> · 4 pages</span></div>
     </li>
-    <li class="ch"><div class="row"><span class="n">A</span><a href="/thesis/chapters/appendix-a.pdf">Availability of Source Code and Results</a><span class="pp">1 page, PDF</span></div>
+    <li class="ch"><div class="row"><span class="n">A</span><a href="/thesis/appendix-a/">Availability of Source Code and Results</a><span class="pp"><a class="pdf" href="/thesis/chapters/appendix-a.pdf">PDF</a> · 1 page</span></div>
     </li>
-    <li class="ch"><div class="row"><span class="n">B</span><a href="/thesis/chapters/appendix-b.pdf">Results on DELVE Regression Tasks</a><span class="pp">18 pages, PDF</span></div>
+    <li class="ch"><div class="row"><span class="n">B</span><a href="/thesis/appendix-b/">Results on DELVE Regression Tasks</a><span class="pp"><a class="pdf" href="/thesis/chapters/appendix-b.pdf">PDF</a> · 18 pages</span></div>
       <ul class="secs">
-        <li><a href="/thesis/chapters/appendix-b.pdf#page=3"><span class="sn">B.1</span>Boston</a></li>
-        <li><a href="/thesis/chapters/appendix-b.pdf#page=4"><span class="sn">B.2</span>The Kin and Pumadyn families</a></li>
+        <li><a href="/thesis/appendix-b/#sB-1"><span class="sn">B.1</span>Boston</a></li>
+        <li><a href="/thesis/appendix-b/#sB-2"><span class="sn">B.2</span>The Kin and Pumadyn families</a></li>
       </ul>
     </li>
-    <li class="ch"><div class="row"><span class="n">C</span><a href="/thesis/chapters/appendix-c.pdf">Results on DELVE Classification Tasks</a><span class="pp">4 pages, PDF</span></div>
+    <li class="ch"><div class="row"><span class="n">C</span><a href="/thesis/appendix-c/">Results on DELVE Classification Tasks</a><span class="pp"><a class="pdf" href="/thesis/chapters/appendix-c.pdf">PDF</a> · 4 pages</span></div>
       <ul class="secs">
-        <li><a href="/thesis/chapters/appendix-c.pdf#page=3"><span class="sn">C.1</span>Image</a></li>
-        <li><a href="/thesis/chapters/appendix-c.pdf#page=4"><span class="sn">C.2</span>Letter</a></li>
-        <li><a href="/thesis/chapters/appendix-c.pdf#page=5"><span class="sn">C.3</span>Splice</a></li>
+        <li><a href="/thesis/appendix-c/#sC-1"><span class="sn">C.1</span>Image</a></li>
+        <li><a href="/thesis/appendix-c/#sC-2"><span class="sn">C.2</span>Letter</a></li>
+        <li><a href="/thesis/appendix-c/#sC-3"><span class="sn">C.3</span>Splice</a></li>
       </ul>
     </li>
     <li class="ch"><div class="row"><span class="n"></span><a href="/thesis/bibliography/">Bibliography</a><span class="pp"><a class="pdf" href="/thesis/chapters/bibliography.pdf">PDF</a> · 20 pages</span></div>

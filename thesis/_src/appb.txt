@@ -1,0 +1,383 @@
+number: B
+title: Results on DELVE Regression Tasks
+pdf: appendix-b.pdf
+first_page: 157
+---
+{p157}
+This appendix contains the results of applying all the learning methods described in Part I of the thesis to the DELVE regression tasks. There are 17 data sets in total: the Boston data set plus 8 data sets in each of the `Kin` and `Pumadyn` families. For brevity, detailed legends are not included for each of the tables and figures and only a short caption is used. Each figure and table shows the standardised squared error loss for each learning method for different sized training sets. For example, the results on the Boston data set are shown in Figure B.1 and Table B.1. Each column of the figure and table shows the squared error loss for the different learning methods for training sets with different numbers of examples. The key to each column in the figures is given at the bottom left of the figure. Reading from top to bottom of the list of methods corresponds to the bars from left to right of each column. In the table the losses are shown in numeric form. The results for the best performing method, *i.e.,* the one with smallest loss, is shown in bold face. In the figure the losses are shown as horizontal lines with the associated standard error shown as bars on either side of the loss. Note that for the `Kin` and `Pumadyn` families, the method `gp-mc-1` was not run on the largest data sets of 1024 points. In these cases the results for `gp-mc-1` are marked with the symbol $\emptyset$ in the tables and figures. Also, for brevity, only the results for the 7 original methods and the 5 ME family methods are shown in the figures. The excluded methods are `lin-2` and `lin-ese-1`, whose results are shown instead in the tables.
+
+Each figure also includes a matrix of $p$-values for each of the methods. These are the $p$-values obtained from paired $t$-tests or $F$-tests between each of the methods, shown as percentages. The minimum $p$-value shown is 1% and the maximum is 5%. A result is considered significant if the $p$-value is 5% or less. Non-significant comparisons are shown with a dot.
+
+{p158}
+## B.1 Boston
+
+:::table tab-b-1 | Table B.1: **Results on the `Boston` data set.** Standardised squared error loss by training set size. The lowest loss in each column is in bold.
+| Method | 32 | 64 | 128 |
+| `gp-map-1` | 0.407 | 0.280 | 0.194 |
+| `knn-cv-1` | 0.522 | 0.425 | 0.344 |
+| `lin-1` | 0.528 | 0.327 | 0.281 |
+| `mars3.6-bag-1` | 0.325 | 0.494 | **0.157** |
+| `mlp-ese-1` | 0.407 | 0.258 | 0.210 |
+| `me-ese-1` | 0.366 | 0.234 | 0.160 |
+| `hme-ese-1` | 0.386 | 0.229 | 0.173 |
+| `me-el-1` | 0.370 | 0.243 | 0.159 |
+| `hme-el-1` | **0.322** | **0.210** | 0.162 |
+| `hme-grow-1` | **0.322** | 0.233 | 0.176 |
+| `lin-2` | 0.525 | 0.326 | 0.281 |
+| `lin-ese-1` | 0.446 | 0.312 | 0.285 |
+
+:::figure fig-b-1 | Figure B.1: **Results on the `Boston` data set.**
+
+{p159}
+## B.2 The Kin and Pumadyn families
+
+#### `Kin-32fm/dist`
+
+:::table tab-b-2 | Table B.2: **Results on the `Kin-32fm` data set.** Standardised squared error loss by training set size. The lowest loss in each column is in bold.
+| Method | 64 | 128 | 256 | 512 | 1024 |
+| `gp-mc-1` | **0.172** | **0.122** | 0.106 | 0.094 | $\emptyset$ |
+| `gp-map-1` | 0.202 | 0.144 | 0.113 | 0.091 | 0.081 |
+| `knn-cv-1` | 0.705 | 0.618 | 0.544 | 0.496 | 0.440 |
+| `lin-1` | 0.182 | 0.124 | 0.107 | 0.101 | 0.097 |
+| `mars3.6-bag-1` | 0.765 | 0.517 | 0.364 | 0.284 | 0.270 |
+| `mlp-ese-1` | 0.187 | 0.124 | **0.105** | 0.092 | 0.076 |
+| `mlp-mc-1` | 0.181 | 0.124 | 0.106 | **0.080** | **0.071** |
+| `me-ese-1` | 0.318 | 0.183 | 0.124 | 0.111 | 0.092 |
+| `hme-ese-1` | 0.330 | 0.187 | 0.125 | 0.114 | 0.093 |
+| `me-el-1` | 0.292 | 0.205 | 0.145 | 0.118 | 0.099 |
+| `hme-el-1` | 0.272 | 0.181 | 0.136 | 0.107 | 0.090 |
+| `hme-grow-1` | 0.181 | 0.125 | 0.107 | 0.099 | 0.080 |
+| `lin-2` | 0.182 | 0.124 | 0.107 | 0.101 | 0.097 |
+| `lin-ese-1` | 0.186 | 0.127 | 0.107 | 0.102 | 0.098 |
+
+:::figure fig-b-2 | Figure B.2: **Results on the `Kin-32fm` data set.**
+
+{p160}
+#### `Kin-32fh/dist`
+
+:::table tab-b-3 | Table B.3: **Results on the `Kin-32fh` data set.** Standardised squared error loss by training set size. The lowest loss in each column is in bold.
+| Method | 64 | 128 | 256 | 512 | 1024 |
+| `gp-mc-1` | **0.584** | 0.389 | 0.349 | 0.325 | $\emptyset$ |
+| `gp-map-1` | 0.656 | 0.439 | 0.350 | 0.335 | 0.310 |
+| `knn-cv-1` | 0.835 | 0.730 | 0.682 | 0.637 | 0.594 |
+| `lin-1` | 0.603 | **0.383** | **0.341** | **0.319** | 0.307 |
+| `mars3.6-bag-1` | 0.851 | 0.716 | 0.565 | 0.498 | 0.458 |
+| `mlp-ese-1` | 0.643 | 0.386 | 0.343 | **0.319** | 0.306 |
+| `mlp-mc-1` | 0.649 | 0.391 | **0.341** | 0.320 | **0.305** |
+| `me-ese-1` | 0.637 | 0.444 | 0.390 | 0.360 | 0.325 |
+| `hme-ese-1` | 0.643 | 0.444 | 0.389 | 0.364 | 0.325 |
+| `me-el-1` | 0.666 | 0.504 | 0.445 | 0.403 | 0.365 |
+| `hme-el-1` | 0.627 | 0.520 | 0.401 | 0.376 | 0.337 |
+| `hme-grow-1` | 0.602 | 0.386 | 0.345 | 0.322 | 0.309 |
+| `lin-2` | 0.604 | 0.384 | **0.341** | **0.319** | 0.307 |
+| `lin-ese-1` | 0.599 | 0.388 | 0.346 | 0.322 | 0.309 |
+
+:::figure fig-b-3 | Figure B.3: **Results on the `Kin-32fh` data set.**
+
+{p161}
+#### `Kin-32nm/dist`
+
+:::table tab-b-4 | Table B.4: **Results on the `Kin-32nm` data set.** Standardised squared error loss by training set size. The lowest loss in each column is in bold.
+| Method | 64 | 128 | 256 | 512 | 1024 |
+| `gp-mc-1` | **0.930** | **0.867** | **0.803** | 0.677 | $\emptyset$ |
+| `gp-map-1` | 1.054 | 0.941 | 0.831 | 0.683 | 0.610 |
+| `knn-cv-1` | 0.965 | 0.926 | 0.910 | 0.843 | 0.811 |
+| `lin-1` | 1.446 | 1.001 | 0.847 | 0.788 | 0.765 |
+| `mars3.6-bag-1` | 0.985 | 0.922 | 0.873 | 0.826 | 0.804 |
+| `mlp-ese-1` | 0.936 | 0.886 | 0.813 | 0.778 | 0.729 |
+| `mlp-mc-1` | 0.941 | 0.897 | 0.823 | **0.675** | **0.582** |
+| `me-ese-1` | 1.031 | 0.915 | 0.822 | 0.767 | 0.708 |
+| `hme-ese-1` | 1.029 | 0.923 | 0.822 | 0.771 | 0.722 |
+| `me-el-1` | 0.969 | 0.958 | 0.843 | 0.780 | 0.728 |
+| `hme-el-1` | 1.115 | 0.919 | 0.846 | 0.768 | 0.723 |
+| `hme-grow-1` | 1.062 | 0.947 | 0.836 | 0.779 | 0.719 |
+| `lin-2` | 1.444 | 1.001 | 0.847 | 0.788 | 0.765 |
+| `lin-ese-1` | 1.064 | 0.947 | 0.835 | 0.791 | 0.766 |
+
+:::figure fig-b-4 | Figure B.4: **Results on the `Kin-32nm` data set.**
+
+{p162}
+#### `Kin-32nh/dist`
+
+:::table tab-b-5 | Table B.5: **Results on the `Kin-32nh` data set.** Standardised squared error loss by training set size. The lowest loss in each column is in bold.
+| Method | 64 | 128 | 256 | 512 | 1024 |
+| `gp-mc-1` | 0.972 | **0.942** | **0.862** | 0.802 | $\emptyset$ |
+| `gp-map-1` | 1.018 | 1.038 | 0.890 | **0.796** | 0.707 |
+| `knn-cv-1` | 1.009 | 0.971 | 0.937 | 0.914 | 0.866 |
+| `lin-1` | 1.806 | 1.079 | 0.898 | 0.850 | 0.815 |
+| `mars3.6-bag-1` | 1.085 | 0.979 | 0.908 | 0.880 | 0.844 |
+| `mlp-ese-1` | **0.960** | 0.944 | 0.868 | 0.844 | 0.796 |
+| `mlp-mc-1` | 0.969 | 0.951 | 0.876 | 0.824 | **0.694** |
+| `me-ese-1` | 1.183 | 1.002 | 0.887 | 0.839 | 0.783 |
+| `hme-ese-1` | 1.183 | 1.004 | 0.889 | 0.848 | 0.783 |
+| `me-el-1` | 1.078 | 1.093 | 0.913 | 0.856 | 0.805 |
+| `hme-el-1` | 1.344 | 1.003 | 0.917 | 0.835 | 0.793 |
+| `hme-grow-1` | 1.241 | 1.026 | 0.892 | 0.849 | 0.791 |
+| `lin-2` | 1.804 | 1.079 | 0.898 | 0.850 | 0.815 |
+| `lin-ese-1` | 1.24 | 1.028 | 0.891 | 0.852 | 0.819 |
+
+:::figure fig-b-5 | Figure B.5: **Results on the `Kin-32nh` data set.**
+
+{p163}
+#### `Kin-8fm/dist`
+
+:::table tab-b-6 | Table B.6: **Results on the `Kin-8fm` data set.** Standardised squared error loss by training set size. The lowest loss in each column is in bold.
+| Method | 64 | 128 | 256 | 512 | 1024 |
+| `gp-mc-1` | 0.061 | 0.043 | 0.033 | **0.028** | $\emptyset$ |
+| `gp-map-1` | 0.067 | 0.044 | 0.033 | **0.028** | **0.026** |
+| `knn-cv-1` | 0.347 | 0.276 | 0.207 | 0.161 | 0.134 |
+| `lin-1` | 0.088 | 0.083 | 0.080 | 0.079 | 0.078 |
+| `mars3.6-bag-1` | 0.123 | 0.068 | 0.059 | 0.057 | 0.061 |
+| `mlp-ese-1` | 0.072 | 0.052 | 0.038 | 0.031 | 0.028 |
+| `mlp-mc-1` | **0.060** | **0.040** | **0.031** | **0.028** | **0.026** |
+| `me-ese-1` | 0.064 | 0.047 | 0.038 | 0.033 | 0.030 |
+| `hme-ese-1` | 0.066 | 0.049 | 0.040 | 0.035 | 0.032 |
+| `me-el-1` | 0.078 | 0.056 | 0.040 | 0.033 | 0.030 |
+| `hme-el-1` | 0.085 | 0.058 | 0.045 | 0.036 | 0.033 |
+| `hme-grow-1` | 0.076 | 0.059 | 0.043 | 0.037 | 0.034 |
+| `lin-2` | 0.088 | 0.083 | 0.080 | 0.079 | 0.079 |
+| `lin-ese-1` | 0.088 | 0.083 | 0.081 | 0.079 | 0.079 |
+
+:::figure fig-b-6 | Figure B.6: **Results on the `Kin-8fm` data set.**
+
+{p164}
+#### `Kin-8fh/dist`
+
+:::table tab-b-7 | Table B.7: **Results on the `Kin-8fh` data set.** Standardised squared error loss by training set size. The lowest loss in each column is in bold.
+| Method | 64 | 128 | 256 | 512 | 1024 |
+| `gp-mc-1` | 0.316 | 0.307 | 0.280 | 0.262 | $\emptyset$ |
+| `gp-map-1` | 0.364 | 0.322 | 0.286 | 0.263 | **0.250** |
+| `knn-cv-1` | 0.524 | 0.452 | 0.404 | 0.376 | 0.346 |
+| `lin-1` | 0.315 | 0.308 | 0.296 | 0.287 | 0.285 |
+| `mars3.6-bag-1` | 0.404 | 0.330 | 0.289 | 0.272 | 0.265 |
+| `mlp-ese-1` | 0.317 | 0.305 | 0.286 | 0.270 | 0.259 |
+| `mlp-mc-1` | 0.320 | 0.304 | 0.284 | 0.262 | 0.253 |
+| `me-ese-1` | 0.311 | **0.291** | **0.270** | **0.260** | 0.253 |
+| `hme-ese-1` | **0.308** | 0.292 | 0.273 | 0.261 | 0.254 |
+| `me-el-1` | 0.354 | 0.314 | 0.298 | 0.271 | 0.251 |
+| `hme-el-1` | 0.348 | 0.300 | 0.287 | 0.270 | 0.258 |
+| `hme-grow-1` | 0.314 | 0.297 | 0.276 | 0.264 | 0.255 |
+| `lin-2` | 0.315 | 0.308 | 0.296 | 0.287 | 0.285 |
+| `lin-ese-1` | 0.318 | 0.309 | 0.297 | 0.287 | 0.286 |
+
+:::figure fig-b-7 | Figure B.7: **Results on the `Kin-8fh` data set.**
+
+{p165}
+#### `Kin-8nm/dist`
+
+:::table tab-b-8 | Table B.8: **Results on the `Kin-8nm` data set.** Standardised squared error loss by training set size. The lowest loss in each column is in bold.
+| Method | 64 | 128 | 256 | 512 | 1024 |
+| `gp-mc-1` | 0.586 | **0.353** | **0.231** | 0.162 | $\emptyset$ |
+| `gp-map-1` | 0.595 | 0.361 | **0.231** | 0.162 | 0.116 |
+| `knn-cv-1` | 0.693 | 0.557 | 0.479 | 0.394 | 0.317 |
+| `lin-1` | 0.655 | 0.600 | 0.590 | 0.574 | 0.569 |
+| `mars3.6-bag-1` | 0.655 | 0.566 | 0.532 | 0.487 | 0.460 |
+| `mlp-ese-1` | **0.581** | 0.408 | 0.248 | 0.154 | 0.104 |
+| `mlp-mc-1` | 0.594 | 0.359 | 0.234 | **0.122** | **0.094** |
+| `me-ese-1` | 0.596 | 0.488 | 0.387 | 0.300 | 0.229 |
+| `hme-ese-1` | 0.592 | 0.496 | 0.395 | 0.325 | 0.262 |
+| `me-el-1` | 0.598 | 0.463 | 0.370 | 0.274 | 0.182 |
+| `hme-el-1` | 0.626 | 0.497 | 0.445 | 0.360 | 0.287 |
+| `hme-grow-1` | 0.615 | 0.516 | 0.438 | 0.395 | 0.378 |
+| `lin-2` | 0.655 | 0.600 | 0.591 | 0.574 | 0.569 |
+| `lin-ese-1` | 0.652 | 0.599 | 0.592 | 0.575 | 0.569 |
+
+:::figure fig-b-8 | Figure B.8: **Results on the `Kin-8nm` data set.**
+
+{p166}
+#### `Kin-8nh/dist`
+
+:::table tab-b-9 | Table B.9: **Results on the `Kin-8nh` data set.** Standardised squared error loss by training set size. The lowest loss in each column is in bold.
+| Method | 64 | 128 | 256 | 512 | 1024 |
+| `gp-mc-1` | 0.735 | 0.643 | 0.501 | 0.449 | $\emptyset$ |
+| `gp-map-1` | 0.827 | **0.596** | **0.497** | 0.449 | 0.413 |
+| `knn-cv-1` | 0.775 | 0.686 | 0.604 | 0.567 | 0.522 |
+| `lin-1` | 0.773 | 0.676 | 0.655 | 0.632 | 0.629 |
+| `mars3.6-bag-1` | 0.763 | 0.678 | 0.627 | 0.593 | 0.579 |
+| `mlp-ese-1` | **0.715** | 0.630 | 0.531 | 0.453 | 0.405 |
+| `mlp-mc-1` | 0.726 | 0.632 | 0.536 | **0.434** | **0.396** |
+| `me-ese-1` | 0.753 | 0.639 | 0.582 | 0.519 | 0.464 |
+| `hme-ese-1` | 0.753 | 0.638 | 0.579 | 0.538 | 0.508 |
+| `me-el-1` | 0.733 | 0.637 | 0.571 | 0.517 | 0.451 |
+| `hme-el-1` | 0.722 | 0.647 | 0.594 | 0.556 | 0.521 |
+| `hme-grow-1` | 0.751 | 0.644 | 0.599 | 0.567 | 0.559 |
+| `lin-2` | 0.773 | 0.676 | 0.654 | 0.632 | 0.629 |
+| `lin-ese-1` | 0.771 | 0.678 | 0.656 | 0.632 | 0.630 |
+
+:::figure fig-b-9 | Figure B.9: **Results on the `Kin-8nh` data set.**
+
+{p167}
+#### `Pumadyn-32fm/accel`
+
+:::table tab-b-10 | Table B.10: **Results on the `Pumadyn-32fm` data set.** Standardised squared error loss by training set size. The lowest loss in each column is in bold.
+| Method | 64 | 128 | 256 | 512 | 1024 |
+| `gp-mc-1` | **0.060** | 0.057 | 0.046 | 0.050 | $\emptyset$ |
+| `gp-map-1` | 0.086 | 0.047 | 0.041 | **0.036** | **0.031** |
+| `knn-cv-1` | 0.713 | 0.598 | 0.543 | 0.497 | 0.443 |
+| `lin-1` | 0.153 | 0.097 | 0.082 | 0.076 | 0.072 |
+| `mars3.6-bag-1` | 0.068 | **0.045** | **0.037** | **0.036** | 0.035 |
+| `mlp-ese-1` | 0.141 | 0.097 | 0.082 | 0.072 | 0.049 |
+| `mlp-mc-1` | 0.070 | 0.046 | 0.044 | 0.041 | **0.031** |
+| `me-ese-1` | 0.169 | 0.099 | 0.083 | 0.076 | 0.072 |
+| `hme-ese-1` | 0.172 | 0.098 | 0.083 | 0.076 | 0.072 |
+| `me-el-1` | 0.215 | 0.142 | 0.109 | 0.093 | 0.071 |
+| `hme-el-1` | 0.185 | 0.139 | 0.101 | 0.085 | 0.076 |
+| `hme-grow-1` | 0.147 | 0.098 | 0.083 | 0.076 | 0.072 |
+| `lin-2` | 0.153 | 0.098 | 0.083 | 0.076 | 0.073 |
+| `lin-ese-1` | 0.144 | 0.098 | 0.083 | 0.076 | 0.072 |
+
+:::figure fig-b-10 | Figure B.10: **Results on the `Pumadyn-32fm` data set.**
+
+{p168}
+#### `Pumadyn-32fh/accel`
+
+:::table tab-b-11 | Table B.11: **Results on the `Pumadyn-32fh` data set.** Standardised squared error loss by training set size. The lowest loss in each column is in bold.
+| Method | 64 | 128 | 256 | 512 | 1024 |
+| `gp-mc-1` | 0.649 | 0.612 | 0.585 | 0.597 | $\emptyset$ |
+| `gp-map-1` | 0.602 | 0.601 | 0.589 | 0.581 | 0.566 |
+| `knn-cv-1` | 0.895 | 0.851 | 0.824 | 0.783 | 0.762 |
+| `lin-1` | 1.143 | 0.759 | 0.637 | 0.603 | 0.582 |
+| `mars3.6-bag-1` | 0.664 | 0.628 | 0.590 | 0.569 | **0.560** |
+| `mlp-ese-1` | 0.772 | 0.698 | 0.627 | 0.600 | 0.582 |
+| `mlp-mc-1` | **0.593** | **0.585** | **0.570** | **0.568** | 0.565 |
+| `me-ese-1` | 0.796 | 0.724 | 0.635 | 0.606 | 0.583 |
+| `hme-ese-1` | 0.797 | 0.724 | 0.634 | 0.605 | 0.587 |
+| `me-el-1` | 0.772 | 0.743 | 0.668 | 0.651 | 0.632 |
+| `hme-el-1` | 0.890 | 0.757 | 0.685 | 0.632 | 0.618 |
+| `hme-grow-1` | 0.836 | 0.744 | 0.636 | 0.604 | 0.584 |
+| `lin-2` | 1.141 | 0.760 | 0.637 | 0.604 | 0.582 |
+| `lin-ese-1` | 0.845 | 0.738 | 0.636 | 0.605 | 0.584 |
+
+:::figure fig-b-11 | Figure B.11: **Results on the `Pumadyn-32fh` data set.**
+
+{p169}
+#### `Pumadyn-32nm/accel`
+
+:::table tab-b-12 | Table B.12: **Results on the `Pumadyn-32nm` data set.** Standardised squared error loss by training set size. The lowest loss in each column is in bold.
+| Method | 64 | 128 | 256 | 512 | 1024 |
+| `gp-mc-1` | **0.108** | 0.117 | **0.058** | 0.057 | $\emptyset$ |
+| `gp-map-1` | 0.123 | **0.113** | 0.062 | **0.043** | **0.044** |
+| `knn-cv-1` | 0.993 | 0.961 | 0.912 | 0.884 | 0.849 |
+| `lin-1` | 1.573 | 1.070 | 0.885 | 0.821 | 0.788 |
+| `mars3.6-bag-1` | 0.494 | 0.135 | 0.068 | 0.062 | 0.061 |
+| `mlp-ese-1` | 0.977 | 0.922 | 0.854 | 0.704 | 0.170 |
+| `mlp-mc-1` | 0.788 | 0.236 | 0.231 | 0.220 | 0.046 |
+| `me-ese-1` | 1.103 | 1.013 | 0.889 | 0.819 | 0.784 |
+| `hme-ese-1` | 1.110 | 1.019 | 0.885 | 0.824 | 0.789 |
+| `me-el-1` | 0.992 | 0.963 | 0.918 | 0.825 | 0.701 |
+| `hme-el-1` | 1.173 | 0.985 | 0.898 | 0.819 | 0.735 |
+| `hme-grow-1` | 1.117 | 1.047 | 0.879 | 0.814 | 0.779 |
+| `lin-2` | 1.572 | 1.070 | 0.886 | 0.822 | 0.789 |
+| `lin-ese-1` | 1.162 | 1.038 | 0.885 | 0.821 | 0.790 |
+
+:::figure fig-b-12 | Figure B.12: **Results on the `Pumadyn-32nm` data set.**
+
+{p170}
+#### `Pumadyn-32nh/accel`
+
+:::table tab-b-13 | Table B.13: **Results on the `Pumadyn-32nh` data set.** Standardised squared error loss by training set size. The lowest loss in each column is in bold.
+| Method | 64 | 128 | 256 | 512 | 1024 |
+| `gp-mc-1` | **0.601** | **0.526** | 0.398 | 0.384 | $\emptyset$ |
+| `gp-map-1` | 1.018 | 0.700 | 0.384 | 0.356 | 0.347 |
+| `knn-cv-1` | 1.002 | 1.010 | 0.948 | 0.929 | 0.908 |
+| `lin-1` | 1.985 | 1.203 | 0.965 | 0.894 | 0.866 |
+| `mars3.6-bag-1` | 0.926 | 0.528 | **0.376** | **0.344** | **0.342** |
+| `mlp-ese-1` | 0.993 | 0.959 | 0.922 | 0.885 | 0.708 |
+| `mlp-mc-1` | 0.879 | 0.582 | 0.502 | 0.592 | 0.345 |
+| `me-ese-1` | 1.253 | 1.127 | 0.962 | 0.896 | 0.867 |
+| `hme-ese-1` | 1.229 | 1.125 | 0.963 | 0.898 | 0.871 |
+| `me-el-1` | 1.041 | 1.060 | 0.990 | 0.917 | 0.882 |
+| `hme-el-1` | 1.332 | 1.050 | 0.976 | 0.906 | 0.880 |
+| `hme-grow-1` | 1.300 | 1.156 | 0.970 | 0.889 | 0.859 |
+| `lin-2` | 1.978 | 1.203 | 0.965 | 0.894 | 0.866 |
+| `lin-ese-1` | 1.32 | 1.15 | 0.966 | 0.895 | 0.865 |
+
+:::figure fig-b-13 | Figure B.13: **Results on the `Pumadyn-32nh` data set.**
+
+{p171}
+#### `Pumadyn-8fm/accel`
+
+:::table tab-b-14 | Table B.14: **Results on the `Pumadyn-8fm` data set.** Standardised squared error loss by training set size. The lowest loss in each column is in bold.
+| Method | 64 | 128 | 256 | 512 | 1024 |
+| `gp-mc-1` | 0.071 | 0.059 | 0.054 | **0.052** | $\emptyset$ |
+| `gp-map-1` | 0.069 | 0.059 | 0.054 | **0.052** | **0.050** |
+| `knn-cv-1` | 0.352 | 0.292 | 0.221 | 0.176 | 0.146 |
+| `lin-1` | 0.097 | 0.085 | 0.079 | 0.077 | 0.076 |
+| `mars3.6-bag-1` | 0.077 | 0.061 | **0.053** | **0.052** | **0.050** |
+| `mlp-ese-1` | 0.090 | 0.073 | 0.061 | 0.056 | 0.052 |
+| `mlp-mc-1` | **0.064** | **0.057** | 0.054 | **0.052** | **0.050** |
+| `me-ese-1` | 0.097 | 0.083 | 0.074 | 0.066 | 0.055 |
+| `hme-ese-1` | 0.097 | 0.084 | 0.075 | 0.071 | 0.062 |
+| `me-el-1` | 0.113 | 0.086 | 0.066 | 0.059 | 0.057 |
+| `hme-el-1` | 0.117 | 0.092 | 0.073 | 0.065 | 0.057 |
+| `hme-grow-1` | 0.097 | 0.084 | 0.076 | 0.066 | 0.059 |
+| `lin-2` | 0.097 | 0.085 | 0.079 | 0.077 | 0.077 |
+| `lin-ese-1` | 0.098 | 0.085 | 0.079 | 0.077 | 0.077 |
+
+:::figure fig-b-14 | Figure B.14: **Results on the `Pumadyn-8fm` data set.**
+
+{p172}
+#### `Pumadyn-8fh/accel`
+
+:::table tab-b-15 | Table B.15: **Results on the `Pumadyn-8fh` data set.** Standardised squared error loss by training set size. The lowest loss in each column is in bold.
+| Method | 64 | 128 | 256 | 512 | 1024 |
+| `gp-mc-1` | 0.467 | 0.431 | 0.407 | 0.405 | $\emptyset$ |
+| `gp-map-1` | 0.470 | 0.429 | 0.411 | **0.395** | **0.390** |
+| `knn-cv-1` | 0.652 | 0.598 | 0.529 | 0.493 | 0.470 |
+| `lin-1` | 0.456 | 0.434 | 0.418 | 0.413 | 0.410 |
+| `mars3.6-bag-1` | 0.488 | 0.462 | 0.418 | 0.403 | 0.393 |
+| `mlp-ese-1` | 0.461 | 0.432 | 0.416 | 0.408 | 0.399 |
+| `mlp-mc-1` | **0.445** | **0.420** | **0.406** | 0.400 | 0.395 |
+| `me-ese-1` | 0.460 | 0.436 | 0.416 | 0.412 | 0.407 |
+| `hme-ese-1` | 0.461 | 0.437 | 0.418 | 0.414 | 0.410 |
+| `me-el-1` | 0.533 | 0.491 | 0.436 | 0.427 | 0.403 |
+| `hme-el-1` | 0.538 | 0.482 | 0.435 | 0.414 | 0.402 |
+| `hme-grow-1` | 0.456 | 0.437 | 0.416 | 0.408 | 0.400 |
+| `lin-2` | 0.456 | 0.435 | 0.419 | 0.414 | 0.410 |
+| `lin-ese-1` | 0.458 | 0.435 | 0.419 | 0.414 | 0.410 |
+
+:::figure fig-b-15 | Figure B.15: **Results on the `Pumadyn-8fh` data set.**
+
+{p173}
+#### `Pumadyn-8nm/accel`
+
+:::table tab-b-16 | Table B.16: **Results on the `Pumadyn-8nm` data set.** Standardised squared error loss by training set size. The lowest loss in each column is in bold.
+| Method | 64 | 128 | 256 | 512 | 1024 |
+| `gp-mc-1` | 0.067 | **0.052** | 0.044 | **0.038** | $\emptyset$ |
+| `gp-map-1` | 0.067 | **0.052** | 0.044 | **0.038** | **0.036** |
+| `knn-cv-1` | 0.683 | 0.536 | 0.452 | 0.365 | 0.303 |
+| `lin-1` | 0.587 | 0.519 | 0.522 | 0.507 | 0.500 |
+| `mars3.6-bag-1` | 0.118 | 0.068 | 0.062 | 0.057 | 0.055 |
+| `mlp-ese-1` | 0.315 | 0.128 | 0.058 | 0.046 | 0.040 |
+| `mlp-mc-1` | **0.066** | 0.054 | **0.042** | **0.038** | **0.036** |
+| `me-ese-1` | 0.569 | 0.465 | 0.269 | 0.127 | 0.057 |
+| `hme-ese-1` | 0.572 | 0.485 | 0.296 | 0.160 | 0.057 |
+| `me-el-1` | 0.555 | 0.363 | 0.127 | 0.059 | 0.046 |
+| `hme-el-1` | 0.553 | 0.423 | 0.189 | 0.070 | 0.049 |
+| `hme-grow-1` | 0.579 | 0.492 | 0.388 | 0.229 | 0.174 |
+| `lin-2` | 0.588 | 0.519 | 0.522 | 0.508 | 0.500 |
+| `lin-ese-1` | 0.588 | 0.520 | 0.523 | 0.507 | 0.501 |
+
+:::figure fig-b-16 | Figure B.16: **Results on the `Pumadyn-8nm` data set.**
+
+{p174}
+#### `Pumadyn-8nh/accel`
+
+:::table tab-b-17 | Table B.17: **Results on the `Pumadyn-8nh` data set.** Standardised squared error loss by training set size. The lowest loss in each column is in bold.
+| Method | 64 | 128 | 256 | 512 | 1024 |
+| `gp-mc-1` | 0.461 | **0.373** | **0.345** | 0.325 | $\emptyset$ |
+| `gp-map-1` | **0.447** | 0.376 | 0.351 | 0.325 | 0.323 |
+| `knn-cv-1` | 0.786 | 0.709 | 0.635 | 0.582 | 0.533 |
+| `lin-1` | 0.735 | 0.680 | 0.654 | 0.635 | 0.631 |
+| `mars3.6-bag-1` | 0.505 | 0.382 | 0.363 | 0.344 | 0.336 |
+| `mlp-ese-1` | 0.668 | 0.509 | 0.409 | 0.366 | 0.342 |
+| `mlp-mc-1` | 0.452 | 0.394 | **0.345** | **0.323** | **0.321** |
+| `me-ese-1` | 0.719 | 0.667 | 0.608 | 0.497 | 0.406 |
+| `hme-ese-1` | 0.724 | 0.672 | 0.613 | 0.549 | 0.448 |
+| `me-el-1` | 0.741 | 0.669 | 0.536 | 0.425 | 0.360 |
+| `hme-el-1` | 0.742 | 0.663 | 0.537 | 0.423 | 0.364 |
+| `hme-grow-1` | 0.723 | 0.672 | 0.603 | 0.537 | 0.512 |
+| `lin-2` | 0.735 | 0.681 | 0.655 | 0.635 | 0.631 |
+| `lin-ese-1` | 0.730 | 0.679 | 0.655 | 0.635 | 0.632 |
+
+:::figure fig-b-17 | Figure B.17: **Results on the `Pumadyn-8nh` data set.**

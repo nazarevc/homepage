@@ -1,0 +1,114 @@
+number: front
+title: Preface, Summary and Notation
+pdf: front-matter.pdf
+first_page: 1
+---
+:::raw
+<p class="ded"><em>To Fran, Rick and Nathan Waterhouse.</em></p>
+:::
+
+## Preface
+
+This thesis is not substantially the same as any other that I have submitted for a degree or diploma or other qualification at any other university. This thesis is entirely the result of my own work over the last four years at Cambridge University Engineering Department. The length of this thesis is approximately 62,000 words, including appendices and bibliography. Some of the work in this thesis has previously been published in: Waterhouse and Cook [233], Waterhouse, Kershaw and Robinson [234], Waterhouse, MacKay and Robinson [235], Waterhouse and Robinson [236], Waterhouse and Robinson [237] and Waterhouse and Robinson [238]. Also, some of the chapters were inspired by joint work with David MacKay, Gary Cook and Dan Kershaw. The level of collaboration was as follows.
+
+#### Chapter 7: Bayesian Methods for Mixtures-of-Experts
+
+I first thought of using Bayesian methods for mixtures-of-experts after becoming frustrated with the singularity problems of the maximum likelihood algorithm [112]. I developed an approach based on MacKay's evidence framework [133] for multi-layer perceptrons which I subsequently discussed with David MacKay. The result of these discussions and my initial experiments was a joint paper [235]. During our discussions, however, David suggested the use of Neal and Hinton's [154] free energy framework for the mixtures-of-experts. This led to the ensemble learning ideas presented in this chapter, and also to a number of papers on ensemble learning by David [136, 134, 137]. Finally, all the experiments in the joint paper and in Chapter 7 were based on my sole implementation and performed by me.
+
+#### Chapter 10: Speech Recognition using Mixtures of Multi-layer Perceptrons
+
+The idea for using mixtures-of-experts models for automatic speech recognition (ASR) originated in my MPhil thesis [232]. During a visit to the International Computer Science Institute (ICSI) at Berkeley, discussions with Nelson Morgan and Hervé Bourlard convinced me that mixtures of multi-layer perceptrons could be more effective than the single multi-layer perceptrons developed at ICSI [16] for speech recognition. David Johnson of ICSI kindly donated code for the MLPs to CUED as part of the SPRACH joint research exercise. After adapting this code to work within the CUED speech recognition system, ABBOT, I then extended the training algorithms and code to allow the use of mixtures of multi-layer perceptrons. At the same time, Gary Cook was independently working on David Johnson's code to adapt it to perform boosting. He has since published the results of his experiments in his PhD thesis [38]. I suggested the idea of using boosting to initialise mixtures-of-experts to Gary, and together we performed work which led to a joint publication [233]. The boosting results presented in Chapter 10 are from experiments performed by Gary, whilst the mixtures experiments, including the ones where boosted networks were used as initial experts, were performed by me.
+
+#### Chapter 11: Speaker Adaptation using Mixtures of Recurrent Neural Networks
+
+I first suggested the idea of using mixtures of recurrent neural networks (RNN) for speaker adaptation during discussions with Dan Kershaw on how to improve the existing adaptation method of the ABBOT system. These discussions led to the ideas presented in Chapter 11. The RNN code and linear input network (LIN) code were written by Dan Kershaw, and based on code developed by Mike Hochberg and Tony Robinson. I subsequently improved the performance and accuracy of the LIN and extended the code to support mixtures of RNN and LIN experts. The experiments on unsupervised adaptation, performed by Dan and myself led to a joint paper [234]. Further experiments on supervised adaptation were then performed by me and these are also presented in Chapter 11.
+
+## Summary
+
+This thesis investigates a recent tool in statistical analysis: the mixtures-of-experts model for classification and regression. The aim of the thesis is to place mixtures-of-experts models in context with other statistical models. The hope of doing this is that we may better understand their advantages and disadvantages over other models. The thesis first considers mixtures-of-experts models from a theoretical perspective and compares them with other models such as trees, switching regression models and modular networks. Two extensions of the mixtures-of-experts model are then proposed. The first extension is a constructive algorithm for learning model architecture and parameters which is inspired by recursive partitioning. The second extension uses Bayesian methods for learning the parameters of the model. These extensions are compared empirically with the standard mixtures-of-experts model and with other statistical models on small to medium sized data sets. In the second part of the thesis the mixtures-of-experts framework is applied to acoustic modelling within a large vocabulary speech recognition system. The mixtures-of-experts is shown to give an advantage over standard single neural network approaches on this task. The results of both of these sets of comparisons indicate that mixtures-of-experts models are competitive with other state-of-the-art statistical models.
+
+## Original Contribution
+
+The original contribution of this thesis may be summarised as follows:
+
+- I have presented a detailed review of mixtures-of-experts in context with other statistical techniques;
+- I have developed two new techniques for mixtures-of-experts: a growing algorithm for hierarchical mixtures-of-experts and a learning algorithm based on Bayesian methods;
+- I have compared standard mixtures-of-experts models with my extensions and with state of the art statistical methods;
+- I have developed new techniques based on the mixtures-of-experts framework for acoustic modelling in a large vocabulary speech recognition system and compared them empirically with existing acoustic models.
+
+## Acknowledgements
+
+Many thanks to all the people who have made the last four years so interesting and enjoyable. To my supervisor, Tony Robinson, whose guidance and advice have been invaluable. To all the people in the Fallside lab who have advised me through the years, in particular Horacio Ayestaran, Simon Blackburn, Dan Kershaw, Jason Humphries, Gary Cook, Mahesan Niranjan, Carl Seymour, Marty Scott, and especially David Lovell.
+
+Thanks also to Leo Breiman, Mike Hochberg, Mike Jordan, Ronjon Nag, Radford Neal, Steve Nowlan and Andreas Weigend for many helpful comments on my research over the last three years. I would like to thank David MacKay in particular for his advice and help. I would also like to acknowledge the financial support I received from Waterhouse Associates, Hewlett Packard, EPSRC, Jesus College, Cambridge University Engineering Department, the NIPS foundation and the Sprach ESPRIT project.
+
+## Notation
+
+I have attempted to make the notation consistent within this thesis and the most commonly used symbols and abbreviations are listed below. To ensure simplicity of presentation some abuses of notation are made, although the intention should be clear from their context. The notation for vectors is as follows. A vector with $d$ elements, $(x_1, x_2, \ldots, x_d)$, is represented by the bold face $\bx$ and the transpose of $\bx$ is represented by $\bx^T$.
+
+:::table tab-n-1 | General
+| Symbol | Meaning |
+| $\bx$ | an input vector |
+| $\bx^T$ | transpose of $\bx$ |
+| $x_i$ | input variable $i$ |
+| $\by$ | a target vector |
+| $y$ | a scalar target |
+| $d$ | number of input variables (dimension of $\bx$) |
+| $\bx^{(n)}$ | an input vector at time $n$ |
+| $\by^{(n)}$ | a target vector at time $n$ |
+| $N$ | number of examples $n$ in a training set |
+| $\{\bx^{(n)}\}_1^N$ | the set of vectors $\bx^{(n)}$ for $n = 1$ to $n = N$ |
+| $X$ | the input data matrix, with $N$ rows; each row consists of the transpose of an input vector $\bx^{(n)T}$ |
+| $Y$ | the target data matrix, with $N$ rows; each row consists of the transpose of a target vector $\by^{(n)T}$ |
+| $\theta$ | a general set of parameters (vector or matrix) |
+| $\bth$ | a parameter vector |
+| $\hat{\by}^{(n)}$ | the prediction of $\by^{(n)}$ |
+| $c_k$ | class $k$ |
+| $P(a)$ | the probability of $a$, in the case of discrete $a$, or probability density of $a$ in the case of continuous $a$ |
+| $E[a]$ | the expectation of $a$, defined as $\int a P(a)\, da$ |
+
+:::table tab-n-2 | Mixtures-of-experts
+| Symbol | Meaning |
+| $\bw_i$ | the parameters of expert $i$ in a mixture of experts |
+| $\sigma_i$ | the noise level variance parameter of expert $i$ in a mixture of experts (for regression) |
+| $\bv$ | the parameters of the gate in a mixture of experts |
+| $g_i^{(n)}$ | output $i$ of the gate at time $n$ in a mixture of experts |
+| $\E_i$ | expert $i$ in a mixture of experts or node $i$ in a hierarchical mixture of experts |
+| $Pa(\E_i)$ | the parent of node $\E_i$ |
+| $An(\E_i)$ | the ancestors of node $\E_i$ |
+| $Ch(\E_i)$ | the children of node $\E_i$ |
+| $\mathcal{G}_j$ | a gate rooted at node $j$ in a HME |
+| $Z$ | a set of missing data in the EM algorithm |
+| $z_i^{(n)}$ | a missing data point $n$ for a mixture component $\E_i$ |
+| $\zeta_i^{(n)}$ | the joint posterior probability of a node |
+| $\varphi_i^{(n)}$ | the conditional posterior probability of a node |
+| $\alpha_i$ | the hyperparameter of the prior distribution on the parameter values of an expert |
+| $\mu_i$ | the hyperparameter of the prior distribution on the parameter values of a gate |
+| $\beta_i$ | the hyperparameter of the prior distribution on the noise level of an expert |
+
+:::table tab-n-3 | Abbreviations
+| Abbreviation | Meaning |
+| ME | mixtures-of-experts |
+| HME | hierarchical mixtures-of-experts |
+| HMM | hidden Markov model |
+| RNN | recurrent neural network |
+| MLP | multi-layer perceptron |
+| GP | Gaussian process |
+| GLIM | generalised linear model |
+| CART | classification and regression tree |
+| MARS | multivariate adaptive regression splines |
+| LIN | linear input network |
+| PLP | perceptual linear prediction |
+| ML | maximum likelihood |
+| MAP | maximum a-posteriori |
+| EM | expectation maximisation |
+| KL | Kullback-Leibler |
+| MCMC | Markov chain Monte Carlo |
+| IRLS | iteratively re-weighted least squares |
+| DELVE | data for evaluating learning in valid experiments |
+| ICSI | International Computer Science Institute |
+| CUED | Cambridge University Engineering Department |
+| WSJ | Wall Street Journal |
+| DARPA | Defense Advanced Research Projects Agency |
+| NIST | National Institute of Standards and Technology |
+| LIMSI | Laboratoire d'Informatique pour la Mécanique et les Sciences de l'Ingénieur |

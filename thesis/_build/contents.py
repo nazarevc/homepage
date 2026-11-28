@@ -9,6 +9,7 @@ def page_for(u):
     if u['key'].isdigit(): d = f"chapter-{u['key']}"
     elif u['key'] == 'bib': d = 'bibliography'
     elif u['key'] in 'ABC': d = f"appendix-{u['key'].lower()}"
+    elif u['key'] == 'front': d = 'preface'
     else: return None
     return f'/thesis/{d}/' if os.path.exists(os.path.join(T, d, 'index.html')) else None
 L = []
@@ -33,7 +34,7 @@ s = open(p, encoding='utf-8').read()
 s, n = re.subn(r'<ul class="toc">.*?\n  </ul>', lambda m: new, s, count=1, flags=re.S)
 assert n == 1
 done = sum(1 for u in U if page_for(u))
-hint = ('Each chapter opens as a web page, with its PDF beside it.' if done == len(U) - 1 else
+hint = ('Each chapter opens as a web page. Its PDF, with a cover page, is beside it. Section links jump to the section.' if done == len(U) else
         'Chapters marked PDF open as a PDF until their web page is ready. Section links jump to the section.')
 s = re.sub(r'<p class="hint">.*?</p>', f'<p class="hint">{hint}</p>', s, count=1)
 if '.toc .pp a' not in s:

@@ -1,0 +1,13 @@
+number: A
+title: Availability of Source Code and Results
+pdf: appendix-a.pdf
+first_page: 156
+---
+{p156}
+To generate the results in Part I of this thesis I implemented five learning methods based on mixtures-of-experts. In order to make future work possible on these methods I have released the source code for these methods. The code is written in C++ and contains additional documentation with its distribution.
+
+The source code for the five mixtures-of-experts based learning methods described in Part I of the thesis may be obtained from http://www.cs.toronto.edu/~delve. This site also contains code for the other learning methods investigated by Rasmussen [189]. In addition the guess and loss files for all the methods on the DELVE datasets described in Part I may also be obtained from this site.
+
+Both David MacKay's original C code and my adapted C++ version of `macopt` are available from http://wol.ra.phy.cam.ac.uk/mackay/c/macopt.html. The C++ version is also available as part of the mixtures-of-experts family of methods source code at http://www.cs.toronto.edu/~delve/methods/me-ese-1/.
+
+*Note for the web edition (2026):* the addresses above are as printed in 1997. Checked in November 2026, the DELVE archive and the `me-ese-1` method page are still online at the University of Toronto: :::raw-link https://www.cs.toronto.edu/~delve/methods/me-ese-1/ :::. David MacKay's `macopt` page now lives at :::raw-link https://www.inference.org.uk/mackay/c/macopt.html :::.

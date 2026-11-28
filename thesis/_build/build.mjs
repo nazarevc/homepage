@@ -31,18 +31,18 @@ function readSource(file) {
   const meta = Object.fromEntries(head.trim().split('\n').map(l => { const i = l.indexOf(':'); return [l.slice(0, i).trim(), l.slice(i + 1).trim()]; }));
   return { meta, body };
 }
-const sources = fs.readdirSync(SRC).filter(f => /^ch\d+\.txt$/.test(f)).sort().map(readSource);
-const built = new Set(sources.map(s => +s.meta.number));
+const sources = fs.readdirSync(SRC).filter(f => /^(ch\d+|app[a-c]|front)\.txt$/.test(f)).sort().map(readSource);
+const built = new Set(sources.map(s => String(s.meta.number)));
 
 // equation labels across the whole thesis, for cross-references like (2.3)
 const EQ = new Map();
-for (const s of sources) for (const m of s.body.matchAll(/(?:\$\$\s*|\\qquad\s*)\((\d+\.\d+)\)/g)) EQ.set(m[1], +s.meta.number);
+for (const s of sources) for (const m of s.body.matchAll(/(?:\$\$\s*|\\qquad\s*)\((\d+\.\d+)\)/g)) EQ.set(m[1], String(s.meta.number));
 
 // figure and table labels across the thesis
 const FIG = new Map();
-for (const s of sources) for (const m of s.body.matchAll(/^:::(?:figure|table|algo) (fig|tab)-(\w+)-(\d+)/gm)) FIG.set(`${m[1]}-${m[2]}-${m[3]}`, +s.meta.number);
+for (const s of sources) for (const m of s.body.matchAll(/^:::(?:figure|table|algo) (fig|tab)-(\w+)-(\d+)/gm)) FIG.set(`${m[1]}-${m[2]}-${m[3]}`, String(s.meta.number));
 const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-const chHref = n => `/thesis/chapter-${n}/`;
+const chHref = n => String(n) === 'front' ? '/thesis/preface/' : /^\d+$/.test(String(n)) ? `/thesis/chapter-${n}/` : `/thesis/appendix-${String(n).toLowerCase()}/`;
 const eqId = l => 'eq-' + l.replace('.', '-');
 
 // ── inline markup ──
@@ -61,9 +61,11 @@ function inline(text, ctx) {
     } else out += text[i];
   }
   text = out;
+  text = text.replace(/\\\$/g, () => keep('$'));
   text = text.replace(/\$\$([^$]+?)(?:\\qquad\s*\((\d+\.\d+)\))?\$\$/g, (_, m, l) => keep(`<div class="eq"${l ? ` id="${eqId(l)}"` : ''}><div class="m">${tex(m.trim(), true)}</div>${l ? `<span class="eqn">(${l})</span>` : ''}</div>`));
   text = text.replace(/\$([^$]+)\$/g, (_, m) => keep(tex(m, false)));
   text = text.replace(/\{p(\d+)\}/g, (_, n) => keep(`<span class="pg" id="page-${n}"></span>`));
+  text = text.replace(/:::raw-link (\S+) :::/g, (_, u) => keep(`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(u.replace(/^https?:\/\//, ''))}</a>`));
   text = text.replace(/`([^`]+)`/g, (_, c) => keep(`<code>${esc(c)}</code>`));
   text = esc(text);
   text = text.replace(/'/g, '’');
@@ -72,14 +74,14 @@ function inline(text, ctx) {
   text = text.replace(/\[((?:<em>[^<]*<\/em>\s*|see also |see |cf\. )?)(\d+(?:,\s*\d+)*)((?:,\s*pp?\.\s*[\d\-–]+)?)\]/g, (_, pre, nums, pp) =>
     `[${pre}${nums.split(/,\s*/).map(n => `<a class="cite" href="/thesis/bibliography/#ref-${n}" title="${esc(bibShort(+n))}">${n}</a>`).join(', ')}${pp}]`);
   // section references
-  text = text.replace(/\b(Sections?) (\d+)\.(\d+(?:\.\d+)?)/g, (all, w, c, k) => {
+  text = text.replace(/\b(Sections?) ([A-C]|\d+)\.(\d+(?:\.\d+)?)/g, (all, w, c, k) => {
     const id = `s${c}-${k.replace('.', '-')}`;
-    const url = +c === ctx.number ? '' : (built.has(+c) ? chHref(c) : null);
+    const url = String(c) === ctx.number ? '' : (built.has(String(c)) ? chHref(c) : null);
     return url === null ? all : `${w} <a href="${url}#${id}">${c}.${k}</a>`;
   });
   // chapter links
   text = text.replace(/\b(Chapters?) (\d+)((?:, \d+)*)( and (\d+))?/g, (all, w, a, mid, and_, b) => {
-    const link = n => (+n !== ctx.number && +n >= 1 && +n <= 12) ? `<a href="${built.has(+n) ? chHref(n) : `/thesis/chapters/${chapterUnits[+n - 1].file}`}">${n}</a>` : n;
+    const link = n => (String(n) !== ctx.number && +n >= 1 && +n <= 12) ? `<a href="${built.has(String(n)) ? chHref(n) : `/thesis/chapters/${chapterUnits[+n - 1].file}`}">${n}</a>` : n;
     let s = `${w} ${link(a)}`;
     if (mid) s += mid.split(', ').map(x => x && link(x)).join(', ');
     if (and_) s += ` and ${link(b)}`;
@@ -87,7 +89,7 @@ function inline(text, ctx) {
   });
   // figure and table references
   text = text.replace(/\b(Figures?|Tables?) ([A-C\d]+)\.(\d+)/g, (all, w, c, k) => {
-    const id = `${w.startsWith('F') ? 'fig' : 'tab'}-${c}-${k}`;
+    const id = `${w.startsWith('F') ? 'fig' : 'tab'}-${c.toLowerCase()}-${k}`;
     if (!FIG.has(id)) return all;
     const ch = FIG.get(id);
     return `${w} <a href="${ch === ctx.number ? '' : chHref(ch)}#${id}">${c}.${k}</a>`;
@@ -155,10 +157,10 @@ function renderBody(body, ctx) {
       const file = m[1], cap = m[2].replace(/\s*\n\s*/g, ' ');
       const lab = cap.match(/^(Figure|Table) ([A-C\d]+\.\d+):?\s*/);
       const size = imgSize(file);
-      html.push(`${pg}<figure id="${file}"><div class="fimg"><img src="/thesis/fig/${file}.png" alt="${esc(cap.replace(/[$*]/g, ''))}" width="${size[0]}" height="${size[1]}" loading="lazy"></div><figcaption>${lab ? `<span class="fl">${lab[1]} ${lab[2]}</span> ` : ''}${inline(lab ? cap.slice(lab[0].length) : cap, ctx)}</figcaption></figure>`);
+      html.push(`${pg}<figure id="${file}"><div class="fimg"><a href="/thesis/fig/${file}.png" title="Open full size"><img src="/thesis/fig/${file}.png" alt="${esc(cap.replace(/[$*]/g, ''))}" width="${size[0]}" height="${size[1]}" loading="lazy"></a></div><figcaption>${lab ? `<span class="fl">${lab[1]} ${lab[2]}</span> ` : ''}${inline(lab ? cap.slice(lab[0].length) : cap, ctx)}</figcaption></figure>`);
     } else if ((m = b.match(/^:::table ([\w-]+) \| ([^\n]+)\n([\s\S]+)$/))) {
       const lab = m[2].match(/^Table ([A-C\d]+\.\d+):?\s*/);
-      const rows = m[3].trim().split('\n').map(r => r.replace(/^\||\|$/g, '').split('|').map(c => c.trim()));
+      const rows = m[3].trim().split('\n').map(r => r.replace(/\$[^$]*\$/g, x => x.replace(/\|/g, '\u0001')).replace(/^\||\|$/g, '').split('|').map(c => c.trim().replace(/\u0001/g, '|')));
       const head = rows[0], bodyRows = rows.slice(1).filter(r => !r.every(c => /^-+$/.test(c)));
       const cell = (c, t) => `<${t}>${inline(c, ctx)}</${t}>`;
       html.push(`${pg}<figure class="tbl" id="${m[1]}"><figcaption>${lab ? `<span class="fl">Table ${lab[1]}</span> ` : ''}${inline(lab ? m[2].slice(lab[0].length) : m[2], ctx)}</figcaption><div class="tw"><table><thead><tr>${head.map(c => cell(c, 'th')).join('')}</tr></thead><tbody>${bodyRows.map(r => `<tr>${r.map(c => cell(c, 'td')).join('')}</tr>`).join('')}</tbody></table></div></figure>`);
@@ -231,9 +233,10 @@ figcaption{font-size:14px;color:var(--ink2);margin-top:8px;text-wrap:pretty}
 .tbl figcaption{margin:0 0 8px}
 .tw{overflow-x:auto}
 table{border-collapse:collapse;font-size:14px;width:100%}
-th,td{padding:6px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
 th{font-weight:500;color:var(--ink)}
 td{font-variant-numeric:tabular-nums}
+td code,th code{font-size:12px;padding:1px 4px}
 ol.alg,ul.lst{margin:0 0 1em;padding-left:22px}
 .abox{border-top:1px solid var(--ink2);border-bottom:1px solid var(--ink2);padding:10px 4px;font-size:15px;overflow-x:auto}
 .abox ol,.abox ul{margin:.2em 0;padding-left:22px}
@@ -242,7 +245,7 @@ ol.alg,ul.lst{margin:0 0 1em;padding-left:22px}
 blockquote{margin:0 0 1.2em;padding:2px 0 2px 16px;border-left:2px solid var(--line);font-style:italic;color:var(--ink2)}
 blockquote p{margin:0}
 blockquote footer{font-style:normal;font-size:14px;margin-top:4px}
-code{font:13px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ink);background:var(--surface);padding:2px 5px;border-radius:4px}
+code{white-space:nowrap;font:13px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ink);background:var(--surface);padding:2px 5px;border-radius:4px}
 ol.alg li,ul.lst li{margin:0 0 .4em}
 .notes{margin-top:2.4em;border-top:1px solid var(--line);padding-top:12px;font-size:14px;color:var(--ink2)}
 .notes h2{font:500 15px/1.3 var(--font);color:var(--ink);margin:0 0 8px}
@@ -256,6 +259,7 @@ ol.alg li,ul.lst li{margin:0 0 .4em}
 .foot{font-size:13px;color:var(--ink2);margin-top:32px;border-top:1px solid var(--line);padding-top:14px}
 .foot p{margin:0 0 6px}
 .foot .links a{margin-right:14px}
+.ded{font-size:17px;color:var(--ink2);margin:1.6em 0}
 .bib{list-style:none;margin:16px 0 0;padding:0}
 .bib li{display:grid;grid-template-columns:44px 1fr;gap:0 8px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px;scroll-margin-top:16px}
 .bib li:target{background:var(--surface)}
@@ -308,14 +312,16 @@ const header = (kicker, h1, meta, extra = '') => `<div class="brand">
 </div>`;
 
 // ── chapters ──
-const order = [...chapterUnits.map(u => ({ href: chHref(u.key), label: `Chapter ${u.key}`, title: u.title, n: +u.key }))];
+const labelOf = u => /^\d+$/.test(u.key) ? `Chapter ${u.key}` : u.key === 'front' ? 'Front matter' : (u.key === 'bib' ? 'Bibliography' : `Appendix ${u.key}`);
+const order = units.map(u => ({ key: u.key, label: labelOf(u), title: u.title, file: u.file,
+  href: u.key === 'bib' ? '/thesis/bibliography/' : chHref(u.key) }));
 const navTarget = i => {
   const t = order[i];
   if (!t) return null;
-  return built.has(t.n) ? t : { ...t, href: `/thesis/chapters/${chapterUnits[i].file}`, pdf: true };
+  return (t.key === 'bib' || built.has(t.key)) ? t : { ...t, href: `/thesis/chapters/${t.file}`, pdf: true };
 };
 for (const s of sources) {
-  const n = +s.meta.number, unit = chapterUnits.find(u => +u.key === n), i = chapterUnits.indexOf(unit);
+  const n = String(s.meta.number), unit = units.find(u => u.key === n), i = order.findIndex(o => o.key === n), lab = labelOf(unit);
   const ctx = { number: n, notes: [], toc: [] };
   const content = renderBody(s.body, ctx);
   const first = +s.meta.first_page, last = first + unit.pages - 1 - (unit.part ? 1 : 0);
@@ -323,22 +329,22 @@ for (const s of sources) {
   const notes = ctx.notes.length ? `\n<section class="notes"><h2>Notes</h2><ol>${ctx.notes.map((t, k) => `<li id="note-${k + 1}">${t} <a href="#ref-note-${k + 1}" aria-label="Back to text">↩</a></li>`).join('')}</ol></section>` : '';
   const prev = navTarget(i - 1), next = navTarget(i + 1);
   const pn = `\n<nav class="pn" aria-label="Chapters">${prev ? `<a class="prev" href="${prev.href}"><span class="k">Previous: ${prev.label}${prev.pdf ? ' (PDF)' : ''}</span>${esc(prev.title)}</a>` : '<span></span>'}${next ? `<a class="next" href="${next.href}"><span class="k">Next: ${next.label}${next.pdf ? ' (PDF)' : ''}</span>${esc(next.title)}</a>` : ''}</nav>`;
-  const body = header(`Chapter ${n}${unit.part ? ` · ${esc(unit.part.split(':')[0])}` : ''}`, esc(s.meta.title),
-    `Pages ${first} to ${last} of the thesis. <a href="/thesis/chapters/${unit.file}">PDF of this chapter</a>`, jumps)
+  const body = header(`${lab}${unit.part ? ` · ${esc(unit.part.split(':')[0])}` : ''}`, esc(s.meta.title),
+    `${n === 'front' ? 'Front matter' : first === last ? `Page ${first}` : `Pages ${first} to ${last}`} of the thesis. <a href="/thesis/chapters/${unit.file}">PDF of this ${/^\d+$/.test(n) ? 'chapter' : n === 'front' ? 'section' : 'appendix'}</a>`, jumps)
     + `\n<article>\n${content}\n</article>${notes}${pn}`;
-  const dir = path.join(T, `chapter-${n}`);
+  const dir = path.join(T, chHref(n).replace('/thesis/', '').replace(/\/$/, ''));
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, 'index.html'), shell({
-    title: `Chapter ${n}: ${s.meta.title} | Waterhouse, Mixtures of Experts (1997)`,
-    desc: `Chapter ${n}, ${s.meta.title}, of Steven Waterhouse's 1997 Cambridge PhD thesis on mixtures of experts.`,
-    url: `/thesis/chapter-${n}/`, body }));
-  console.log(`chapter ${n}: ${ctx.notes.length} notes, ${(content.match(/class="eq"/g) || []).length} equations`);
+    title: `${lab}: ${s.meta.title} | Waterhouse, Mixtures of Experts (1997)`,
+    desc: `${lab}, ${s.meta.title}, of Steven Waterhouse's 1997 Cambridge PhD thesis on mixtures of experts.`,
+    url: chHref(n), body }));
+  console.log(`${lab}: ${ctx.notes.length} notes, ${(content.match(/class="eq"/g) || []).length} equations`);
 }
 
 // ── bibliography ──
 {
   const items = bib.map(e => {
-    let t = esc(e.text).replace(/(cam\.ac\.uk\/) (\w)/g, '$1~$2');
+    let t = esc(e.text.replace(/[–—]/g, '-')).replace(/(cam\.ac\.uk\/) (\w)/g, '$1~$2');
     t = t.replace(/ URL: (\S+)/, ' URL: <span class="url">$1</span>');
     t = t.replace(/\[(\d+)\](?!,? ?\d{4})/g, (all, n) => (+n >= 1 && +n <= bib.length && !/\[\d{4}/.test(all)) ? `[<a href="#ref-${n}">${n}</a>]` : all);
     return `<li id="ref-${e.n}"><span class="n">[${e.n}]</span><span>${t}</span></li>`;

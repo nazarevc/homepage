@@ -1,0 +1,69 @@
+number: C
+title: Results on DELVE Classification Tasks
+pdf: appendix-c.pdf
+first_page: 175
+---
+{p175}
+This appendix contains the results of applying all the learning methods described in Part I of the thesis to the DELVE classification tasks. There are three data sets in total: the `Image`, `Letter` and `Splice` data sets. Once again, for brevity, detailed legends are not included for each of the tables and figures and only a short caption is used. Each figure and table shows the standardised zero-one losses for each learning method for different sized training sets. For example, the results on the `Image` data set are shown in Figure C.1 and Table C.1. Each column of the figure and table shows the loss for the different learning methods for training sets with different numbers of examples. The key to each column in the figures is given at the bottom left of the figure. Reading from top to bottom of the list of methods corresponds to the bars from left to right of each column. In the table the losses are shown in numeric form. The result for the best performing method, *i.e.,* the one with smallest loss, is shown in bold face. In the figure the losses are shown as horizontal lines with the associated standard error shown as bars on either side of the loss.
+
+Each figure also includes a matrix of $p$-values for each of the methods. These are the $p$-values obtained from paired $t$-tests or $F$-tests between each of the methods, shown as percentages. The minimum $p$-value shown is 1% and the maximum is 5%. A result is considered significant if the $p$-value is 5% or less. Non-significant comparisons are shown with a dot.
+
+{p176}
+## C.1 Image
+
+#### `Image-seg/seg`
+
+:::table tab-c-1 | Table C.1: **Results on the `Image` data set.** Standardised zero-one loss by training set size. The lowest loss in each column is in bold.
+| Method | 70 | 140 | 280 |
+| `cart-1` | 0.422 | 0.406 | 0.336 |
+| `knn-class-1` | 0.412 | 0.389 | 0.376 |
+| `1nn-1` | 0.395 | 0.387 | 0.376 |
+| `me-ese-1` | 0.374 | 0.394 | **0.328** |
+| `hme-ese-1` | 0.372 | 0.364 | 0.330 |
+| `me-el-1` | **0.360** | 0.370 | 0.334 |
+| `hme-el-1` | 0.363 | **0.357** | 0.330 |
+| `hme-grow-1` | 0.369 | 0.374 | 0.332 |
+| `lin-2` | 0.366 | 0.385 | 0.334 |
+| `lin-ese-1` | 0.371 | 0.380 | 0.368 |
+
+:::figure fig-c-1 | Figure C.1: **Results on the `Image` data set.**
+
+{p177}
+## C.2 Letter
+
+#### `Letter/recog`
+
+:::table tab-c-2 | Table C.2: **Results on the `Letter` data set.** Standardised zero-one loss by training set size. The lowest loss in each column is in bold.
+| Method | 390 | 780 | 1560 |
+| `cart-1` | 0.522 | 0.429 | 0.341 |
+| `knn-class-1` | 0.366 | 0.274 | 0.194 |
+| `1nn-1` | 0.366 | 0.274 | 0.194 |
+| `me-ese-1` | **0.316** | 0.263 | **0.193** |
+| `hme-ese-1` | 0.326 | **0.250** | 0.198 |
+| `me-el-1` | 0.337 | 0.274 | 0.203 |
+| `hme-el-1` | 0.328 | 0.257 | 0.204 |
+| `hme-grow-1` | 0.360 | 0.289 | 0.227 |
+| `lin-2` | 0.419 | 0.326 | 0.277 |
+| `lin-ese-1` | 0.344 | 0.298 | 0.271 |
+
+:::figure fig-c-2 | Figure C.2: **Results on the `Letter` data set.**
+
+{p178}
+## C.3 Splice
+
+#### `Splice/bound`
+
+:::table tab-c-3 | Table C.3: **Results on the `Splice` data set.** Standardised zero-one loss by training set size. The lowest loss in each column is in bold.
+| Method | 100 | 200 | 400 |
+| `cart-1` | 0.451 | 0.293 | 0.210 |
+| `knn-class-1` | 0.710 | 0.614 | 0.551 |
+| `1nn-1` | 0.963 | 0.898 | 0.823 |
+| `me-ese-1` | 0.317 | 0.203 | **0.142** |
+| `hme-ese-1` | 0.321 | 0.207 | 0.146 |
+| `me-el-1` | 0.303 | 0.210 | 0.160 |
+| `hme-el-1` | **0.301** | 0.207 | 0.146 |
+| `hme-grow-1` | 0.321 | 0.221 | 0.151 |
+| `lin-2` | 0.303 | 0.216 | 0.167 |
+| `lin-ese-1` | 0.304 | **0.196** | 0.144 |
+
+:::figure fig-c-3 | Figure C.3: **Results on the `Splice` data set.**
