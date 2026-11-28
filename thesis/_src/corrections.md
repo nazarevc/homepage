@@ -30,3 +30,10 @@ Changes from the 1997 text. Typographical slips fixed silently are listed too, s
 - 7.2, multinomial logit experts: "is given by: given by:" -> "is given by:".
 - 7.3: "I denote this methods" -> "I denote these methods"; "early stopping method of `me-ese-1` and `hme-ese-1` of Chapter 4" -> "of Chapter 5".
 - 7.3, Figure 7.4: "1.8765 * N/4" written as "1.8765 x N/4".
+- 8.1: "Section 8.2 describes and discuss" -> "describes and discusses".
+- 8.2, Table 8.2 caption: "Averages ranks" -> "Average ranks".
+- 8.2: the $p$-value matrices were described as "lowest p-value shown is 1, highest is 5"; restated as percentages (1% to 5%), which is what the matrices show.
+- 8.2: Figures 8.7 and 8.8 were listed as "8 input tasks (8.5) or 32 input tasks (8.6)"; corrected to (8.7) and (8.8).
+- 8.3: "Each of the sections C.2 to C.3" -> "C.1 to C.3".
+- 8.4: "This yardstick approach was been used" -> "has been used"; "significantly better that other methods" -> "better than"; "using less covariates" -> "fewer covariates"; "this does not mean that a poorly performing method means that another implementation" restructured to "a poorly performing implementation does not mean that another implementation".
+- 8.4, Figure 8.9 caption: "Sun Sparc-station 20" -> "Sun SPARCstation 20".

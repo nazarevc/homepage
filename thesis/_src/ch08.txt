@@ -1,0 +1,238 @@
+number: 8
+title: Results on DELVE
+pdf: chapter-08.pdf
+first_page: 104
+---
+{p104}
+## 8.1 Introduction
+
+Chapters 5 to 7 have introduced five learning methods based on mixtures-of-experts models. These methods use different techniques to control complexity in their models. Although it may be of interest to compare these methods on theoretical grounds alone, empirical comparisons are necessary to get a true feel for their advantages and disadvantages. As described in Chapter 3, the DELVE framework has been used in this thesis to compare learning methods. In this chapter the results of the five ME methods are compared with various other learning methods on the regression and classification tasks introduced in Chapter 3. The results indicate that mixtures-of-experts are competitive with other state of the art learning methods. In particular, a selective superiority effect is noticed, *i.e.,* the relative performance of each of the methods changes according to the data set used for comparison.
+
+The mixtures-of-experts based methods, or *ME family* of methods, studied in this chapter are as follows:
+
+- `me-ese-1`: a committee of mixtures-of-experts trained by early stopping;
+- `hme-ese-1`: a committee of hierarchical mixtures-of-experts trained by early stopping;
+- `hme-grow-1`: a committee of hierarchical mixtures-of-experts grown via early stopping;
+- `me-el-1`: a committee of mixtures-of-experts trained by ensemble learning;
+- `hme-el-1`: a committee of hierarchical mixtures-of-experts trained by ensemble learning.
+
+In this chapter the ME family of methods are compared with seven other methods for regression used by Rasmussen [189] and contained in the DELVE archive. The methods used by Rasmussen were:
+
+- `gp-map-1`: a Gaussian process model trained using a maximum a-posteriori method;
+- `gp-mc-1`: a Gaussian process model trained using the hybrid Markov Chain Monte Carlo technique of Neal [153];
+- `knn-cv-1`: a $k$ nearest neighbour model with $k$ selected by leave-one-out cross validation;
+- `lin-1`: a linear regression model in which the linear equations are solved using singular value decomposition (SVD) [180];
+- `mars3.6-bag-1`: a bagged version of Friedman's [58] FORTRAN implementation of MARS (version 3.6);
+- `mlp-ese-1`: a committee of multi-layer perceptrons trained with early stopping;
+- `mlp-mc-1`: a multi-layer perceptron trained using the hybrid Markov Chain Monte Carlo technique of Neal [153].
+
+{p105}
+In addition, the mixtures-of-experts family methods are compared with three other methods for classification implemented by Mike Revow of the University of Toronto^[Details of these methods and others can be found at the DELVE web site: http://www.cs.toronto.edu/~delve/methods.].
+
+- `cart-1`: a classification and regression tree using the Gini index splitting criterion;
+- `knn-class-cv-1`: a $k$ nearest neighbour model for classification, with $k$ selected by leave-one-out cross validation;
+- `1nn-1`: a one nearest neighbour model for classification.
+
+Finally, two further methods for classification and regression were designed to show up details of particular aspects of the implementation of the ME family of methods. These are:
+
+- `lin-2`: a generalised linear model for classification or regression (with the link function chosen according to the task) in which the parameters were trained using the `macopt` conjugate gradient algorithm of Section 4.4;
+- `lin-ese-1`: a committee of GLIMs of the form of `lin-2` trained with `macopt`, in which the training of each committee member was stopped early according to the performance on a set of validation data; this model is equivalent to the early stopped committee of ME models of Chapter 5 when one expert only is used rather than a mixture of experts.
+
+All these methods are summarised for convenience in Table 8.1. The rest of this chapter is organised as follows. The results of these methods on different data sets are described in two sections. Section 8.2 describes and discusses the results on the regression tasks while Section 8.3 describes the results on the classification tasks. Section 8.4 concludes this chapter and this part of the thesis and gives suggestions for future work.
+
+{p106}
+:::table tab-8-1 | Table 8.1: **Summary of the methods considered in this chapter.** Each method is shown with its name, usage and description. The usage is denoted *R* if the method is used for regression, and *C* if it is used for classification. Methods which may be used for regression or classification are given the notation *C/R*. The link function in the GLIMs of the mixtures-of-experts models is changed according to whether the models are used for regression or classification.
+| Name | Usage (C/R) | Details |
+| `gp-mc-1` | R | Gaussian processes trained with MCMC methods |
+| `gp-map-1` | R | Gaussian processes trained with MAP methods |
+| `knn-cv-1` | R | $k$-nearest neighbour with $k$ selected by leave-one-out CV |
+| `lin-1` | R | Linear regression |
+| `mars3.6-bag-1` | R | Multivariate Adaptive Regression Splines with bagging |
+| `mlp-ese-1` | R | Multi-Layer Perceptrons trained using early stopping committees |
+| `mlp-mc-1` | R | Multi-Layer Perceptron trained using MCMC methods |
+| `cart-1` | C | Classification and Regression Trees |
+| `knn-class-cv-1` | C | $k$-nearest neighbour for classification |
+| `1nn-1` | C | One-nearest neighbour for classification |
+| `me-ese-1` | C/R | Mixtures of Experts trained using early stopping committees |
+| `hme-ese-1` | C/R | Hierarchical Mixtures of Experts trained using early stopping committees |
+| `me-el-1` | C/R | Mixtures of Experts trained using ensemble learning |
+| `hme-el-1` | C/R | Hierarchical Mixtures of Experts trained using ensemble learning |
+| `hme-grow-1` | C/R | Hierarchical Mixtures of Experts trained via early stopped growing |
+| `lin-2` | C/R | Generalised linear model trained using conjugate gradients |
+| `lin-ese-1` | C/R | Committee of generalised linear models trained using conjugate gradients and early stopping (equivalent to `me-ese-1` with one expert only) |
+
+## 8.2 Results on Regression Tasks
+
+I considered two types of data in my study of methods for regression: real and realistic. The real data was the Boston housing data [78] (see Chapter 3). The realistic data was taken from two families of data sets: the `Kin` family and the `Pumadyn` family, which are both simulations of robot arms. In each of the `Kin` and `Pumadyn` families there are eight data sets which are split into two sets of four data sets of 8 inputs and 32 inputs respectively. The simulations also have varying degrees of noise and nonlinearity in them, as described in Chapter 3. When combined with the Boston housing data this gives 17 regression tasks in total. For convenience the full set of numerical and graphical results are given in Appendix B. In the following sections I discuss and summarise the major points from each data set and draw conclusions {p107}from them. In these studies I consider only squared error loss which is standardised by dividing by the variance of the targets, so that a model which predicts the mean of the targets will achieve a loss of 1 in the standardised domain. DELVE also allows the use of absolute error loss and log probability loss, but because of time and space constraints I do not consider these measures here.
+
+### Boston
+
+:::table tab-8-2 | Table 8.2: **Average ranks on the `Boston` data.**
+| Task | `gp-map-1` | `knn-cv-1` | `lin-1` | `mars3.6-bag-1` | `mlp-ese-1` | `me-ese-1` | `hme-ese-1` | `me-el-1` | `hme-el-1` | `hme-grow-1` |
+| `Boston/price/std.32` | 7 | 9 | 10 | 3 | 7 | 4 | 6 | 5 | 1 | 1 |
+| `Boston/price/std.64` | 7 | 9 | 8 | 10 | 6 | 4 | 2 | 5 | 1 | 3 |
+| `Boston/price/std.128` | 7 | 10 | 9 | 1 | 8 | 3 | 5 | 2 | 4 | 6 |
+| mean | 7 | 9.3 | 9 | 4.7 | 7 | 3.7 | 4.3 | 4 | 2 | 3.3 |
+
+The results of five of the original methods plus the five ME methods are shown in Figure B.1 and Table B.1. Two of the original methods are omitted (`gp-mc-1` and `mlp-mc-1`) since results for these methods were not available from the DELVE archive. Table B.1 shows the standardised squared error losses for the three tasks containing 32, 64 and 128 examples. The winning method (*i.e.,* lowest error) is shown in bold in this table. This information is additionally shown graphically in the plot of Figure B.1. In this plot the standardised squared error loss for each method is shown in a bar chart form, with standard errors shown above each bar. The order of the methods in this plot is shown at the left of the plot. In addition, below the plot is a matrix of $p$-values obtained from paired $F$-tests (or $t$-tests in hierarchical testing schemes). The $p$-values are shown as percentages: the lowest shown is 1%, and the highest is 5%. If a $p$-value is greater than 5% it is not considered significant and not shown in the matrix.
+
+For a particular task size, reading along the matrix for a method gives the $p$-values at which all the other methods outperformed it. If the method was not outperformed by another method no number is written in the matrix. Therefore if a method has no entries in its row it has not been outperformed significantly by any other method. Conversely, reading down the matrix from each method's bar gives the $p$-values at which it outperformed another method.
+
+As noted by Rasmussen [189], the results on the `Boston` data are somewhat hard to interpret due to the large error bars and lack of significant $p$-values in the matrices. Many of the error bars in the plots overlap for example `me-el-1` and `hme-el-1` for the task with 64 examples. In this case, however, the result of the F-test suggests that `hme-el-1` significantly outperforms `me-el-1` at the 99% level. Rasmussen suggests that caution be used when interpreting the results on the `Boston` data set, mostly due to its small size.
+
+Although in this case it may be hard to draw significant conclusions from the results, they do indicate that the ME family of methods is *competitive* with the best of the other methods. A comparison of the methods in terms of average rank is given in Table 8.2. The best performing methods are `hme-el-1` and
+{p108}`hme-grow-1`. `mars3.6-bag-1` also does well on the tasks with 32 and 128 examples but very badly on the task with 64 examples. Neither `knn-cv-1` nor `lin-1` perform particularly well on this data set. `mlp-ese-1` and `gp-map-1` do moderately well but not as well as the best ME methods.
+
+The results for `lin-2` are marginally better than those of `lin-1`, indicating that the conjugate gradient algorithm works well for linear regression experts. Over all the regression tasks, the performances of `lin-2` and `lin-1` were not significantly different. The early stopping plus committees variant of linear regression, `lin-ese-1` gives mixed results. For the smaller data sets it performs better than `lin-1` and `lin-2` but for the larger data set it performs marginally worse. Once again, these differences were not significant for the regression tasks. Within the ME methods the ensemble learning methods do marginally better than the early stopping methods, although this improvement is not consistent over different sized training sets.
+
+### Results on the `Kin` and `Pumadyn` Families
+
+An overview of the results of the twelve regression methods (not including `lin-2` and `lin-ese-1`) on the `Kin` and `Pumadyn` datasets is given in Tables 8.3 and 8.4. These show the average ranks of each method computed over the different sized tasks of each data set. The final row in each table gives the average ranks over all the data sets.
+
+An alternative viewpoint is given in Figures 8.1 to 8.8. These show the geometric means of the standardised squared error loss averaged over different data sets in the `Kin` and `Pumadyn` families. The data sets were designed to have different characteristics such as degree of linearity, amount of noise and number of inputs, as described in Chapter 3. The geometric mean was also used by Rasmussen [189] to compare DELVE learning methods. It is used in preference to the arithmetic mean since the relative size of the different losses on different data sets varies considerably. The geometric mean gives a measure of the *relative* differences between the methods. Given a set of losses $\{l_i\}_1^m$, the geometric mean is given by $\exp(\sum_i \log(l_i)/m)$.
+
+Each figure shows the geometric mean averaged over similar data sets on each of the different sized tasks. The method number is shown along the horizontal axis of each plot, with the geometric mean on the vertical axis. A legend is given for each figure listing the mapping from method number to name. A method which did not contain results for a particular task is shown with the symbol $\emptyset$. Various comparisons are shown in each of the pairs of figures:
+
+- **Figures 8.1 and 8.2**: these figures show the dependence of losses on data set family, either `Kin` (8.1) or `Pumadyn` (8.2).
+- **Figures 8.3 and 8.4**: these figures show the dependence on the degree of linearity in the tasks on both the `Kin` and `Pumadyn` families: fairly linear tasks (8.3) or non-linear tasks (8.4).
+- **Figures 8.5 and 8.6**: these figures show the dependence on the amount of noise in the tasks on both the `Kin` and `Pumadyn` families: medium noise tasks (8.5) or high noise tasks (8.6).
+- **Figures 8.7 and 8.8**: these figures show the dependence on the number of inputs in the tasks on both the `Kin` and `Pumadyn` families: 8 input tasks (8.7) or 32 input tasks (8.8).
+
+{p109}
+Overall, the Gaussian process and MLP methods perform best on the `Kin` and `Pumadyn` data sets. The MCMC methods for both GP and MLP methods are the most successful on average. However, `gp-map-1` performs well on the larger data sets, with its relative performance improving as the size of the data set is increased. The MLP with early stopping method, `mlp-ese-1`, performs almost as well as the MLP with MCMC, `mlp-mc-1`, on the `Kin` data sets but then performs much worse on the `Pumadyn` data sets.
+
+The $k$ nearest neighbour method, `knn-cv-1` performs poorly on average over all tasks in the `Kin` and `Pumadyn` tasks, ranking last on most of the tasks. It performs better than the `lin-1` method, however, on the non-linear tasks (Figure 8.4), in particular, the non-linear tasks with 8 inputs.
+
+The linear regression method, `lin-1`, performs better on the `Kin` data sets than on the `Pumadyn` data sets. It performs well on the fairly linear tasks, as might be expected.
+
+The performance of MARS with bagging, `mars3.6-bag-1`, is particularly dependent on the data set family. It ranks 11th on the `Kin` data sets, worse on average than `lin-1`, yet ranks 4th on average on the `Pumadyn` data sets. The method also performs better on the 32 input tasks than on the 8 input tasks.
+
+For the mixtures-of-experts methods, the performance lies somewhere between the linear method and the MLP with early stopping. On the `Kin` data sets they perform better than MARS whilst on the `Pumadyn` data sets they perform worse than MARS. Their best performance is on `Kin-8fh` in which they perform best out of all the methods. Within the ME methods the best performing method, on average, is `me-ese-1`. However, for the small data sets `hme-grow-1` performs best, whilst for the larger data sets `me-el-1` performs best. The ensemble learning methods, `me-el-1` and `hme-el-1` work better on the non-linear data sets than on the linear data sets but surprisingly work best when there is more data available. This was not anticipated before these empirical results since it is generally thought that early stopping via cross validation will not work as well as Bayesian methods when there is a small amount of data. Possibly the use of committees for the early stopping methods is averaging effectively over the uncertainty in the validation samples for small data sets. There appears to be little change in the overall behaviour of the ME methods according to the amount of noise. The number of inputs, however, seems to affect their performance. In comparison to the early stopping methods, the ensemble learning methods perform better on the 8 dimensional data sets than on the 32 dimensional data sets. In contrast, the growing method, `hme-grow-1`, performs better on the 32 dimensional data sets than on the 8 dimensional data sets. This dependence of number of inputs on the growing algorithm can partly be explained by the performance of the linear regression method, `lin-1`, which also performs better on the 32 than on the 8 dimensional data sets. Since the growing algorithm can select a single expert as well as hierarchies of experts, its performance might be expected to be correlated with that of the linear regression method. Finally, the mixture models seem to be better overall than the binary hierarchical models, apart from the hierarchies made by growing.
+
+The most spectacular differences between the methods may be seen on the non-linear `Pumadyn` data sets, `Pumadyn-32nm`, `Pumadyn-32nh`, `Pumadyn-8nm` and `Pumadyn-8nh`. As noted by Rasmussen {p110}[189], these data sets have only a few important inputs. The methods which can take account of this fact perform the best on these data sets: the GP methods which use the Bayesian automatic relevance detection approach [153], and MARS (with bagging).
+
+:::table tab-8-3 | Table 8.3: **Average ranks on the `Kin` data sets.**
+| Data set | `gp-mc-1` | `gp-map-1` | `knn-cv-1` | `lin-1` | `mars3.6-bag-1` | `mlp-ese-1` | `mlp-mc-1` | `me-ese-1` | `hme-ese-1` | `me-el-1` | `hme-el-1` | `hme-grow-1` |
+| `Kin-32fm` | 2.0 | 5.0 | 11.8 | 5.4 | 11.2 | 3.0 | 2.2 | 7.6 | 8.6 | 9.4 | 8.0 | 4.0 |
+| `Kin-32fh` | 3.8 | 6.6 | 11.8 | 2.0 | 11.2 | 3.6 | 4.0 | 7.2 | 7.0 | 9.8 | 8.2 | 3.4 |
+| `Kin-32nm` | 1.3 | 6.0 | 9.6 | 10.8 | 9.0 | 4.4 | 2.8 | 4.8 | 5.8 | 8.2 | 7.4 | 8.0 |
+| `Kin-32nh` | 1.8 | 5.0 | 8.8 | 10.0 | 8.6 | 3.8 | 2.6 | 5.4 | 6.8 | 9.4 | 8.0 | 8.0 |
+| `Kin-8fm` | 2.3 | 3.2 | 12.0 | 10.8 | 10.2 | 4.8 | 1.2 | 4.6 | 5.8 | 6.6 | 8.6 | 8.2 |
+| `Kin-8fh` | 5.0 | 6.6 | 12.0 | 8.8 | 10.2 | 7.2 | 5.0 | 1.8 | 2.8 | 8.2 | 7.0 | 4.2 |
+| `Kin-8nm` | 1.8 | 3.6 | 10.0 | 11.6 | 11.0 | 2.8 | 2.4 | 6.0 | 6.2 | 5.4 | 8.4 | 9.0 |
+| `Kin-8nh` | 4.0 | 4.2 | 10.4 | 10.6 | 10.6 | 2.6 | 2.6 | 6.4 | 6.2 | 4.6 | 7.0 | 8.8 |
+| mean | 2.7 | 5.0 | 10.8 | 8.7 | 10.3 | 3.9 | 2.8 | 5.5 | 6.1 | 7.7 | 7.7 | 7.1 |
+
+:::table tab-8-4 | Table 8.4: **Average ranks on the `Pumadyn` data sets.**
+| Data set | `gp-mc-1` | `gp-map-1` | `knn-cv-1` | `lin-1` | `mars3.6-bag-1` | `mlp-ese-1` | `mlp-mc-1` | `me-ese-1` | `hme-ese-1` | `me-el-1` | `hme-el-1` | `hme-grow-1` |
+| `Pumadyn-32fm` | 3.3 | 2.4 | 12.0 | 6.0 | 2.0 | 5.4 | 2.8 | 7.8 | 8.2 | 10.0 | 10.2 | 8.4 |
+| `Pumadyn-32fh` | 3.0 | 2.8 | 11.8 | 8.6 | 3.2 | 5.2 | 1.4 | 7.2 | 7.6 | 9.2 | 10.2 | 8.2 |
+| `Pumadyn-32nm` | 1.5 | 1.6 | 9.6 | 9.8 | 3.2 | 5.0 | 3.8 | 8.4 | 9.6 | 8.4 | 8.6 | 8.2 |
+| `Pumadyn-32nh` | 2.0 | 3.6 | 8.2 | 9.4 | 1.8 | 4.8 | 3.2 | 8.4 | 8.6 | 9.8 | 9.8 | 8.6 |
+| `Pumadyn-8fm` | 2.0 | 2.4 | 12.0 | 9.6 | 3.0 | 5.0 | 2.8 | 7.0 | 8.6 | 7.8 | 8.8 | 9.0 |
+| `Pumadyn-8fh` | 4.0 | 3.2 | 12.0 | 6.4 | 6.4 | 4.8 | 1.8 | 6.2 | 8.6 | 10.2 | 9.6 | 5.8 |
+| `Pumadyn-8nm` | 1.5 | 2.4 | 11.4 | 11.6 | 5.0 | 4.4 | 2.2 | 8.0 | 9.0 | 6.0 | 6.6 | 10.0 |
+| `Pumadyn-8nh` | 1.8 | 2.4 | 11.4 | 11.2 | 3.8 | 5.0 | 2.2 | 7.6 | 9.2 | 7.4 | 7.4 | 8.8 |
+| mean | 2.4 | 2.6 | 11.1 | 9.1 | 3.6 | 4.9 | 2.5 | 7.6 | 8.7 | 8.6 | 8.9 | 8.4 |
+
+{p111}
+:::figure fig-8-1 | Figure 8.1: **Geometric mean of squared error loss averaged over all tasks in the `Kin` family.**
+
+:::figure fig-8-2 | Figure 8.2: **Geometric mean of squared error loss averaged over all tasks in the `Pumadyn` family.**
+
+{p112}
+:::figure fig-8-3 | Figure 8.3: **Geometric mean of squared error loss averaged over all fairly linear tasks in the `Kin` and `Pumadyn` families.**
+
+:::figure fig-8-4 | Figure 8.4: **Geometric mean of squared error loss averaged over all non-linear tasks in the `Kin` and `Pumadyn` families.**
+
+{p113}
+:::figure fig-8-5 | Figure 8.5: **Geometric mean of squared error loss averaged over all medium noise tasks in the `Kin` and `Pumadyn` families.**
+
+:::figure fig-8-6 | Figure 8.6: **Geometric mean of squared error loss averaged over all high noise tasks in the `Kin` and `Pumadyn` families.**
+
+{p114}
+:::figure fig-8-7 | Figure 8.7: **Geometric mean of squared error loss averaged over all 8 dimensional input tasks in the `Kin` and `Pumadyn` families.**
+
+:::figure fig-8-8 | Figure 8.8: **Geometric mean of squared error loss averaged over all 32 dimensional input tasks in the `Kin` and `Pumadyn` families.**
+
+{p115}
+## 8.3 Results on Classification Tasks
+
+In addition to the regression tasks described in the last section, three classification tasks were used in this thesis. These were described in Chapter 3 and are `Image`, `Letter` and `Splice`. The full results for these data sets are given in Appendix C. Each of the sections C.1 to C.3 contain a figure and table showing the 0/1 losses standardised by the baseline of guessing the majority class.
+
+### `Image`
+
+The results on the `Image` data set are shown in Section C.1. There are large error bars evident in Figure C.1 which contribute to the small number of significant performances in the $p$-value matrices. Few conclusions can be drawn from this data set except that the ME family of methods perform better (but not always significantly better) than either of CART, nearest neighbours or logistic regression. For the largest training set the performance of `cart-1` approaches the ME methods and is not significantly outperformed on this training set. Within the ME family, the ensemble learning methods perform best on the training sets of size 70 and 140 with the growing method performing best on the 280 example training sets. None of the ME methods significantly outperform any of the other ME methods, making conclusions difficult in this case.
+
+### `Letter`
+
+The results on the `Letter` data are shown in Section C.2. In contrast to the `Image` data the error bars are much smaller in magnitude, and there are many more significant values in the matrices. Overall `cart-1` is significantly outperformed by all methods on all tasks. The nearest neighbour methods are significantly outperformed by some of the ME methods on the first two tasks but are not outperformed on the largest task. The ME methods are on average the most successful on this data, and the early stopping methods are the most effective within these. Together the early stopping methods significantly outperform all other methods on all tasks except for the nearest neighbour methods on the largest task sizes.
+
+### `Splice`
+
+The results on the `Splice` data are shown in Section C.3. The error bars are moderate in Figure C.3 and the results of comparisons appear significant. Overall, the nearest neighbour methods do poorly on all three task sizes. CART does better, particularly on the largest tasks. However, all three methods are significantly outperformed by the ME methods across all three task sizes. Within the ME methods there is little space to choose a best method. On the smallest task size the ensemble learning methods have the smallest loss whilst on the larger two tasks the early stopping methods perform best. There are, however, only a few significant out performances amongst the ME methods. However, one of the best performing methods on this data set is `lin-ese-1`, which is equivalent to the `me-ese-1` method with only one expert. This suggests that the mixtures are not adding much benefit in this data set.
+
+{p116}
+## 8.4 Conclusions
+
+The results on the classification tasks indicate that the ME methods are competitive with the best classifiers in the study on the three tasks chosen. Indeed on most of the classification tasks the ME methods are the best overall by a significant margin. These conclusions should be taken with care, however, firstly as a result of the small number of data sets and secondly as a result of the lack of many comparative classification methods in DELVE. However, the methods that were compared span most of the popular methods for classification, *i.e.,* nearest neighbour, decision trees and logistic regression, so there is at least some indication that the ME methods are useful within this range.
+
+On the regression tasks, the ME methods perform well on the `Boston` data but overall on the `Kin` and `Pumadyn` data sets the Gaussian process and MLP based methods perform best. Early stopping works well for the `Kin` data but less well for the `Pumadyn` data for both MLP and ME methods. MARS with bagging performs poorly on the `Kin` data but well on the `Pumadyn` data and overall is on par with the early stopped MLP. The nearest neighbour method is the worst performing method by a considerable margin whilst the linear regression method performs poorly on average, but is sometimes the best method for the `Kin` data. The ME family of methods lie between the linear regression, bagged MARS and early stopped MLPs and perform better on the `Kin` data than on the `Pumadyn` data.
+
+Within the ME family of methods the mixture models perform better than the hierarchical models. Overall, there seems to be little to choose between early stopping and Bayesian methods for controlling complexity, although the Bayesian methods perform better on the `Pumadyn` data sets and on non-linear data sets. The growing method performs the least well on average, although it is the best method on small data sets. However, each of the methods in the ME family has at least one data set on which it performs best out of the ME family methods.
+
+Viewed as a whole, the regression tasks indicate that Gaussian processes and MLPs are the best methods on average, whilst MARS is competitive on some of the tasks as are the ME methods. On average linear regression and nearest neighbour methods are not competitive with these more sophisticated methods.
+
+These conclusions must be taken with caution, however. Whilst the regression tasks considered are fairly wide ranging in that they contain different noise and non-linear effects, they are still from a restricted domain, *i.e.,* robot arm simulations. It seems likely that the winning methods in this domain will perform well on other robot arm data sets, either *realistic*, as in this study, or hopefully *real* ones. Whether they will also perform well on other domains remains to be seen. Hopefully, the flexibility of the DELVE framework will encourage other researchers to contribute new methods and data sets which will allow more conclusions to be drawn in the future.
+
+This concludes the description of the results on the DELVE data sets. Although the results give some indication as to which method we might want to use for a particular task, there are many other issues in choosing a learning method. These issues include the ability to add expert knowledge, the speed of the method and how interpretable it is. These issues are discussed in the following sections. Before this, we discuss the issue of selective superiority and how one might choose between different methods for a particular task.
+
+{p117}
+### Selective superiority
+
+For both the overall results and the ME family results, we therefore see two levels of *selective superiority*, both at a model bias level and at a search bias level. As noted by Brodley:
+
+> The results of empirical comparisons of existing learning algorithms illustrate that each algorithm has a selective superiority; it is best for some but not all tasks. -- Brodley [24]
+
+Given any particular data set there exists a certain model class (*e.g.,* Gaussian processes, MLPs, MEs) and a certain search method for that model class (*e.g.,* MCMC, MAP, early stopping) which will perform best. This begs a question at a *meta* level: how do we *choose* between different models and search methods for a new, unseen data set? This question was considered by Michie et al. [144, pp. 197-211] in their study of different classifiers. They used a series of characteristic statistics of the data sets in their study and examined the relationship between these statistics and the performance of the different classifiers by using a decision tree and derived rules built by C4.5 [186]. Their conclusions were that it is possible to infer certain relationships between data set characteristics and the performance of different classifiers on that data set, although they stress that care must be taken with direct interpretation of their rules since the space of classifiers and data sets was relatively sparse. Another approach taken by Brodley [24] is to use a number of simple classifiers (Brodley used $k$-nearest neighbour, linear discriminants and decision trees) and *recursively* apply them to a data set. The recursive process works by first applying simple rules to choose the initial classifier. For regions of the data where the behaviour of the first classifier follows certain rules, a new classifier is then chosen. This process is iterated and the classifiers combined in a piecewise manner. Brodley shows that the resulting hybrid classifiers have performance equal to or greater than the best single classifiers on all data sets in the study. Such an approach is attractive for simple classifiers such as the ones studied by Brodley, but is less applicable to the sophisticated methods used here which take much longer to train. A final possibility is the use of *simple* models to predict the performance of more *complex* models. This *yardstick* approach has been used by Michie et al. [144, pp. 210-211] and also by Holte [92]. Holte considered the use of a simple decision "stump" (a decision tree with only one rule), which he coined the "1 rule" (1R) method. In Holte's study he found that the 1R method was capable of predicting quite accurately where more sophisticated methods, in particular C4.5, would do well.
+
+{p118}
+### Using expert knowledge
+
+The results from DELVE represent the best that can be achieved with an *automatic* learning method. As noted by Michie et al. [144] the behaviour of many methods will be markedly different in the hands of an expert:
+
+> In the hands of an expert the performance of an algorithm can be radically different, and of course there is always the possibility of transforming or otherwise preprocessing the data. These considerations will often outweigh any choice of algorithm. -- Michie et al. [144, pp. 225]
+
+This point is further emphasised in Bayesian methods in which choice of appropriate priors can have a major effect. For example, Zhu and Rohwer [259] describe results on a number of the UCI data sets which show that appropriate choice of priors based on performance on some data sets can help improve performance on unseen data sets of the same type. However, automatic learning methods are the only *practical* manner in which to perform comparisons since otherwise extra variability such as the performance of the expert must be considered. The former point, however, means that the failure of an algorithm on a data set in DELVE does not mean that in the hands of an expert it might not work much better. It is interesting to note that the winning methods, Gaussian processes and MLPs, have many adjustable parameters but few that can be set easily using prior knowledge, or readily interpreted.
+
+One additional point to consider is that the comparisons made here are between particular instances of learning methods, *i.e.,* we are comparing software programs not abstract concepts. Hopefully these programs represent good implementations of the state of the art in each method but it should be remembered that a poorly performing implementation does not mean that another implementation of that method will also do badly. Given the many design choices and restrictions imposed by finite computing resources (and patience) it is likely that new implementations will have improved performance either as a result of being more efficient, or by using more effective search strategies, *e.g.,* Markov chain Monte Carlo. Only after a number of implementations of a method have been compared will it be possible to say which model class or search method gives the best performance on average. In particular, the results do not mean that ME or HME model classes are not as good as other model classes. There is a possibility that for the regression tasks the training and architecture selection methods do not find the optimal model. Future research will be needed to validate these conclusions on general data sets.
+
+### Speed of algorithms
+
+An interesting discussion of the issues of searching for the best model is given by Dietterich [46], who describes the apparent trade off between computational time spent during search and generalisation of models. This is in contrast to computationally intensive methods such as MCMC trained MLPs [153]. Rasmussen [189] performed a study of varying the time allowed for different Gaussian process and MLP methods which suggest that even when the MCMC methods are allowed a small amount of time (and will therefore not usually have converged) they still perform significantly better than other methods on average.
+
+{p119}
+One of the original motivations for mixtures-of-experts was their fast convergence rates. As pointed out in Chapter 2 most of these speed comparisons were in terms of epochs (*i.e.,* presentations of the training data) rather than actual time taken. In this study I have not attempted to compare ME methods with MLPs in terms of speed, except that the `me-ese-1` and `mlp-ese-1` methods are allowed the same overall time to build committees. In general, the `me-ese-1` method takes of the order of $M \times P \times T_{lin}$ where $M$ is the number of experts and gates, $P$ is the number of iterations (typically about 10) and $T_{lin}$ is the time taken by linear regression. In comparison, Figure 8.9 shows the average time taken by a single model in each of the five ME methods on the `Kin` and `Pumadyn` data sets. Note that this is only the time taken by *one* model in the committees and that the overall time allowed for each method is the same. One obvious point is that the ensemble learning methods take on average around 20 times longer (23.6 times longer for `me-el-1` than `me-ese-1` and 18.7 times longer for `hme-el-1` than `me-el-1`) than the early stopping methods. This is as a result of the parameter/hyper-parameter iterations which take a long time to converge. One encouraging aspect however is that the growing algorithm `hme-grow-1` takes a similar amount of time as the fixed architecture early stopping methods.
+
+:::figure fig-8-9 | Figure 8.9: **Speed of mixtures-of-experts methods.** The figure shows the time taken in seconds by a single model in each of the ME methods on the vertical axis, against the number of training cases on the horizontal axis. Dashed lines are shown between the symbols to guide the eye. The computer used in these experiments was a Sun SPARCstation 20.
+
+{p120}
+### Interpretability
+
+The mixtures-of-experts based learning methods studied here all use generalised linear models as experts and gates. These models can be given some interpretation. For example, in logistic regression [140, pp. 110] we may rewrite the model as:
+
+$$ \log\left(\frac{y}{1-y}\right) = \bth^T \bx. $$ (8.1)
+
+The term on the left is the *log odds* of the category $y$. If all other covariates are kept fixed, a unit change in one of the covariates $x_i$ increases the log odds by an amount given by its parameter $\theta_i$.
+
+In comparison to other tree structured predictors, however, mixtures-of-experts models are less interpretable. Univariate classification and regression trees use only one covariate per split, and use constant functions as predictions at their leaves. These models lend themselves readily to interpretation, a property which has led to their widespread usage in some fields. Although mixtures-of-experts have similarities with standard classification and regression trees, they use all the covariates to make each split and to make each prediction at the leaves. It may be possible, however, to make mixtures-of-experts more interpretable. For example, by using fewer covariates to make each split and each prediction, more interpretation might be possible. Similar techniques for building multivariate trees which use a restricted set of covariates have been described by Brodley and Utgoff [26].
+
+A final point to note about interpretation was made by Breiman [20] who notes that there is an apparent trade off between predictive accuracy of a model and its interpretability. For example, in bagging, multiple copies of a model are trained on different bootstrap samples from a training set. The resulting predictions, when combined in a committee, are more accurate than a single model, but the committee is less interpretable than a single model. The trade-off is expressed neatly by Breiman [20] in his anecdotal *Heisenberg uncertainty principle for statistics*:
+
+$$ IA \geq b $$ (8.2)
+
+where $I$ is interpretability, $A$ is predictive accuracy and $b$ is "Breiman's constant". It is interesting to note that although mixtures-of-experts have less interpretability than CART, they have been shown in this work to be more accurate than CART on classification tasks. Whether this result holds true across a range of tasks will only be determined after more extensive comparisons have been performed.
+
+## 8.5 Summary
+
+The results presented in this chapter indicate that mixtures-of-experts models are competitive with other state of the art learning methods. Although they perform poorly on some tasks they perform well on others. The results on the three classification tasks are particularly encouraging, with mixtures-of-experts models outperforming CART, $k$ nearest neighbour and logistic regression in the majority of the tasks. As described previously, it is difficult to say in general what kind of tasks mixtures-of-experts or any other kind of model will perform well on in general. Further comparisons will be necessary to determine this.
