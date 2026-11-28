@@ -36,8 +36,11 @@ const built = new Set(sources.map(s => +s.meta.number));
 
 // equation labels across the whole thesis, for cross-references like (2.3)
 const EQ = new Map();
-for (const s of sources) for (const m of s.body.matchAll(/\$\$\s*\((\d+\.\d+)\)/g)) EQ.set(m[1], +s.meta.number);
+for (const s of sources) for (const m of s.body.matchAll(/(?:\$\$\s*|\\qquad\s*)\((\d+\.\d+)\)/g)) EQ.set(m[1], +s.meta.number);
 
+// figure and table labels across the thesis
+const FIG = new Map();
+for (const s of sources) for (const m of s.body.matchAll(/^:::(?:figure|table) (fig|tab)-(\w+)-(\d+)/gm)) FIG.set(`${m[1]}-${m[2]}-${m[3]}`, +s.meta.number);
 const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const chHref = n => `/thesis/chapter-${n}/`;
 const eqId = l => 'eq-' + l.replace('.', '-');
@@ -58,14 +61,21 @@ function inline(text, ctx) {
     } else out += text[i];
   }
   text = out;
+  text = text.replace(/\$\$([^$]+?)(?:\\qquad\s*\((\d+\.\d+)\))?\$\$/g, (_, m, l) => keep(`<div class="eq"${l ? ` id="${eqId(l)}"` : ''}><div class="m">${tex(m.trim(), true)}</div>${l ? `<span class="eqn">(${l})</span>` : ''}</div>`));
   text = text.replace(/\$([^$]+)\$/g, (_, m) => keep(tex(m, false)));
   text = text.replace(/\{p(\d+)\}/g, (_, n) => keep(`<span class="pg" id="page-${n}"></span>`));
   text = esc(text);
   text = text.replace(/'/g, '’');
   text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>').replace(/\*([^*]+)\*/g, '<em>$1</em>');
   // citations: [104], [29, 133, 153], [<em>e.g.,</em> 18]
-  text = text.replace(/\[((?:<em>[^<]*<\/em>\s*)?)(\d+(?:,\s*\d+)*)\]/g, (_, pre, nums) =>
-    `[${pre}${nums.split(/,\s*/).map(n => `<a class="cite" href="/thesis/bibliography/#ref-${n}" title="${esc(bibShort(+n))}">${n}</a>`).join(', ')}]`);
+  text = text.replace(/\[((?:<em>[^<]*<\/em>\s*|see also |see |cf\. )?)(\d+(?:,\s*\d+)*)((?:,\s*pp?\.\s*[\d\-–]+)?)\]/g, (_, pre, nums, pp) =>
+    `[${pre}${nums.split(/,\s*/).map(n => `<a class="cite" href="/thesis/bibliography/#ref-${n}" title="${esc(bibShort(+n))}">${n}</a>`).join(', ')}${pp}]`);
+  // section references
+  text = text.replace(/\b(Sections?) (\d+)\.(\d+(?:\.\d+)?)/g, (all, w, c, k) => {
+    const id = `s${c}-${k.replace('.', '-')}`;
+    const url = +c === ctx.number ? '' : (built.has(+c) ? chHref(c) : null);
+    return url === null ? all : `${w} <a href="${url}#${id}">${c}.${k}</a>`;
+  });
   // chapter links
   text = text.replace(/\b(Chapters?) (\d+)((?:, \d+)*)( and (\d+))?/g, (all, w, a, mid, and_, b) => {
     const link = n => (+n !== ctx.number && +n >= 1 && +n <= 12) ? `<a href="${built.has(+n) ? chHref(n) : `/thesis/chapters/${chapterUnits[+n - 1].file}`}">${n}</a>` : n;
@@ -74,9 +84,20 @@ function inline(text, ctx) {
     if (and_) s += ` and ${link(b)}`;
     return s;
   });
+  // figure and table references
+  text = text.replace(/\b(Figures?|Tables?) ([A-C\d]+)\.(\d+)/g, (all, w, c, k) => {
+    const id = `${w.startsWith('F') ? 'fig' : 'tab'}-${c}-${k}`;
+    if (!FIG.has(id)) return all;
+    const ch = FIG.get(id);
+    return `${w} <a href="${ch === ctx.number ? '' : chHref(ch)}#${id}">${c}.${k}</a>`;
+  });
   // equation references (2.3)
   text = text.replace(/\((\d+\.\d+)\)/g, (all, l) => EQ.has(l) ? `(<a class="eqref" href="${EQ.get(l) === ctx.number ? '' : chHref(EQ.get(l))}#${eqId(l)}">${l}</a>)` : all);
   return text.replace(/\u0000(\d+)\u0000/g, (_, i) => slots[+i]);
+}
+function imgSize(file) {
+  const b = fs.readFileSync(path.join(T, 'fig', file + '.png'));
+  return [Math.round(b.readUInt32BE(16) / 2), Math.round(b.readUInt32BE(20) / 2)];
 }
 function bibShort(n) { const e = bib[n - 1]; return e ? e.text.replace(/\s+/g, ' ').slice(0, 140) : ''; }
 
@@ -93,16 +114,31 @@ function renderBody(body, ctx) {
     const lead = b.match(/^((?:\{p\d+\})+)/);
     if (lead && /^\{p\d+\}(#|\$\$)/.test(b)) { pg = inline(lead[1], ctx); b = b.slice(lead[1].length).trim(); }
     let m;
-    if ((m = b.match(/^(#{2,3}) (.+)$/))) {
+    if ((m = b.match(/^(#{2,5}) (.+)$/))) {
       const num = m[2].match(/^([A-Z]?\d*(?:\.\d+)+|[A-C]\.\d+)\s/);
       const id = num ? 's' + num[1].replace(/\./g, '-') : m[2].toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-      ctx.toc.push({ id, title: m[2], level: m[1].length });
+      if (m[1].length <= 3) ctx.toc.push({ id, title: m[2], level: m[1].length });
       html.push(`${pg}<h${m[1].length} id="${id}">${inline(m[2], ctx)}</h${m[1].length}>`);
     } else if ((m = b.match(/^\$\$([\s\S]+?)\$\$\s*(?:\((\d+\.\d+)\))?$/))) {
       const label = m[2];
       html.push(`${pg}<div class="eq"${label ? ` id="${eqId(label)}"` : ''}><div class="m">${tex(m[1].trim(), true)}</div>${label ? `<span class="eqn">(${label})</span>` : ''}</div>`);
+    } else if ((m = b.match(/^:::figure ([\w-]+) \| (.+)$/s))) {
+      const file = m[1], cap = m[2].replace(/\s*\n\s*/g, ' ');
+      const lab = cap.match(/^(Figure|Table) ([A-C\d]+\.\d+):?\s*/);
+      const size = imgSize(file);
+      html.push(`${pg}<figure id="${file}"><div class="fimg"><img src="/thesis/fig/${file}.png" alt="${esc(cap.replace(/[$*]/g, ''))}" width="${size[0]}" height="${size[1]}" loading="lazy"></div><figcaption>${lab ? `<span class="fl">${lab[1]} ${lab[2]}</span> ` : ''}${inline(lab ? cap.slice(lab[0].length) : cap, ctx)}</figcaption></figure>`);
+    } else if ((m = b.match(/^:::table ([\w-]+) \| ([^\n]+)\n([\s\S]+)$/))) {
+      const lab = m[2].match(/^Table ([A-C\d]+\.\d+):?\s*/);
+      const rows = m[3].trim().split('\n').map(r => r.replace(/^\||\|$/g, '').split('|').map(c => c.trim()));
+      const head = rows[0], bodyRows = rows.slice(1).filter(r => !r.every(c => /^-+$/.test(c)));
+      const cell = (c, t) => `<${t}>${inline(c, ctx)}</${t}>`;
+      html.push(`${pg}<figure class="tbl" id="${m[1]}"><figcaption>${lab ? `<span class="fl">Table ${lab[1]}</span> ` : ''}${inline(lab ? m[2].slice(lab[0].length) : m[2], ctx)}</figcaption><div class="tw"><table><thead><tr>${head.map(c => cell(c, 'th')).join('')}</tr></thead><tbody>${bodyRows.map(r => `<tr>${r.map(c => cell(c, 'td')).join('')}</tr>`).join('')}</tbody></table></div></figure>`);
     } else if ((m = b.match(/^:::raw\n([\s\S]*)\n:::$/))) {
       html.push(pg + m[1]);
+    } else if (/^- /.test(b)) {
+      html.push(`${pg}<ul class="lst">${b.split(/\n(?=- )/).map(li => `<li>${inline(li.slice(2).replace(/\s*\n\s*/g, ' '), ctx)}</li>`).join('')}</ul>`);
+    } else if (/^1\. /.test(b)) {
+      html.push(`${pg}<ol class="alg">${b.split(/\n(?=\d+\. )/).map(li => `<li>${inline(li.replace(/^\d+\. /, '').replace(/\s*\n\s*/g, ' '), ctx)}</li>`).join('')}</ol>`);
     } else {
       html.push(`${pg}<p>${inline(b.replace(/\s*\n\s*/g, ' '), ctx)}</p>`);
     }
@@ -141,6 +177,8 @@ article p{margin:0 0 1em;text-wrap:pretty}
 article em{padding-right:.12em}
 article h2{font:500 21px/1.3 var(--font);margin:2em 0 .6em;text-wrap:balance}
 article h3{font:500 17px/1.35 var(--font);margin:1.8em 0 .5em;text-wrap:balance}
+article h4{font:500 16px/1.4 var(--font);margin:1.6em 0 .4em}
+article h5{font:400 16px/1.4 var(--font);font-style:italic;color:var(--ink2);margin:1.4em 0 .4em}
 .eq{display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;margin:.4em 0 1.1em}
 .eq .m{overflow-x:auto;overflow-y:hidden;min-width:0;padding:2px 0}
 .eq .katex-display{margin:0}
@@ -149,6 +187,19 @@ article h3{font:500 17px/1.35 var(--font);margin:1.8em 0 .5em;text-wrap:balance}
 .cite,.eqref{white-space:nowrap}
 .fn{font-size:.72em;line-height:0}
 .pg{scroll-margin-top:16px}
+figure{margin:1.4em 0 1.6em}
+.fimg{background:#fff;border-radius:8px;padding:12px;text-align:center;overflow-x:auto}
+.fimg img{max-width:100%;height:auto;display:inline-block}
+figcaption{font-size:14px;color:var(--ink2);margin-top:8px;text-wrap:pretty}
+.fl{color:var(--ink);font-weight:500}
+.tbl figcaption{margin:0 0 8px}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;font-size:14px;width:100%}
+th,td{padding:6px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-weight:500;color:var(--ink)}
+td{font-variant-numeric:tabular-nums}
+ol.alg,ul.lst{margin:0 0 1em;padding-left:22px}
+ol.alg li,ul.lst li{margin:0 0 .4em}
 .notes{margin-top:2.4em;border-top:1px solid var(--line);padding-top:12px;font-size:14px;color:var(--ink2)}
 .notes h2{font:500 15px/1.3 var(--font);color:var(--ink);margin:0 0 8px}
 .notes ol{margin:0;padding-left:20px}
