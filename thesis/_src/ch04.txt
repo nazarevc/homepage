@@ -1,0 +1,270 @@
+number: 4
+title: Mixtures of Experts for Classification and Regression
+pdf: chapter-04.pdf
+first_page: 51
+---
+{p51}
+## 4.1 Introduction
+
+The aim of this chapter is to describe a framework for regression and classification using mixtures-of-experts models. The first issue addressed is how to propagate posterior credit through hierarchical mixtures-of-experts models. This is followed by a description of an algorithm that implements the E step of the EM algorithm presented in Chapter 2. The choice of conditional densities and the functional forms of the experts and gates is then described. Generalised linear models [140] are used for both experts and gates in this part of the thesis. In this chapter the choice of optimisation algorithm for experts and gates is also discussed. The original paper on the use of GLIMs in hierarchical mixtures-of-experts by Jordan and Jacobs [112] advocated the use of a Newton based optimisation algorithm. This chapter describes an alternative conjugate gradient based optimisation algorithm which is believed to be preferable in most circumstances. Some issues in efficient implementation and initialisation are also discussed. Finally, a summary is given of the maximum likelihood training algorithm which will be used in Chapters 5 and 6 and which forms the basis of the Bayesian training algorithm described in Chapter 7.
+
+## 4.2 The E step - Posterior Propagation and Segmentation
+
+In Section 2.3 the EM algorithm for mixtures and hierarchical mixtures-of-experts developed by Jordan and Jacobs [112] was described. This algorithm consisted of two parts: a propagation of posterior credit to each node in the model (the E step) and a maximisation of a likelihood function weighted by the posterior credit of each node (the M step). This chapter discusses how to implement both of these steps. Section 4.3 describes the functional form of the experts and gates used in this part of the thesis and the implementation of the M step for these models. This section describes how to implement the E step of the EM algorithm for general choices of experts and gates.
+
+The form of the computations in the E step varies according to the type of experts and gates used. The E step involves computation of two probabilities. First, for each expert $\E_i$, compute the probability {p52}of the target $\by^{(n)}$ given the input $\bx^{(n)}$ and current parameters $\bw_i$: $P(\by^{(n)}|\bx^{(n)}, \bw_i)$. Secondly, for each child node of each non-terminal node $\E_j$ compute the set of probabilities $P(Ch(\E_j)|\bx^{(n)}, \bv_j)$ given by the outputs of gate $\mathcal{G}_j$. Computation of these two probabilities is usually straightforward, but its form depends on the type of experts and gates used. The next phase of the E step involves combining and propagating these probabilities so as to compute the posterior probabilities of each node in the model. Before we describe how to perform this propagation process, let us introduce a concept which is considered in the E step which we call the *segmentation*. The segmentation of an HME model is defined as the set of joint posterior probabilities $\{\zeta_i^{(n)} = P(\E_i, An(\E_i)|\by^{(n)}, \bx^{(n)})\}$ for all nodes and all examples $(\by^{(n)}, \bx^{(n)})$.
+
+As described in Section 2.3, there are two types of posterior probability of nodes in a mixture of experts model: *conditional* and *joint* posterior probabilities. The conditional probability of node $\E_i$ is given by:
+
+$$ \varphi_i^{(n)} = P(\E_i|An(\E_i), \by^{(n)}, \bx^{(n)}, \bth), $$ (4.1)
+
+where $An(\E_i)$ is the set of ancestor nodes from $\E_i$ to the root node and $\bth$ is the set of parameters of $\E_i$ and its ancestors. The joint probability is given by
+
+$$ \zeta_i^{(n)} = P(\E_i, An(\E_i)|\by^{(n)}, \bx^{(n)}, \bth). $$ (4.2)
+
+Using these forms, in conjunction with the belief network decomposition of Figure 2.2 and Bayes' rule, we may write down the following expressions:
+
+$$ \varphi_i^{(n)} = \frac{P(\by^{(n)}|\E_i, An(\E_i), \bx^{(n)}) P(\E_i|An(\E_i), \bx^{(n)})}{P(\by^{(n)}|An(\E_i), \bx^{(n)})} $$ (4.3)
+
+for the conditional probability, and
+
+$$ \zeta_i^{(n)} = \frac{P(\by^{(n)}|\E_i, An(\E_i), \bx^{(n)}) P(\E_i, An(\E_i)|\bx^{(n)})}{\sum_j P(\by^{(n)}|\E_j, An(\E_j), \bx^{(n)}) P(\E_j, An(\E_j)|\bx^{(n)})} $$ (4.4)
+
+for the joint probability, where $j$ sums over all nodes on the same level in the tree as $\E_i$. The individual terms of these equations are given by:
+
+- $P(\by^{(n)}|\E_i, An(\E_i), \bx^{(n)})$: the probability of the target at time $n$ given node $i$ and its ancestors. For a terminal node this is a function of the form of the expert at the terminal node (and will be described in the next section). For a non-terminal node this may be computed via an upwards propagation of the appropriate terms from the siblings of the node. For example, the denominator of Equation 4.3, $P(\by^{(n)}|An(\E_i), \bx^{(n)})$, is given by: $$P(\by^{(n)}|An(\E_i), \bx^{(n)}) = \sum_{j \in Ch(\E_k)} P(\by^{(n)}|\E_j, An(\E_j), \bx^{(n)}) P(\E_j|An(\E_j), \bx^{(n)}), \qquad (4.5)$$ where $\E_k = Pa(\E_j)$, the immediate parent of node $\E_i$.
+- $P(\E_i|An(\E_i), \bx^{(n)})$: the probability of node $\E_i$ given its ancestors and the input at time $n$. This is given by the $i^{th}$ output of the gate rooted at $Pa(\E_i)$.
+- $P(\E_i, An(\E_i)|\bx^{(n)})$: the joint probability of node $\E_i$ and its ancestors given the input at time $n$. This is given by the product of terms $P(\E_i|An(\E_i), \bx^{(n)})$ over all ancestors of $\E_i$ along the path to the root node from $\E_i$, *i.e.,* the product of all the gate outputs for the path from $\E_i$ to the root node.
+
+{p53}
+:::algo fig-4-1 | Figure 4.1: **Algorithm for posterior propagation in hierarchical mixtures-of-experts models.**
+- For all examples $\{\by^{(n)}, \bx^{(n)}\}$:
+  - For each terminal node, compute $P(\by^{(n)}|\E_i, An(\E_i), \bx^{(n)})$.
+  - For each terminal node, compute via a downwards recursion from the root node, $P(\E_i, An(\E_i)|\bx^{(n)})$ as the product of terms $P(\E_j|An(\E_j), \bx^{(n)})$ for each node $\E_j$ in $An(\E_i)$.
+  - For each terminal node $\E_i$ form the product $\phi_i = P(\by^{(n)}|\E_i, An(\E_i), \bx^{(n)}) P(\E_i, An(\E_i)|\bx^{(n)})$.
+  - For each node $\E_i$ divide each product term $\phi_i$ by the summation $\sum_j \phi_j$ over all nodes in the same level as $\E_i$ which gives the joint posterior probability $\zeta_i^{(n)}$ for $\E_i$.
+
+The algorithm shown in Figure 4.1 is used to compute the joint posterior probabilities of the terminal nodes. Once the joint posterior probabilities of the terminal nodes have been computed, the joint posterior probabilities of all other nodes can be computed by an upwards propagation to the root node, using the fact that the joint posterior probability of a non-terminal node is the sum of the joint posterior probabilities of its children:
+
+$$ \zeta_i^{(n)} = \sum_{j \in Ch(\E_i)} \zeta_j^{(n)} $$ (4.6)
+
+Finally, the conditional probabilities may be computed by the following expression:
+
+$$ P(\E_i|An(\E_i), \by^{(n)}, \bx^{(n)}) = \frac{P(\E_i, An(\E_i)|\by^{(n)}, \bx^{(n)})}{\sum_{Ch(Pa(\E_i))} P(\E_i, An(\E_i)|\by^{(n)}, \bx^{(n)})} = \frac{\zeta_i^{(n)}}{\zeta_k^{(n)}} $$ (4.7)
+
+where the sum in the denominator is over all the children of $\E_k = Pa(\E_i)$.
+
+This is not the only possible method of posterior propagation but is the one I prefer since it allows easy extension to other ideas, such as initialisation of the expert posterior probabilities. The form of the propagation algorithm is an example of more general methods for calculating posterior probabilities on directed graphs. Other possible methods are discussed by Jordan [108]. Note also that in the case of more complicated variants and extensions of the HME, such as hidden Markov decision trees [110], the E step often becomes intractable and approximate methods must be used.
+
+{p54}
+:::algo fig-4-2 | Figure 4.2: **The `log-add` algorithm.** Given two arguments, $a$ and $b$, `log-add` computes the result $c = \log(\exp(a) + \exp(b))$.
+1. Compare $a$ to $b$. If $a < b$, reverse $a$ and $b$.
+2. Compute the difference $d = b - a$.
+3. If $d > -10$,
+  - set $c = a + \log(1 + \exp(d))$,
+4. else
+  - if $a < -0.5e10$, set $c = -1.0e10$,
+  - else set $c = a$.
+5. Return $c$.
+
+#### Use of logs to avoid underflow
+
+Since some of the product terms in these algorithms can run over many nodes, the resulting probabilities can become small. For this reason logarithms are used to avoid numerical underflow. The products then become summations. In order to compute the summations of products of probabilities, *e.g.,* $\sum_i \phi_i$, I use an algorithm called `log-add` which is shown in Figure 4.2. This algorithm is based on the expansion,
+
+$$ \begin{aligned} \log(\exp(a) + \exp(b)) &= \log(\exp(a)(1 + \exp(b - a))) \\ &= a + \log(1 + \exp(b - a)). \end{aligned} $$ (4.8)
+
+Expanding the log in this form saves one $\exp()$ computation. However, further savings can be made examining the magnitude of the difference $b - a$ as shown in Figure 4.2. This algorithm was motivated by an implementation used in Young et al. [250]. It is also used for the softmax function for multinomial logit experts and gates.
+
+## 4.3 Choice of Expert and Gate Forms and Implementation of the M step
+
+As described in Chapter 1 there have been a number of suggestions in the literature for choices of expert and gating networks. In this part of the thesis generalised linear models are used for experts and gates. In a generalised linear model the conditional density $P(y|\bx, \bth)$ is restricted to the exponential family. A general form for the expected value of $y$ is given by:
+
+$$ h(\hat{y}) = E(y|\bx, \bth) = \bth^T \bx $$ (4.9)
+
+where $h(\cdot)$ is called the *link* function. In the case of linear regression, for example, the link function is the identity function. I consider two types of generalised linear models: linear regression models with {p55}constant variance for experts in the case of regression, and multinomial logit models for gates and experts in the case of classification.
+
+One of the advantages of choosing generalised linear models is that their optimisation is straightforward, in contrast, for example, to MLPs. In addition, generalised linear models are generally accepted as being more "interpretable" than more complex models such as MLPs. It is questionable, however, whether a deep hierarchy with many experts and gates is still interpretable. This question of interpretability will be considered in more depth in Chapter 8. Let us now consider the models used in this part of the thesis: linear regression experts, multinomial logit gates and multinomial logit experts.
+
+As described in Section 2.3 the auxiliary function for a hierarchical mixtures-of-experts model is given by the sum of two terms, one for the gates and one for the experts in the model:
+
+$$ R = \sum_s R(g)_s + \sum_i R(e)_i, $$ (4.10)
+
+where the sum $s$ is over all gates, and the sum $i$ over all experts. This auxiliary function is maximised in the M step of the EM algorithm. In the following sections we describe how to implement this maximisation.
+
+### Linear Regression experts
+
+For regression problems I use linear regression experts, which have the following form. In the case of 1-dimensional outputs, the output of expert $i$ is given by
+
+$$ \hat{y}_i^{(n)} = \sum_{l=1}^{d} w_{il} x_l^{(n)} + w_0 $$ (4.11)
+
+where $\bw_i = \{w_{il}\}_0^d$ is the parameter vector for expert $\E_i$. The intercept term $w_0$ is sometimes referred to as the *bias* term in neural network research. I lump it together with the parameter vector and augment the input vector $\bx^{(n)}$ with an extra constant element of 1, so that the output can be written as $\hat{y}_i^{(n)} = \bw_i^T \bx^{(n)}$.
+
+As described in the previous section, the E step of the EM algorithm utilises the conditional density of the target given the input and the model in its calculation. In the case of regression over 1-dimensional targets, this distribution takes the form of a Gaussian:
+
+$$ P(y^{(n)}|\bx^{(n)}, \bw_i, \sigma_i) = \frac{1}{\sqrt{2\pi\sigma_i^2}} \exp\left(-\frac{1}{2\sigma_i^2}(y^{(n)} - \hat{y}_i^{(n)})^2\right), $$ (4.12)
+
+where $\sigma_i^2$ is the variance parameter for expert $i$. In the case of multivariate regression, the variance parameter becomes a covariance matrix $\Sigma_i$. I also use the notation $\beta_i$ to refer to the reciprocal of the variance $\beta_i = 1/\sigma_i^2$.
+
+#### Training linear regression experts
+
+For linear regression experts the contribution of node $i$ to the auxiliary function is given by:
+
+$$ R(e)_i = -\tfrac{1}{2}\log(2\pi\sigma_i^2) \sum_n \zeta_i^{(n)} - \tfrac{1}{2\sigma_i^2} \sum_n \zeta_i^{(n)} (y^{(n)} - \bw_i^T \bx^{(n)})^2 $$ (4.13)
+
+{p56}where $\zeta_i^{(n)}$ is the joint posterior probability of expert $\E_i$. The second term in this expression is the sum of weighted squared errors between targets and predictions of expert $i$. The weights are given by the joint posterior probability of expert $i$ divided by the variance of expert $i$. Maximisation of this function corresponds to a weighted least squares regression, with weights given by $\zeta_i^{(n)}/\sigma_i^2$. The first and second derivatives of this function are given by:
+
+$$ \frac{\partial R(e)_i}{\partial \bw_i} = \sum_n \frac{\zeta_i^{(n)}}{\sigma_i^2} (y^{(n)} - \hat{y}_i^{(n)}) \bx^{(n)}, $$ (4.14)
+
+$$ \frac{\partial^2 R(e)_i}{\partial \bw_i \partial \bw_i^T} = -\sum_n \frac{\zeta_i^{(n)}}{\sigma_i^2} (\bx^{(n)})(\bx^{(n)})^T. $$ (4.15)
+
+The process of credit assignment can be seen clearly in these derivatives. For an expert at node $\E_i$ the standard gradient contributions of a linear regression model $(y^{(n)} - \hat{y}_i^{(n)})\bx^{(n)}/\sigma_i^2$ are weighted by the joint posterior probability of the node $\zeta_i^{(n)}$. The second derivative terms are also weighted in a similar way. This is effectively assigning credit to parameters of experts which have a high probability of being selected according to the probabilistic model.
+
+To maximise $R(e)_i$, these derivatives may be used in a standard optimisation algorithm such as conjugate gradients, Newton methods or quasi-Newton methods. Alternatively, since $R(e)_i$ is quadratic an exact solution can be written down:
+
+$$ \bw_i = (X^T W_i X)^{-1} X^T W_i Y $$ (4.16)
+
+where $X$ is the input data matrix, $Y$ is the target data vector and $W_i$ is an $N \times N$ diagonal matrix whose $n^{\text{th}}$ element is given by $\zeta_i^{(n)}/\sigma_i^2$. This expression may be solved using matrix methods such as LU decomposition or singular value decomposition (SVD). In Section 4.4 a conjugate gradient algorithm is described which is used in this work. The variance may be computed exactly by setting $\partial R(e)_i/\partial\sigma^2$ to zero:
+
+$$ \sigma_i^2 = \frac{\sum_{n=1}^{N} \zeta_i^{(n)} (y^{(n)} - \hat{y}_i^{(n)})^2}{\sum_{n=1}^{N} \zeta_i^{(n)}} $$ (4.17)
+
+This takes the form of the weighted sum of squared errors divided by the sum of weights $\zeta_i^{(n)}$.
+
+#### Practical issues
+
+There are a number of practical issues which arise in the implementation of linear regression experts. Foremost is the behaviour of the algorithm in regions of low noise in the data set. Consider a region in which an expert has low contribution to the total prediction (*i.e.,* $\sum_n \zeta_i^{(n)}$ is small) and the error of this expert is also small (*i.e.,* $\sum \zeta_i^{(n)}(y^{(n)} - \hat{y}_i^{(n)})^2$ is small). This implies the variance estimate approaches a singularity giving rise to an unbounded likelihood. This problem is also found in other {p57}mixture models, such as mixtures of Gaussians, as noted by many authors including Gelman et al. [67, pp.103] and Titterington et al. [224, pp.83]. In general, a simple approach to solving this problem is to place a minimum bound on the variance, based on some prior knowledge. This approach was used by Weigend et al. [242] for the prediction of laser activity by a mixture of experts. The threshold they used was based on the accuracy of the equipment used to record the training data.
+
+In this work I place a prior on the variance parameter, and maximise the *a-posteriori* distribution rather than the likelihood. This is done purely for computational purposes so as to avoid the singularity in the variance solution arising from the maximum likelihood solution. Potentially, many other methods could be used, such as not updating the variance when the number of observations for an expert falls below a threshold or flooring the variance to a specific level. I would expect these methods to turn out to be identical to the approach outlined here. Personally I prefer the use of a prior since it embodies our assumptions mathematically.
+
+It turns out to be more convenient to place a prior on the reciprocal of the variance $\beta_i = 1/\sigma_i^2$. Since this is a *scale* parameter, a suitable prior is the Gamma prior [13]. This prior has two parameters, $\rho$ and $\upsilon$, and has the following form:
+
+$$ P(\log \beta_i|\rho, \upsilon) = \frac{1}{\Gamma(\rho)} \left(\frac{\beta_i}{\upsilon}\right)^{\rho} \exp(-\beta_i/\upsilon), $$ (4.18)
+
+The resulting estimate of the variance for expert $\E_i$ is then given by:
+
+$$ \sigma_i^2 = \frac{\sum_n \zeta_i^{(n)} (y^{(n)} - \hat{y}_i^{(n)})^2 + 2/\upsilon}{\sum_n \zeta_i^{(n)} + 2\rho} $$ (4.19)
+
+The interpretation of these hyper-parameters is that $2/\upsilon$ defines the prior sum squared error that we might expect a single expert to have. $2\rho$ defines the prior number of observations that we might expect an expert to see. I re-parametrise these hyper-parameters so that
+
+$$ 1/\upsilon = \frac{\rho}{2} \sigma_{prior}^2 $$ (4.20)
+
+where $\sigma_{prior}^2$ is the prior noise level which I set to 0.01 by default. I then set $\rho$ to be a function of the number of terminal nodes $I$:
+
+$$ 2\rho = 0.01 \left(\frac{N}{I}\right) $$ (4.21)
+
+where $N$ is the number of examples in the data set. Note that the choice of $\sigma_{prior}^2$ will depend on the range and scale of the data. In all the examples studied here the data is standardised so as to have zero mean and unit standard deviation.
+
+One problem with using priors such as this one, is the effect that the choice of hyper-parameters may have on the final model after training^[As noted by David Spiegelhalter (personal communication).]. For example, if the prior noise level is set too high, the model may degenerate into modelling the data using only one expert. Ideally, for each new data set we should {p58}perform a number of runs using different values for the hyper-parameters and examining the parameters of the model. In practice this may be difficult when a large number of parameters are present. In this work I found the choices of hyper-parameters outlined above to be adequate to both bound the likelihood safely so as to avoid singularities, and to not lead to degenerate solutions. The prior became most useful in situations where a large number of experts were present, *e.g.,* deep trees, in which the contribution to each expert $\sum_n \zeta_i^{(n)}$ becomes small.
+
+#### Multiple targets
+
+In the case of multiple regression, where the target variable $\by^{(n)}$ is a $k$-dimensional vector, the appropriate Gaussian distribution for $P(\by^{(n)}|\bx^{(n)}, \E_i)$ is given by:
+
+$$ P(\by^{(n)}|\E_i, \bx^{(n)}) = \frac{1}{(2\pi)^{\frac{k}{2}} |\Sigma_i|^{\frac{1}{2}}} \exp\left(-\tfrac{1}{2}(\by^{(n)} - \hat{\by}_i^{(n)})^T \Sigma_i^{-1} (\by^{(n)} - \hat{\by}_i^{(n)})\right) $$ (4.22)
+
+where $\Sigma_i$ is the variance-covariance matrix of the targets $\by^{(n)}$ and predictions $\hat{\by}_i^{(n)}$ of expert $\E_i$. The choice of form for $\Sigma_i$ reflects our belief in the form of the prediction task. If $\Sigma_i$ is chosen to be diagonal, we are saying that the noise in each target variable $y_i$ is independent but has different variance. Alternatively we might be even more restrictive and say that the covariance matrix be modelled by $\Sigma_i = \sigma_i^2 I$, *i.e.,* with common variance for each target variable. At the other end of the spectrum, a full covariance matrix $\Sigma_i$ models all dependencies between the noise in the target variables.
+
+Jordan and Xu [113] present a framework for the mixture of experts using a full covariance matrix. As far as I am aware, no other authors have used the mixture of experts for prediction of multiple targets. In this work I choose a diagonal covariance matrix, so that the log of the probability distribution for each expert $\E_i$ can be written as:
+
+$$ \log P(\by^{(n)}|\E_i, \bx^{(n)}) = -\frac{k}{2}\log 2\pi - \tfrac{1}{2}\sum_{l=1}^{k} \log \sigma_{il}^2 - \sum_{l=1}^{k} \tfrac{1}{2\sigma_{il}^2} (y_l^{(n)} - \hat{y}_{il}^{(n)})^2 $$ (4.23)
+
+where $\hat{y}_{il}^{(n)}$ and $\sigma_{il}^2$ are the predictions and the variance of expert $\E_i$ for target variable $y_l^{(n)}$.
+
+### Multinomial Logit Experts
+
+In the case of classification, the experts can take any form such that their output is a prediction of the class probability distribution $P(Y|X)$ where $Y$ is the target class distribution, *i.e.,* $y_r^{(n)} = 1$ if class $r$ is the correct class at time $n$ otherwise $y_r^{(n)} = 0$. In this work I use multinomial logit models in which the estimate of the probability of class $r$ takes the form:
+
+$$ \hat{y}_{i,r}^{(n)} = P(y_r^{(n)} = 1|\bx^{(n)}, \bw_i) = \frac{\exp(\bw_{ir}^T \bx^{(n)})}{\sum_p \exp(\bw_{ip}^T \bx^{(n)})} $$ (4.24)
+
+where $\bw_{ip}$ is the parameter vector for expert $\E_i$, parameterising the estimate for class $p$. This function allows linear decision boundaries to be constructed between adjacent classes [14, pp.79]. For expert $\E_i$
+{p59}the distribution of targets given inputs and parameters takes the form of the exponential of the negative of the cross entropy between the targets $\{\by^{(n)}\}$ and the outputs of the expert $\{\hat{\by}_i^{(n)}\}$:
+
+$$ P(\by^{(n)}|\bx^{(n)}, \bw_i) = \exp\left(\sum_{r=1}^{k} y_r^{(n)} \log \hat{y}_{i,r}^{(n)}\right), $$ (4.25)
+
+where $\hat{y}_{ir}^{(n)}$ is the $r^{\text{th}}$ output of expert $\E_i$.
+
+#### Training multinomial logit experts
+
+In the case of multinomial logit experts the contribution of expert $i$ to the auxiliary function is given by:
+
+$$ R(e)_i = \sum_{n=1}^{N} \zeta_i^{(n)} \sum_{r=1}^{k} y_r^{(n)} \log \hat{y}_{i,r}^{(n)}. $$ (4.26)
+
+Maximisation of this function corresponds to maximising the negative of the cross entropy between the targets $\by^{(n)}$ and the predictions $\hat{\by}^{(n)}$, weighted by the joint posterior probability of the expert. Once again we wish to find the derivatives of this function. Bishop [14, pp. 237-40] shows that for a cross entropy function $E$ given by:
+
+$$ E = -\sum_n \sum_{c=1}^{k} y_c^{(n)} \log \hat{y}_c^{(n)} $$ (4.27)
+
+the first derivative is given by:
+
+$$ \frac{\partial E}{\partial a_c} = \sum_n (\hat{y}_c^{(n)} - y_c^{(n)}), $$ (4.28)
+
+where $a_c$ is some function of the inputs $f(\bx^{(n)})$. In an MLP $f$ is given by the outputs of the hidden units. In a generalised linear model, $f$ is simply the linear combination of the parameters $\bw_c$ with the inputs $\bx^{(n)}$, *i.e.,* $f(\bx^{(n)}) = \bw_c^T \bx^{(n)}$. This allows the derivative of $R(e)_i$ with respect to parameter vector $\bw_{ic}$ to be written as:
+
+$$ \frac{\partial R(e)_i}{\partial \bw_{ic}} = \sum_n \zeta_i^{(n)} (y_k^{(n)} - \hat{y}_{i,c}^{(n)}) \bx^{(n)}. $$ (4.29)
+
+The second derivative is given by:
+
+$$ \frac{\partial^2 R(e)_i}{\partial \bw_{ic} \partial \bw_{ic}^T} = -\sum_n \zeta_i^{(n)} \hat{y}_{i,c}^{(n)} (1 - \hat{y}_{i,c}^{(n)}) (\bx^{(n)})(\bx^{(n)})^T. $$ (4.30)
+
+{p60}
+### Multinomial Logit Gates
+
+The gate can take any functional form that is consistent with the estimation of probabilities. In this chapter the gates are multinomial logit models which can form only linear boundaries between expert regions. The outputs in this case are given by:
+
+$$ g_i^{(n)} = \frac{\exp(\bv_i^T \bx^{(n)})}{\sum_j \exp(\bv_j^T \bx^{(n)})}, $$ (4.31)
+
+where $\{\bv_i\}_{i=1}^I$ is the set of parameters for the gate. The vector $\bv_i$ parameterises the $i^{\text{th}}$ output of the gate.
+
+#### Training multinomial logit gates
+
+The contribution of gate $\mathcal{G}_i$ rooted at node $\E_i$ is given by:
+
+$$ R(g)_i = \sum_{n=1}^{N} \zeta_i^{(n)} \sum_{j \in Ch(\E_i)} \varphi_j^{(n)} \log g_j^{(n)}. $$ (4.32)
+
+where the sum is over the child nodes of node $\E_i$. Maximising this function maximises the negative of the cross entropy between the target distribution for the missing data $\varphi_j^{(n)}$ and the output distribution of the gates $g_j^{(n)}$, weighted by the joint posterior probability of the node $\zeta_i^{(n)}$. In a similar manner to the multinomial logit experts the derivatives of $R(g)_i$ with respect to parameter vector $\bv_j$ are given by:
+
+$$ \frac{\partial R(g)_i}{\partial \bv_j} = \sum_{n=1}^{N} \zeta_i^{(n)} (\varphi_j^{(n)} - g_j^{(n)}) \bx^{(n)}, $$ (4.33)
+
+$$ \frac{\partial^2 R(g)_i}{\partial \bv_j \partial \bv_j^T} = -\sum_{n=1}^{N} \zeta_i^{(n)} g_j^{(n)} (1 - g_j^{(n)}) (\bx^{(n)})(\bx^{(n)})^T. $$ (4.34)
+
+## 4.4 Optimisation of Experts and Gates
+
+Given the specification of posterior probabilities which are computed by the posterior propagation algorithm, it remains only to specify how the experts and gates are optimised. Given that each gate and expert is a generalised linear model, the optimisation process reduces to solving a set of linear equations [140, pp. 41]. Specifically, if Equations 4.14, 4.29 and 4.33 are set to zero, they may be written in the generic form:
+
+$$ \sum_{n=1}^{N} \zeta_i^{(n)} (t_l^{(n)} - \hat{t}_l^{(n)}) \bx^{(n)} = 0 $$ (4.35)
+
+in which $t_l^{(n)}$ represents target $l$ at time $n$, which is either the actual target $y_l^{(n)}$ in the case of linear regression or multinomial logit experts, or the conditional posterior probability $\varphi_l^{(n)}$ in the case of multinomial logit gates. The term $\hat{t}_l^{(n)}$ represents the prediction of $t_l^{(n)}$ by the model, which is either the {p61}actual prediction $\hat{\by}_l^{(n)}$ of an expert, or the output $g_l^{(n)}$ of a gate. An algorithm for solving these equations based on a Newton method, known as iteratively re-weighted least squares (IRLS) is described by McCullagh and Nelder [140]. IRLS was proposed by Jordan and Jacobs [112] for solving these equations in mixtures-of-experts models.
+
+In the special case of linear regression experts, IRLS reduces to weighted least squares, with the weights given by posterior probabilities as shown in Equation 4.16. These equations may be efficiently solved using a matrix decomposition method such as Cholesky decomposition, LU decomposition or Singular Value Decomposition (SVD). In practice, the use of SVD method for least squares may be preferred since this allows solutions when the Hessian matrix is nearly singular. Near-singularity of the Hessian matrix is likely when the sum of posterior probabilities $\sum_n \zeta_i^{(n)}$ is close to the dimension $k$ of the Hessian matrix.
+
+Rather than using IRLS, in this thesis I use a conjugate gradient algorithm for both linear regression and multinomial logit models. This is because I find empirically the IRLS algorithm to be too unstable in the presence of the extra weighting induced by the posterior probabilities $\{\zeta_i^{(n)}\}$, in particular when the number of observations for a node is very small. In addition, the IRLS algorithm requires the computation of the Hessian matrix (requiring $\mathcal{O}(Nd^2)$ calculations) which may be a costly operation in the case of large input dimensionality $d$. An alternative to conjugate gradients is the use of variable metric methods (see Press et al. [180] or Fletcher [53] for more details).
+
+I now describe the conjugate gradient algorithm which I use for optimising experts and gates. This is called `macopt` and was originally written by David MacKay.^[See Appendix A for details of the availability of `macopt`.] Briefly, the major difference between `macopt` and other conjugate gradient algorithms is its use of gradient information. This difference comes in the way that `macopt` performs line searches. Standard conjugate gradient algorithms do a line search for the minimum along the conjugate direction by evaluating the value of the function it is minimising. `macopt`, however, uses the gradient of the function to *bracket* the minimum of the function. This bracketing is based on the principle that on either side of a minimum, the inner product between the gradient at and the line search direction will have opposite signs. `macopt` also only evaluates the minimum of the line search approximately. On average the algorithm takes approximately 2 gradient evaluations per line minimisation. The following parameters control the behaviour of `macopt`:
+
+- *tol*: the value of magnitude of gradient below which the algorithm terminates. I set this to 0.001.
+- *itmax*: the maximum number of iterations of the algorithm performed before it terminates (if *tol* has not been already reached). I set this to 10.
+
+These values for the parameters were found to be adequate to ensure good training of linear models in empirical trials.
+
+{p62}
+## 4.5 Initialisation
+
+Examination of the likelihood function for the HME indicates that choice of initial parameter values for experts and gates is important. For example, for a mixture of two experts, if the values of the expert parameters are the same, and the gate parameters are set to zero, training will not change these values. In order to "break symmetry" either the expert parameters must be different or the gate parameters must be sufficiently different from zero so as to give an advantage to one expert or the other. If the predictions of each expert are too close to one another (perhaps by poor choice of starting parameters), the training algorithm falls into a *degenerate* solution in which each expert has near-identical parameters and the gate has near-zero parameter values.
+
+I experimented with a number of different initialisation strategies for expert and gate parameters. One method is to randomise the expert and gate parameters using a uniform or Gaussian distribution in a pre-specified range. Choice of this range, however, is somewhat ad hoc. Another method I tried was to train a single expert on the data and use the magnitude of the parameters of this expert as the range for randomisation of the experts. This approach was somewhat successful, but still led to degenerate solutions for small tasks.
+
+A more successful method of initialisation, which forms the basis for all the mixture of experts models in Chapters 5 to 7, is based on the concept of *segmentation*, described in Section 4.2. I randomise the segmentation values $\zeta_i^{(n)}$ for each example $n$ and each expert $i$ given the constraint that the sum $\sum_i \zeta_i^{(n)} = 1$ for nodes $\{\E_i\}$ in the same level of the tree. Each terminal node segmentation value is drawn from a uniform random distribution and normalised by the sum of segmentation values of all nodes at this level of the tree. I then propagate these probabilities up the tree using the propagation algorithm of Section 4.2, and run the training algorithms for all experts and gates to give initial values. This method is more stable than the randomisation of parameters method (*i.e.,* leads to less degenerate solutions), and has the practical advantage of not requiring choice of initial values for the randomisation, since the randomisation is over probabilities rather than parameter values.
+
+## 4.6 Summary
+
+In this chapter I have described a framework for regression and classification using mixtures-of-experts. A number of issues have been addressed including the choice of models for experts and gates and optimisation and initialisation of parameters. These are summarised in the algorithm `ml-train` shown in Figure 4.3. `ml-train` forms the basis of Chapters 5, 6 and 7. These chapters address the issue of complexity control and architecture selection in mixtures-of-experts based learning methods.
+
+{p63}
+:::algo fig-4-3 | Figure 4.3: **The `ml-train` algorithm.**
+**Initialisation**
+1. Initialise the segmentation of the terminal nodes to random values between 0 and 1, normalise to 1 and propagate the posteriors through the tree.
+2. Compute the gradients of each expert and gate and use `macopt` to update their parameters.
+**Training**
+3. Compute the likelihood of the model $L^t$.
+4. Compute the posterior probabilities $\{\varphi_i^{(n)}\}_1^N$ and $\{\zeta_i^{(n)}\}_1^N$ for each node in the tree using the posterior propagation algorithm of Section 4.2.
+5. Compute the gradients of each expert and gate and use `macopt` to update their parameters.
+6. Compute the new likelihood $L^{t+1}$.
+7. If $L^{t+1} - L^t > 10^{-4}$ go to (3) else terminate.

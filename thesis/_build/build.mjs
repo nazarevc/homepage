@@ -40,7 +40,7 @@ for (const s of sources) for (const m of s.body.matchAll(/(?:\$\$\s*|\\qquad\s*)
 
 // figure and table labels across the thesis
 const FIG = new Map();
-for (const s of sources) for (const m of s.body.matchAll(/^:::(?:figure|table) (fig|tab)-(\w+)-(\d+)/gm)) FIG.set(`${m[1]}-${m[2]}-${m[3]}`, +s.meta.number);
+for (const s of sources) for (const m of s.body.matchAll(/^:::(?:figure|table|algo) (fig|tab)-(\w+)-(\d+)/gm)) FIG.set(`${m[1]}-${m[2]}-${m[3]}`, +s.meta.number);
 const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const chHref = n => `/thesis/chapter-${n}/`;
 const eqId = l => 'eq-' + l.replace('.', '-');
@@ -97,9 +97,32 @@ function inline(text, ctx) {
     const web = fs.existsSync(path.join(SRC, `app${a.toLowerCase()}.txt`));
     return `Appendix <a href="${web ? `/thesis/appendix-${a.toLowerCase()}/` : `/thesis/chapters/appendix-${a.toLowerCase()}.pdf`}">${a}</a>`;
   });
+  // "Equation 4.3", "Equations 4.14, 4.29 and 4.33"
+  text = text.replace(/\b(Equations?|Eq\.) ((?:\d+\.\d+)(?:(?:, | and )\d+\.\d+)*)/g, (all, w, list) =>
+    `${w} ` + list.replace(/\d+\.\d+/g, l => EQ.has(l) ? `<a class="eqref" href="${EQ.get(l) === ctx.number ? '' : chHref(EQ.get(l))}#${eqId(l)}">${l}</a>` : l));
   // equation references (2.3)
   text = text.replace(/\((\d+\.\d+)\)/g, (all, l) => EQ.has(l) ? `(<a class="eqref" href="${EQ.get(l) === ctx.number ? '' : chHref(EQ.get(l))}#${eqId(l)}">${l}</a>)` : all);
   return text.replace(/\u0000(\d+)\u0000/g, (_, i) => slots[+i]);
+}
+// nested lists: "- " or "1. " markers, two spaces per level; other lines continue the item or stand as text
+function nestedList(src, ctx) {
+  const items = [];
+  for (const line of src.split('\n')) {
+    const m = line.match(/^(\s*)(- |\d+\. )(.*)$/);
+    if (m) items.push({ lvl: m[1].length >> 1, ord: m[2] !== '- ', num: parseInt(m[2]), text: m[3] });
+    else if (line.trim() && items.length) items[items.length - 1].text += ' ' + line.trim();
+    else if (line.trim()) items.push({ lvl: -1, text: line.trim() });
+  }
+  let out = '', stack = [];
+  for (const it of items) {
+    if (it.lvl < 0) { while (stack.length) out += `</li></${stack.pop()}>`; out += `<p>${inline(it.text, ctx)}</p>`; continue; }
+    while (stack.length > it.lvl + 1) out += `</li></${stack.pop()}>`;
+    if (stack.length === it.lvl + 1) out += '</li>';
+    while (stack.length < it.lvl + 1) { const t = it.ord ? 'ol' : 'ul'; out += `<${t}${it.ord && it.num > 1 ? ` start="${it.num}"` : ''}>`; stack.push(t); }
+    out += `<li>${inline(it.text, ctx)}`;
+  }
+  while (stack.length) out += `</li></${stack.pop()}>`;
+  return out;
 }
 function imgSize(file) {
   const b = fs.readFileSync(path.join(T, 'fig', file + '.png'));
@@ -117,8 +140,8 @@ function renderBody(body, ctx) {
     if (/^\{p\d+\}$/.test(b)) { carry += b; continue; }
     if (carry) { b = carry + b; carry = ''; }
     let pg = '';
-    const lead = b.match(/^((?:\{p\d+\})+)/);
-    if (lead && /^\{p\d+\}(#|\$\$)/.test(b)) { pg = inline(lead[1], ctx); b = b.slice(lead[1].length).trim(); }
+    const lead = b.match(/^((?:\{p\d+\}\s*)+)(?=#|\$\$|:::|> |- |\d+\. )/);
+    if (lead) { pg = inline(lead[1].replace(/\s+/g, ''), ctx); b = b.slice(lead[1].length).trim(); }
     let m;
     if ((m = b.match(/^(#{2,5}) (.+)$/))) {
       const num = m[2].match(/^([A-Z]?\d*(?:\.\d+)+|[A-C]\.\d+)\s/);
@@ -139,6 +162,9 @@ function renderBody(body, ctx) {
       const head = rows[0], bodyRows = rows.slice(1).filter(r => !r.every(c => /^-+$/.test(c)));
       const cell = (c, t) => `<${t}>${inline(c, ctx)}</${t}>`;
       html.push(`${pg}<figure class="tbl" id="${m[1]}"><figcaption>${lab ? `<span class="fl">Table ${lab[1]}</span> ` : ''}${inline(lab ? m[2].slice(lab[0].length) : m[2], ctx)}</figcaption><div class="tw"><table><thead><tr>${head.map(c => cell(c, 'th')).join('')}</tr></thead><tbody>${bodyRows.map(r => `<tr>${r.map(c => cell(c, 'td')).join('')}</tr>`).join('')}</tbody></table></div></figure>`);
+    } else if ((m = b.match(/^:::algo ([\w-]+) \| ([^\n]+)\n([\s\S]+)$/))) {
+      const lab = m[2].match(/^(Figure|Table) ([A-C\d]+\.\d+):?\s*/);
+      html.push(`${pg}<figure class="algo" id="${m[1]}"><div class="abox">${nestedList(m[3], ctx)}</div><figcaption>${lab ? `<span class="fl">${lab[1]} ${lab[2]}</span> ` : ''}${inline(lab ? m[2].slice(lab[0].length) : m[2], ctx)}</figcaption></figure>`);
     } else if ((m = b.match(/^:::raw\n([\s\S]*)\n:::$/))) {
       html.push(pg + m[1]);
     } else if (/^> /.test(b)) {
@@ -209,6 +235,10 @@ th,td{padding:6px 10px;border-bottom:1px solid var(--line);text-align:left;verti
 th{font-weight:500;color:var(--ink)}
 td{font-variant-numeric:tabular-nums}
 ol.alg,ul.lst{margin:0 0 1em;padding-left:22px}
+.abox{border-top:1px solid var(--ink2);border-bottom:1px solid var(--ink2);padding:10px 4px;font-size:15px;overflow-x:auto}
+.abox ol,.abox ul{margin:.2em 0;padding-left:22px}
+.abox li{margin:.25em 0}
+.abox p{margin:.3em 0}
 blockquote{margin:0 0 1.2em;padding:2px 0 2px 16px;border-left:2px solid var(--line);font-style:italic;color:var(--ink2)}
 blockquote p{margin:0}
 blockquote footer{font-style:normal;font-size:14px;margin-top:4px}
