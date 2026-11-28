@@ -8,7 +8,8 @@
   "printed": null,
   "part": null,
   "sections": [],
-  "size": 230673
+  "size": 230673,
+  "cover": false
  },
  {
   "key": "1",
@@ -19,7 +20,8 @@
   "printed": 1,
   "part": null,
   "sections": [],
-  "size": 161901
+  "size": 161901,
+  "cover": true
  },
  {
   "key": "2",
@@ -33,30 +35,31 @@
    {
     "n": "2.1",
     "t": "Specification of the Mixtures-of-Experts Model",
-    "p": 1
+    "p": 2
    },
    {
     "n": "2.2",
     "t": "Hierarchical Mixtures of Experts",
-    "p": 4
+    "p": 5
    },
    {
     "n": "2.3",
     "t": "Training Mixtures and Hierarchical Mixtures-of-Experts",
-    "p": 9
+    "p": 10
    },
    {
     "n": "2.4",
     "t": "Review of Related Literature",
-    "p": 12
+    "p": 13
    },
    {
     "n": "2.5",
     "t": "Conclusions",
-    "p": 25
+    "p": 26
    }
   ],
-  "size": 395156
+  "size": 395156,
+  "cover": true
  },
  {
   "key": "3",
@@ -70,30 +73,31 @@
    {
     "n": "3.1",
     "t": "Issues in Comparing Learning Methods",
-    "p": 2
+    "p": 3
    },
    {
     "n": "3.2",
     "t": "The DELVE Framework",
-    "p": 4
+    "p": 5
    },
    {
     "n": "3.3",
     "t": "The Data Sets used in Part I",
-    "p": 6
+    "p": 7
    },
    {
     "n": "3.4",
     "t": "Issues in Designing Learning Algorithms",
-    "p": 15
+    "p": 16
    },
    {
     "n": "3.5",
     "t": "Outline of Part I",
-    "p": 17
+    "p": 18
    }
   ],
-  "size": 255953
+  "size": 255953,
+  "cover": true
  },
  {
   "key": "4",
@@ -107,35 +111,36 @@
    {
     "n": "4.1",
     "t": "Introduction",
-    "p": 1
+    "p": 2
    },
    {
     "n": "4.2",
     "t": "The E step - Posterior Propagation and Segmentation",
-    "p": 1
+    "p": 2
    },
    {
     "n": "4.3",
     "t": "Choice of Expert and Gate Forms and Implementation of the M step",
-    "p": 4
+    "p": 5
    },
    {
     "n": "4.4",
     "t": "Optimisation of Experts and Gates",
-    "p": 10
+    "p": 11
    },
    {
     "n": "4.5",
     "t": "Initialisation",
-    "p": 12
+    "p": 13
    },
    {
     "n": "4.6",
     "t": "Summary",
-    "p": 12
+    "p": 13
    }
   ],
-  "size": 240963
+  "size": 240963,
+  "cover": true
  },
  {
   "key": "5",
@@ -149,25 +154,26 @@
    {
     "n": "5.1",
     "t": "Introduction",
-    "p": 1
+    "p": 2
    },
    {
     "n": "5.2",
     "t": "Avoiding Over-fitting",
-    "p": 1
+    "p": 2
    },
    {
     "n": "5.3",
     "t": "Choosing the Number of Experts and Depth of Hierarchy",
-    "p": 4
+    "p": 5
    },
    {
     "n": "5.4",
     "t": "Summary",
-    "p": 5
+    "p": 6
    }
   ],
-  "size": 169892
+  "size": 169892,
+  "cover": true
  },
  {
   "key": "6",
@@ -181,25 +187,26 @@
    {
     "n": "6.1",
     "t": "Introduction",
-    "p": 1
+    "p": 2
    },
    {
     "n": "6.2",
     "t": "Design of the Growing Algorithm",
-    "p": 2
+    "p": 3
    },
    {
     "n": "6.3",
     "t": "Related Work",
-    "p": 13
+    "p": 14
    },
    {
     "n": "6.4",
     "t": "Summary",
-    "p": 16
+    "p": 17
    }
   ],
-  "size": 345055
+  "size": 345055,
+  "cover": true
  },
  {
   "key": "7",
@@ -213,30 +220,31 @@
    {
     "n": "7.1",
     "t": "Introduction",
-    "p": 1
+    "p": 2
    },
    {
     "n": "7.2",
     "t": "Background Theory",
-    "p": 2
+    "p": 3
    },
    {
     "n": "7.3",
     "t": "Method",
-    "p": 15
+    "p": 16
    },
    {
     "n": "7.4",
     "t": "Related Work",
-    "p": 18
+    "p": 19
    },
    {
     "n": "7.5",
     "t": "Summary",
-    "p": 19
+    "p": 20
    }
   ],
-  "size": 343005
+  "size": 343005,
+  "cover": true
  },
  {
   "key": "8",
@@ -250,30 +258,31 @@
    {
     "n": "8.1",
     "t": "Introduction",
-    "p": 1
+    "p": 2
    },
    {
     "n": "8.2",
     "t": "Results on Regression Tasks",
-    "p": 3
+    "p": 4
    },
    {
     "n": "8.3",
     "t": "Results on Classification Tasks",
-    "p": 12
+    "p": 13
    },
    {
     "n": "8.4",
     "t": "Conclusions",
-    "p": 13
+    "p": 14
    },
    {
     "n": "8.5",
     "t": "Summary",
-    "p": 17
+    "p": 18
    }
   ],
-  "size": 288649
+  "size": 288649,
+  "cover": true
  },
  {
   "key": "9",
@@ -287,30 +296,31 @@
    {
     "n": "9.1",
     "t": "Automatic Speech Recognition",
-    "p": 2
+    "p": 3
    },
    {
     "n": "9.2",
     "t": "The ABBOT System",
-    "p": 4
+    "p": 5
    },
    {
     "n": "9.3",
     "t": "Evaluating Speech Recognition Systems",
-    "p": 7
+    "p": 8
    },
    {
     "n": "9.4",
     "t": "Previous Applications of Mixtures-of-Experts to Speech Recognition",
-    "p": 11
+    "p": 12
    },
    {
     "n": "9.5",
     "t": "Outline of Part II",
-    "p": 11
+    "p": 12
    }
   ],
-  "size": 202419
+  "size": 202419,
+  "cover": true
  },
  {
   "key": "10",
@@ -324,30 +334,31 @@
    {
     "n": "10.1",
     "t": "Introduction",
-    "p": 1
+    "p": 2
    },
    {
     "n": "10.2",
     "t": "Multi-Layer Perceptrons in ABBOT",
-    "p": 1
+    "p": 2
    },
    {
     "n": "10.3",
     "t": "Mixtures of MLPs as Acoustic Models",
-    "p": 3
+    "p": 4
    },
    {
     "n": "10.4",
     "t": "Results",
-    "p": 4
+    "p": 5
    },
    {
     "n": "10.5",
     "t": "Conclusions",
-    "p": 6
+    "p": 7
    }
   ],
-  "size": 154323
+  "size": 154323,
+  "cover": true
  },
  {
   "key": "11",
@@ -361,40 +372,41 @@
    {
     "n": "11.1",
     "t": "Introduction",
-    "p": 1
+    "p": 2
    },
    {
     "n": "11.2",
     "t": "Speaker Adaptation",
-    "p": 1
+    "p": 2
    },
    {
     "n": "11.3",
     "t": "Recurrent Neural Networks for Speech Recognition",
-    "p": 3
+    "p": 4
    },
    {
     "n": "11.4",
     "t": "Speaker Adaptation within ABBOT",
-    "p": 5
+    "p": 6
    },
    {
     "n": "11.5",
     "t": "Mixtures of Local Linear Transforms",
-    "p": 6
+    "p": 7
    },
    {
     "n": "11.6",
     "t": "Results",
-    "p": 8
+    "p": 9
    },
    {
     "n": "11.7",
     "t": "Conclusions",
-    "p": 11
+    "p": 12
    }
   ],
-  "size": 254416
+  "size": 254416,
+  "cover": true
  },
  {
   "key": "12",
@@ -405,7 +417,8 @@
   "printed": 152,
   "part": "Part III: Conclusions, Appendices and References",
   "sections": [],
-  "size": 85575
+  "size": 85575,
+  "cover": true
  },
  {
   "key": "A",
@@ -416,7 +429,8 @@
   "printed": 156,
   "part": null,
   "sections": [],
-  "size": 57669
+  "size": 57669,
+  "cover": true
  },
  {
   "key": "B",
@@ -430,15 +444,16 @@
    {
     "n": "B.1",
     "t": "Boston",
-    "p": 2
+    "p": 3
    },
    {
     "n": "B.2",
     "t": "The Kin and Pumadyn families",
-    "p": 3
+    "p": 4
    }
   ],
-  "size": 350711
+  "size": 350711,
+  "cover": true
  },
  {
   "key": "C",
@@ -452,20 +467,21 @@
    {
     "n": "C.1",
     "t": "Image",
-    "p": 2
+    "p": 3
    },
    {
     "n": "C.2",
     "t": "Letter",
-    "p": 3
+    "p": 4
    },
    {
     "n": "C.3",
     "t": "Splice",
-    "p": 4
+    "p": 5
    }
   ],
-  "size": 124628
+  "size": 124628,
+  "cover": true
  },
  {
   "key": "bib",
@@ -476,6 +492,7 @@
   "printed": 179,
   "part": null,
   "sections": [],
-  "size": 195561
+  "size": 195561,
+  "cover": true
  }
 ]

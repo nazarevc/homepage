@@ -94,7 +94,8 @@ function renderBody(body, ctx) {
     if (lead && /^\{p\d+\}(#|\$\$)/.test(b)) { pg = inline(lead[1], ctx); b = b.slice(lead[1].length).trim(); }
     let m;
     if ((m = b.match(/^(#{2,3}) (.+)$/))) {
-      const id = m[2].toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      const num = m[2].match(/^([A-Z]?\d*(?:\.\d+)+|[A-C]\.\d+)\s/);
+      const id = num ? 's' + num[1].replace(/\./g, '-') : m[2].toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
       ctx.toc.push({ id, title: m[2], level: m[1].length });
       html.push(`${pg}<h${m[1].length} id="${id}">${inline(m[2], ctx)}</h${m[1].length}>`);
     } else if ((m = b.match(/^\$\$([\s\S]+?)\$\$\s*(?:\((\d+\.\d+)\))?$/))) {
