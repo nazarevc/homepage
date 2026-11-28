@@ -1,0 +1,85 @@
+number: 5
+title: Training Mixtures-of-Experts using Early Stopping
+pdf: chapter-05.pdf
+first_page: 64
+---
+{p64}
+## 5.1 Introduction
+
+This chapter describes the first two of my proposed methods for regression and classification based on the mixtures-of-experts. The background theory on which these methods are based was described in Chapters 2 and 4. Sections 5.2 and 5.3 describe how these methods are implemented. Included in these sections are answers to such issues as how to initialise the models, how many parameters to use and how to reduce over-fitting of the data. The two methods are given the names `me-ese-1` which is a mixtures-of-experts model and `hme-ese-1` which is a hierarchical mixtures-of-experts model. Both methods use early stopping via cross-validation to control the complexity of their models.
+
+The two methods described in this chapter were motivated by Carl Rasmussen's [189] method for multi-layer perceptrons with early stopping, `mlp-ese-1`. Rasmussen found this method to be competitive with other learning methods such as MLPs trained by Markov Chain Monte Carlo (MCMC) techniques (results summarised in Chapter 8, Appendix B and Appendix C). The technique used by Rasmussen was followed closely so as to see how well a ME or HME model would do in comparison to a MLP given similar constraints on computing resources and time.
+
+## 5.2 Avoiding Over-fitting
+
+The mixture of experts consists of a series of experts, each modelling different processes assumed to be underlying causes of the data. Since each expert may focus on a different subset of the data which may be arbitrarily small, the possibility of over-fitting is increased when using a large number of experts. There is an added potential for the whole architecture to over-fit the data through the gates. This effect occurs when the distribution of missing data $P(Z|X, Y)$ becomes sharp, focusing on small groups of data points at a time. The net effect is to cause the gates to select a single expert for each small group of points. In the limit, the effect is to assign one expert for each pair of data points. This leads to disjointed functions being predicted by the model, an effect akin to "joining the dots".
+
+{p65}
+A side effect of over-trained gates is the potential for *pinch off* to occur. Pinch off is caused by the magnitude of the parameters in the gate becoming large, so that the outputs of the gate tend to one and zero. This effect is observed in mixtures when the number of experts is greater than the number of actual processes in the data. In a hierarchy, however, the effect can lead to many parameters being unused when a high level branch is pinched off.
+
+Chapter 4 described how to train the mixtures-of-experts model using a combination of the EM algorithm and a conjugate gradient algorithm. This section describes how to reduce over-fitting of the training data using the method of *early stopping*. An alternative method will be described in Chapter 7 based on Bayesian methods.
+
+The technique of early stopping states simply that a model should be trained on the training data until its error on a validation set reaches a minimum. Figure 5.1 shows the behaviour of the training and validation errors for the `hme-ese-1` method.
+
+:::figure fig-5-1 | Figure 5.1: **Early stopping of an HME model on the Boston housing data.** This figure shows the behaviour of early stopping for an HME on one of the `Boston` data training sets (128 cases) using the `hme-ese-1` method. The upper figure (a) shows the evolution of the error on the validation set which is a randomly chosen third of the total data (43 patterns) against iterations of the algorithm. The lower figure (b) shows the evolution of the error on the training data which is the remainder of the total data (85 patterns). The minimum validation error is shown in sub-figure (a) via a dashed horizontal line at the value 0.879. This minimum is achieved after 11 iterations of the algorithm.
+
+The first time I ran the `me-ese-1` training algorithm on the Boston housing data I checked when the minimum on the validation set was achieved. I noticed that the minimum was achieved after only the 2nd iteration of the EM cycle. This indicated to me that the conjugate gradient algorithm was actually working *too* well, and causing the minimum of the validation error set to be missed. To remedy this I {p66}reduced the number of line searches (the variable *itmax* in `macopt`)^[The `macopt` algorithm was introduced in Section 4.4.] from 10 to 3, a value which was computed empirically by looking at the minimum found over a series of runs of the training algorithm. Subsequent comparison of the errors on unseen data justified this move, as errors for $itmax = 3$ were significantly lower than for $itmax = 10$.
+
+In order not to stop training too early, the algorithm searches for additional minima after finding the first minimum so that the final iteration is at least 1.5 times the iteration at which the last minimum occurred. In addition, at least 30 iterations of the algorithm are performed, with a maximum of 200 total iterations allowed.
+
+In the algorithms `me-ese-1` and `hme-ese-1` the total data available for training were divided into a training set consisting of two thirds of the total data and a validation set consisting of one third of the total. These sets were chosen at random every time a new pair of {train:validate} sets was required. After training a specified number of models on the different sets created by this method, I stored these models and used the average of their predictions, in a *committee* [14, pp. 364], [174] to form the overall prediction on unseen data. If we represent the prediction of the $m^{th}$ committee member by $\hat{y}(m)^{(n)}$, the prediction of the committee is given by:
+
+$$ \hat{y}^{(n)} = \frac{1}{M} \sum_{m=1}^{M} \hat{y}(m)^{(n)}, $$ (5.1)
+
+where $M$ is the total number of members in the committee.
+
+In order to decide how many committee members to use, the method of Rasmussen [189] was followed. In this method, a minimum of 3 committee members and a maximum of 50 are created. After each committee member has been trained, the overall time elapsed (in seconds) since starting to train the members is examined. If this time is greater than a critical threshold $T_{crit}$, no more members are created. $T_{crit}$ is chosen to be $1.8765 \times N$ seconds where $N$ is the number of points in the training set. The value of $T_{crit}$ was chosen so that a training set with 1024 points would take 32 minutes to train on [189].
+
+Ideally, it would be nice to use the time constraint to decide on the number of points to leave out in the cross validation process. However, since in practice the length of time taken by each run of the training algorithm may vary, and is not known in advance, the ideal method is not realisable. An approximation to the ideal method could be implemented by training on a small subset of the training data and using information about the scaling properties of the algorithm to make a decision about the dimension of the CV process. In practice I believe the method used here provides a reasonable solution to the choice of free parameters in the early stopping process.
+
+Table 5.1 shows the behaviour of algorithm `hme-ese-1` as the number of committee members are reduced for the task `Pumadyn-32nh/accel/std.64` (see Chapter 3). It seems that for this task increasing the number of committee members over 5 gives no significant improvement in loss. Up to 5 members, however, each new member gives a significant decrease in loss.
+
+{p67}
+:::table tab-5-1 | Table 5.1: **Effect of committee size on the performance of the `hme-ese-1` method.** The table shows the effect of the numbers of committee members on the performance of algorithm `hme-ese-1` on the task `Pumadyn-32nh/accel/std.64`. The $p$-values are the result of pairwise $t$-tests relative to the default committee with 40 members.
+| Members | Loss | Standard Error | $p$-value |
+| 1 | 0.00210 | 1.62 | 1.24e-08 |
+| 2 | 0.00177 | 1.37 | 1.47e-05 |
+| 3 | 0.00166 | 1.28 | 0.003 |
+| 4 | 0.00163 | 1.26 | 0.036 |
+| 5 | 0.00160 | 1.24 | 0.517 |
+| 6 | 0.00158 | 1.22 | 0.498 |
+| 10 | 0.00158 | 1.23 | 0.645 |
+| 20 | 0.00159 | 1.23 | 0.547 |
+| 30 | 0.00159 | 1.23 | 0.738 |
+| 40 | 0.00159 | 1.23 | N/A |
+
+## 5.3 Choosing the Number of Experts and Depth of Hierarchy
+
+One point I have missed out so far in the description of the `me-ese-1` and `hme-ese-1` methods is the specification of architecture: both the shape and depth of the mixtures and hierarchies. Both methods used fixed architectures, *i.e.,* the number of experts and gates is fixed in advance and remains the same throughout training and for each member of the committee.
+
+The number of experts and gates in each model is decided by balancing the number of parameters in the architecture and the number of points in the training set. This is a simple method for architecture selection used by Rasmussen [189] in his `mlp-ese-1` method for specifying the number of hidden nodes in a multi-layer perceptron.
+
+In the `me-ese-1` method only a mixture of experts is used, so only one gate is included. The number of experts $I$ is given by:
+
+$$ I = \frac{N}{(d+1)(k+1)} $$ (5.2)
+
+where $N$ is the number of training examples, $d$ is the dimension of $\bx$ and $k$ is the dimension of $\by$. In the `hme-ese-1` method a hierarchical mixture of experts is used. The number of branches at each node in the hierarchy is fixed at 2, *i.e.,* the architecture takes the form of a binary tree. In this case the free parameter is the depth of the tree, $M$, which is given by:
+
+$$ M = \frac{1}{\log 2} \left(\log(N + 2(d+1)) - \log(d+1) - \log(k+2)\right) $$ (5.3)
+
+It is interesting to note that the `me-ese-1` method will allocate proportionally more resources to expert networks than the `hme-ese-1` method which will allocate more gating networks.
+
+{p68}
+:::algo fig-5-2 | Figure 5.2: **The `me-ese-1` and `hme-ese-1` methods.**
+1. Randomly divide the training data into an estimation set and validation set in the ratio 2 : 1.
+2. Initialise a new committee member $\mathcal{H}$ using either a fixed width mixture with number of experts set by Equation 5.2 (for `me-ese-1`) or a fixed depth binary hierarchy with depth set by Equation 5.3 (for `hme-ese-1`).
+3. Set $iter = 0$.
+4. Perform an EM step of `ml-train` for $\mathcal{H}$ on the estimation set.
+5. If the error on the validation set $VE^{(iter)}(\mathcal{H})$ is less than the best error $VE^*(\mathcal{H})$, set $iter^* = iter$.
+6. Set $iter = iter + 1$.
+7. If [$iter < 30$ or (($iter < 1.5 \times iter^*$) and ($iter < 200$))] go to 4.
+8. If (time elapsed $> T_{crit}$ and number of committee members $> 3$) terminate, else go to 1.
+
+## 5.4 Summary
+
+This chapter has described two learning methods based on the theory of mixtures-of-experts outlined in Chapter 2 and Chapter 4 which are summarised in Figure 5.2. These two learning methods are based on early stopping using a fixed architecture. In Chapter 8 results on the DELVE data sets will be given for these methods. In Chapters 6 and 7 three more learning methods are described which address complexity control in different ways to the methods presented in this chapter.
