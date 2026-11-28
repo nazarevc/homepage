@@ -1,0 +1,193 @@
+number: 11
+title: Speaker Adaptation using Mixtures of Recurrent Neural Networks
+pdf: chapter-11.pdf
+first_page: 140
+---
+{p140}
+## 11.1 Introduction
+
+In this chapter I describe the application of the mixtures-of-experts framework to speaker adaptation within the ABBOT speech recognition system using a recurrent neural network as the acoustic model. Speaker adaptation is performed by learning a linear transform of the input data based on the performance of the acoustic model. I extend the linear input transformation method for speaker adaptation of Neto et al. [155] to a non-linear one. The new transform consists of a mixture of linear transforms gated by a multinomial logit model. This new transform is shown to have desirable properties and gives improved performance at the frame level. Tests on supervised adaptation of speakers also indicate significant improvements over the linear transform.
+
+The chapter is structured as follows. Section 11.2 reviews speaker adaptation. Section 11.3 introduces the recurrent network and describes its architecture and training algorithm. The linear transform method of adaptation is then introduced in Section 11.4. The extension to mixtures of linear transforms is then described in Section 11.5 and results presented.
+
+## 11.2 Speaker Adaptation
+
+The accuracy of automatic speech recognition systems may be affected by two major factors: external noise in the recording environment and speaker variability. The external noise in the recording environment may be caused for example by differences in the microphones used to record the speech or by extraneous signals such as other speakers or fan noise in the background. There are two major approaches to handling such noise: model compensation [65] and channel adaptation [128]. In this thesis only speaker variability is considered, although channel adaptation can be performed in a similar framework. Speaker variability may be caused by *inter*-speaker differences or by *intra*-speaker differences. Inter-speaker differences are caused by anatomical differences between speakers or by differences in speaking habit caused, for example, by the nationality or dialect of the speaker. Intra-speaker differ{p141}ences, on the other hand, are caused by factors such as the health and mood of the speaker. Ideally, an ASR system should be robust to both inter and intra speaker variability. One approach to achieving this aim is *speaker adaptation* which will now be described.
+
+ASR systems are either speaker dependent (SD) or speaker independent (SI). For SD systems the training corpus contains data from just one speaker, whereas for an SI system the corpus contains a range of different speakers. As a result an SD system is typically more accurate for its specific speaker than an SI system would be, but the SI system is more flexible. However, it is generally infeasible to collect enough data to train large SD systems reliably for a single speaker from scratch and so some form of mapping of the speech or models is used. In an attempt to bridge the gap between SD and SI systems, two approaches have been used: *speaker normalisation* and *speaker adaptation*. Speaker normalisation attempts to mimic the supposed process that occurs within the human auditory system. Humans are able to recognise many different speakers in different contexts and environments, suggesting that a process of normalisation of the speech occurs. Speaker normalisation attempts to learn a mapping of the speech for any speaker to a space of normalised speech. The recogniser then is trained on this normalised speech. In spite of the attractiveness of this approach, there is a problem in the amount of variation between speakers such that finding a good general mapping is difficult. In contrast, speaker adaptation attempts to learn a separate mapping for each speaker. The specific mapping is produced by using a sample of speech for the speaker. All further recognition for this speaker then uses this mapping. Speaker adaptation has emerged as the more successful of the two approaches and will be considered further in the remainder of this chapter. Speaker normalisation is not considered further here.
+
+There are two main approaches to speaker adaptation: transformation of the speech or transformation of the model parameters. Speaker adaptation can also be performed in several different ways depending on the purpose of the adaptation system. In speaker adaptation, a speaker first provides an adaptation sample of speech. If a reference transcription for this sample is available, the adaptation is known as *supervised*; otherwise, it is known as *unsupervised*. In addition, the adaptation sample may be used in two ways: block adaptation or incremental adaptation. In block adaptation, all the adaptation data is presented to the adaptation system before any adaptation is performed. In incremental adaptation, the system begins to adapt itself as soon as data is presented and subsequently refines its adaptation as more data is seen.
+
+Previous approaches to speaker adaptation can be separated into [127]:
+
+- **Speaker Clustering**: In this approach the speakers are clustered into different groups. The data in these groups are used to train different models. According to the group which a new speaker falls into, the appropriate model is selected for recognition. Although some good results have been shown by Kosaka and Sagayama [121], speaker clustering suffers from similar problems as speaker normalisation, namely that the variability within each cluster may be too great and also that the new speaker may not be represented within the set of clusters.
+- **Spectral Transformations**: In this approach the aim is to map the speech for a new speaker to the speech that the recogniser was trained on. Typically a linear transform is used to map the speech. Spectral transformations have been shown to be successful by Zhao [257]. The linear input network transform of Neto et al. [155] considered in this chapter is an example of this type of approach.
+- **Bayesian Adaptation**: In this approach, which was proposed by Gauvain and Lee [66], the parameters of hidden Markov models are adapted using Bayesian inference. In the simplest case the priors are derived from the parameters of the SI system and used in conjunction with the adaptation data to maximise the a-posteriori probability of the models.
+- **Model Parameter Transformations**: In this approach the parameters of hidden Markov models are transformed, typically by a linear transform which is learnt from the adaptation data. These are the most popular adaptation approaches in current state of the art systems. The most prominent model parameter transformation technique is the maximum likelihood linear regression (MLLR) method of Leggetter and Woodland [128]. MLLR was used extensively in the state of the art HMM system of Woodland et al. [247].
+
+{p142}
+:::figure fig-11-1 | Figure 11.1: **The recurrent network architecture used in ABBOT.** See Section 11.3 for more details.
+
+## 11.3 Recurrent Neural Networks for Speech Recognition
+
+The recurrent neural network (RNN) is a natural method for modelling time varying signals. A number of different variants of RNNs have been proposed in the neural network literature [*e.g.,* 50, 107]. In the RNN of Robinson [198] which is used in ABBOT, the input consists of two components: the standard input $\bx^{(n)}$ and a state input $\boldsymbol{s}^{(n)}$. The network consists of fully connected links from these input units to the output units. This is shown schematically in Figure 11.1. The output of the RNN consists of two components: the prediction of the target $\hat{\by}^{(n)}$ and the output state vector $\boldsymbol{s}^{(n+1)}$. The output state vector is fed back to the input state units after a unit time delay. The prediction component $\hat{\by}^{(n)}$ is the set of probabilities for each of the $k$ phones:
+
+$$ \hat{y}_i^{(n)} = P(q_k|\bx^{(0)}, \ldots, \bx^{(n)}, \bth, \boldsymbol{\omega}) $$ (11.1)
+
+{p143}
+:::figure fig-11-2 | Figure 11.2: **An expanded recurrent network.** The input $\bx^{(0)}$ and state $\boldsymbol{s}^{(0)}$ at time 0 feed through the network to produce the output $\hat{\by}^{(0)}$ and the next state $\boldsymbol{s}^{(1)}$.
+
+where $\bth$ and $\boldsymbol{\omega}$ are matrices of parameters. $\bth$ connects the input and state input units to the output units. $\boldsymbol{\omega}$ connects the input and state input units to the state output units. If we represent the combined input $\bx^{(n)}$ and $\boldsymbol{s}^{(n)}$ by:
+
+$$ \boldsymbol{u}^{(n)} = \left[ 1\; \bx^{(n)T}\; \boldsymbol{s}^{(n)T} \right]^T $$ (11.2)
+
+we get the following expression for the prediction $\hat{y}_i^{(n)}$:
+
+$$ \hat{y}_i^{(n)} = \frac{\exp(\bth_i^T \boldsymbol{u}^{(n)})}{\sum_j \exp(\bth_j^T \boldsymbol{u}^{(n)})} $$ (11.3)
+
+where the sum is over all the $k$ classes. The state output $s_j^{(n+1)}$ is given by:
+
+$$ s_j^{(n+1)} = \frac{1}{1 + \exp(-\boldsymbol{\omega}_j^T \boldsymbol{u}^{(n)})}. $$ (11.4)
+
+The RNN used in the standard ABBOT system uses 12th order PLP feature vectors without any delta coefficients or windowing (unlike the MLP of Chapter 10). The RNN contains 256 state units giving a total of 83,700 parameters.
+
+### Training the RNN
+
+The problems of training recurrent networks are similar to those of static multi-layer perceptrons. Although there exist targets $\by^{(n)}$ for the outputs $\hat{\by}^{(n)}$, there are no targets for the state variables $\boldsymbol{s}^{(n)}$. This is a problem of credit assignment, in that it is not obvious what values of the state variables lead to the desired output $\by^{(n)}$. The method used to solve this problem is back-propagation through time (BPTT) [245]. Back-propagation through time involves expanding the recurrent network out over $N$ time intervals so that it resembles an MLP with $N$ layers. This idea is shown schematically in Figure 11.2. Training of the expanded RNN may then be carried out via back-propagation with the additional constraint that the parameters of adjacent hidden layers are tied. Optimisation may then be carried out using any standard gradient based scheme.
+
+The actual optimisation scheme used in the RNN of ABBOT is similar to the RProp algorithm of Schiffmann et al. [211] and delta bar delta algorithm of Jacobs [97] but was developed independently by
+{p144}Robinson [198]. For a parameter vector $\bth$ the algorithm takes the following form. The objective function $E$ is the cross entropy between the targets and the predictions of the network. For each iteration of the algorithm a local gradient of the objective function is computed, $\partial E^{(t)}/\partial \theta_i^{(t)}$, from the training data in the $t$th subset of the training data. This local gradient is smoothed using a momentum term:
+
+$$ \frac{\partial \tilde{E}^{(t)}}{\partial \theta_i^{(t)}} = \alpha^{(t)} \frac{\partial \tilde{E}^{(t-1)}}{\partial \theta_i^{(t-1)}} + (1 - \alpha^{(t)}) \frac{\partial E^{(t)}}{\partial \theta_i^{(t)}}. $$ (11.5)
+
+where the smoothing parameter, $\alpha^{(t)}$, is increased from $\alpha^{(0)} = 1/2$ to $\alpha^{(\infty)} = 1 - 1/N$ by
+
+$$ \alpha^{(t)} = \alpha^{(\infty)} - (\alpha^{(\infty)} - \alpha^{(0)}) e^{-t/2T}, $$ (11.6)
+
+where $T$ is the number of parameter updates made in each pass through the training data.
+
+Given this smoothed local gradient, a step size $\Delta\theta_i^{(t)}$, is computed for every parameter. Each parameter is updated by its step size in the direction of the smoothed local gradient,
+
+$$ \theta_i^{(t+1)} = \begin{cases} \theta_i^{(t)} + \Delta\theta_i^{(t)} & \text{if } \dfrac{\partial \tilde{E}^{(t)}}{\partial \theta_i^{(t)}} > 0, \\ \theta_i^{(t)} - \Delta\theta_i^{(t)} & \text{otherwise.} \end{cases} $$ (11.7)
+
+If the direction of the local gradient is in agreement with the smoothed gradient, the step size is geometrically increased by a factor of $\phi$ otherwise it is geometrically decreased by a factor of $1/\phi$,
+
+$$ \Delta\theta_i^{(t+1)} = \begin{cases} \phi \Delta\theta_i^{(t)} & \text{if } \dfrac{\partial \tilde{E}^{(t-1)}}{\partial \theta_i^{(t-1)}} \dfrac{\partial E^{(t)}}{\partial \theta_i^{(t)}} > 0 \\ \frac{1}{\phi} \Delta\theta_i^{(t)} & \text{otherwise.} \end{cases} $$ (11.8)
+
+The factor $\phi$ is set to 1/0.9 which ensures that random gradients produce little overall change to the search. The size of each block of data that is observed before an update is made is 2880 frames.
+
+## 11.4 Speaker Adaptation within ABBOT
+
+Speaker adaptation is the process of adapting a speaker independent (SI) recogniser to a new speaker. Another use of adaptation is to adapt a recogniser to new environments such as a new microphone or more noisy recording environment. This is known as *channel* adaptation. In order to perform speaker and channel adaptation, ABBOT uses the linear input network (LIN) adaptation technique of [155]. The LIN makes a linear transform of the acoustic vector which is then fed to the standard acoustic model, as shown in Figure 11.3. The aim is to learn a transform without retraining the original acoustic model. To train the LIN for a new speaker, the LIN parameters are initialised to an identity matrix; this guarantees that the initial starting point is the speaker independent model. The input is propagated forward to the output of the connectionist model. At this point the error is back-propagated through the connectionist model keeping the RNN parameters fixed, and only updating the LIN's parameters.
+
+Neto et al. [155] compared a number of methods for adapting connectionist models (both MLPs and RNNs) and showed that the LIN method has two benefits. Firstly the LIN transform can be learnt more {p145}
+
+:::figure fig-11-3 | Figure 11.3: **Speaker adaptation via the linear input network (LIN).** The original acoustic vector $\bx^{(n)}$ is transformed by the LIN to the vector $\bar{\bx}^{(n)}$ which is used as input to the RNN.
+
+quickly than retraining the original acoustic model and secondly is actually more accurate on average. The LIN is relatively efficient in parameters using $(d+1)^2$ parameters to transform a $d$ dimensional acoustic vector. On a supervised adaptation task with 100 adaptation sentences from the RM database, Neto et al. [155] demonstrated an average reduction of 35% in word error rate over a baseline MLP acoustic model and 24% over a baseline RNN acoustic model.
+
+In this chapter I consider the use of the LIN for speaker adaptation of the RNN acoustic model in ABBOT. This builds on the work of Kershaw et al. [118] who used the LIN successfully in the 1995 ARPA evaluations for channel adaptation to unknown microphone and noise environments.
+
+## 11.5 Mixtures of Local Linear Transforms
+
+Although the LIN is effective at adapting to new speakers or a new environment (*e.g.,* a different microphone), the transform is global over the input space. In this section I describe a method in which the transform is *locally* linear over different regions of the input space. The local linear transforms are combined by an additional network using a non-linear transform. This scheme falls naturally into the mixtures-of-experts framework. I call this method the *mixture of linear input networks* or MLIN.
+
+One motivation for the use of the MLIN is the success of local adaptation techniques in hidden Markov models [128]. In HMMs the local regions are selected according to sets of similar phone classes which are clustered using a set of phonetic rules. The selection of local regions based on similar phone classes is not possible with the recurrent network, because the RNN is a dynamical system requiring a continuous input stream.
+
+Figure 11.4 shows the architecture of this mixture of linear input networks (MLIN). The gate consists of a single layer network with softmax activation function. Each expert consists of a linear input network followed by a recurrent network. The recurrent network parameters are shared across all experts and are not adapted during training. Each LIN is distinct however, so that individual linear transforms can be performed by each of the experts. The gate combines the outputs of each of the experts (after the recurrent network portion) which are class conditional probability estimates. The overall output is given {p146}
+
+:::figure fig-11-4 | Figure 11.4: **A mixture of 2 linear input networks (MLIN) for adapting the recurrent network.**
+
+by:
+
+$$ \hat{\by}^{(n)} = \sum_i g_i^{(n)} \hat{\by}_i^{(n)} $$ (11.9)
+
+where $\hat{\by}_i^{(n)}$ is the output of each expert and $g_i^{(n)}$ is the $i$th output of the gate. If the output of the RNN is represented as a function of the input, $f(\bx^{(n)})$, this can be rewritten as:
+
+$$ \hat{\by}^{(n)} = \sum_i g_i^{(n)} f(\bw_i^T \bx^{(n)}) $$ (11.10)
+
+where $\bw_i$ is the parameter matrix of expert $i$.
+
+Before training, the parameters of the LINs in each expert are initialised to diagonal matrices with random parameters between 0.95 and 1.05. The gate parameter matrix is initialised using random values between $-0.5$ and 0.5. This randomisation ensures symmetry breaking and prevents the experts all learning the same transform.
+
+During training of the MLIN the current input $\bx^{(n)}$ is propagated forward through each LIN and RNN expert to give an error term at the output of each expert $e_{ic} = y_c - \hat{y}_{ic}$. This term is then weighted by the posterior probability of each expert:
+
+$$ \varphi_i^{(n)} = \frac{g_i^{(n)} \exp\left(\sum_{c=1}^{k} y_c^{(n)} \log \hat{y}_{ic}^{(n)}\right)}{\sum_j g_j^{(n)} \exp\left(\sum_{c=1}^{k} y_c^{(n)} \log \hat{y}_{jc}^{(n)}\right)} $$ (11.11)
+
+where $y_c^{(n)}$ is the target for class $c$ at time $n$ and $\hat{y}_{ic}^{(n)}$ is the conditional probability of class $c$ given by expert $i$. This gives an error $\varphi_i^{(n)} e_i$ which is then back-propagated through the RNN using the scheme described in Section 11.3.
+
+{p147}
+The gate error terms are based on the difference between the posterior probability of each expert $\varphi_i^{(n)}$ and the gate's estimate of this probability $g_i^{(n)}$:
+
+$$ \frac{\partial E}{\partial \bv_i} = \sum_n (\varphi_i^{(n)} - g_i^{(n)}) \bx^{(n)}. $$ (11.12)
+
+The expert and gate parameters are optimised using these gradients and the optimisation algorithm described in Section 11.3.
+
+Note that the MLIN does not increase the number of parameters significantly, since the RNN is effectively tied across the different experts. The computational cost of training is increased slightly however, due to the need to back-propagate the error terms through each copy of the RNN.
+
+## 11.6 Results
+
+In this section I describe results of evaluations using the LIN and MLIN adaptation models on the ARPA 1995 H3 multiple unknown microphones (MUM) Task. I chose the et\_h3\_c0 subset of the H3 task described in Table 9.3 of Chapter 9. This is the 1995 H3 MUM unlimited vocabulary test recorded using a Sennheiser microphone. I considered two tasks: supervised adaptation using enrolment sentences, and unsupervised adaptation.
+
+For supervised adaptation 10 speakers were chosen from the H3 database which had 40 enrolment sentences each. For each speaker the recogniser is adapted to the enrolment sentences using the transcriptions of these sentences as targets. After adaptation the recogniser was then tested on 15 unseen sentences for each speaker.
+
+For the unsupervised adaptation task 20 speakers were chosen from the H3 database, with 15 sentences per speaker. The task in unsupervised adaptation is to improve the accuracy of the recogniser for new speakers *without* seeing the transcription of the speech. Although this is called unsupervised adaptation, it is similar to supervised adaptation with the difference that the reference transcript is replaced by a transcript guessed by the recogniser. In order to get labels for each frame in the adaptation sentences a Viterbi alignment is performed initially using the untrained MLIN, whose performance is similar to the baseline recogniser. After adapting the MLIN model to this set of labels a new alignment is performed using the MLIN model. The MLIN model is then adapted to this new alignment. This process is iterated until there is no change in the alignment hypotheses from one adaptation pass to the next. This typically converges in 2 to 3 iterations. This process is known as unsupervised *block* adaptation since the whole block of data is seen before adaptation is performed. This is distinct from *on-line* adaptation in which adaptation must be done as soon as data arrives.
+
+### Supervised adaptation
+
+For each speaker, the recogniser was adapted to the enrolment sentences using 30 sentences for adaptation and 10 for cross validation. Early stopping (based on the frame accuracy) on the validation set was used to control the learning of the system in the following way. After each pass through the adaptation
+{p148}sentences the frame accuracy of the recogniser on the validation sentences was evaluated. A minimum of 7 passes through the data were made and the best accuracy chosen out of these 7 models. If the best model was found on the 7th pass, a further 7 passes were made until the error on the validation set reached a minimum. Typically the best model was found after 5 passes.
+
+:::table tab-11-1 | Table 11.1: **Word error rates of different acoustic models for supervised adaptation.** The table shows the decoding performance on the supervised adaptation task using a single LIN, and MLINs with 2, 3, 4 and 5 experts. The improvements of each model are significant over the simpler models at a 5% level using the NIST scoring software (see Section 9.3 for details) except for MLIN\_4 and MLIN\_3 whose results are not significantly different.
+| Model | Substitutions | Deletions | Insertions | WER |
+| RNN | 12.2% | 3.3% | 2.4% | 17.8% |
+| LIN | 11.4% | 3.0% | 2.1% | 16.6% |
+| MLIN\_2 | 10.7% | 2.9% | 2.1% | 15.7% |
+| MLIN\_3 | 10.5% | 2.8% | 2.0% | 15.3% |
+| MLIN\_4 | 10.6% | 2.9% | 1.8% | 15.3% |
+| MLIN\_5 | 10.2% | 2.7% | 1.9% | 14.9% |
+
+The results of the baseline system (RNN), single linear input network (LIN) and mixtures of 2 to 5 experts (MLIN\_2 to MLIN\_5) are shown in Table 11.1. These results suggest that the MLIN method gives a significant improvement over the simple LIN adaptation method. The largest model considered here, MLIN\_5 gives a relative improvement over the LIN method of 10%.
+
+### Unsupervised Adaptation
+
+In unsupervised adaptation the MLIN models were adapted to the hypothesised transcriptions obtained from the baseline model. In the first instance this was the RNN model. After subsequent adaptation passes, the resulting adapted models were used to align the speech. These alignments were then used as hypothesised transcriptions in the next adaptation pass. In each adaptation pass the models were trained using the same cross validation scheme described for the supervised adaptation task, with 10 sentences chosen for adaptation and 5 for validation.
+
+Table 11.2 shows the error rates using different models and different numbers of adaptation passes. Whilst the MLIN models give an overall decrease in word error rate (MLIN\_5 gives a 6.7% relative improvement over LIN), the improvement is not as uniform as for the supervised adaptation. In addition, in some cases, *e.g.,* MLIN\_2 and LIN after 2 passes of adaptation, the performance degrades as the number of parameters in the models is increased. In order to investigate this behaviour in more detail I examined the phone error rates at a frame level. These are relative to the hypothesised transcription in each case and are shown in Table 11.3. As this table shows the more complex models have lower frame error rates *relative* to the hypothesised transcription. As the word error rates suggest, however, this hypothesised transcription is sometimes in error.
+
+This effect can be likened to a game of Chinese whispers. If the final person in the chain listens {p149}
+
+:::table tab-11-2 | Table 11.2: **Word error rates of different acoustic models for unsupervised adaptation.** The table shows the decoding performance on the H3 task using a single LIN, MLIN with between 2 and 5 experts (MLIN\_2 to MLIN\_5). The number of passes of adaptation for each model is shown, along with the percentage of substitutions, deletions, insertions and overall word error rate (WER). Only the results for 3 passes are shown since there are no further significant improvements for any of the models after this number.
+| Model | Passes | Substitutions | Deletions | Insertions | WER |
+| RNN | 0 | 13.1% | 2.9% | 2.1% | 18.1% |
+| LIN | 1 | 11.7% | 2.7% | 2.1% | 16.5% |
+| LIN | 2 | 11.2% | 2.6% | 2.1% | 15.9% |
+| LIN | 3 | 11.1% | 2.6% | 2.1% | 15.8% |
+| MLIN\_2 | 1 | 11.7% | 2.7% | 2.1% | 16.5% |
+| MLIN\_2 | 2 | 11.4% | 2.6% | 2.1% | 16.1% |
+| MLIN\_2 | 3 | 11.3% | 2.6% | 2.1% | 16.0% |
+| MLIN\_4 | 1 | 11.2% | 2.6% | 2.1% | 15.9% |
+| MLIN\_4 | 2 | 11.1% | 2.6% | 2.1% | 15.8% |
+| MLIN\_4 | 3 | 10.9% | 2.6% | 2.1% | 15.6% |
+| MLIN\_5 | 1 | 11.0% | 2.5% | 2.1% | 15.6% |
+| MLIN\_5 | 2 | 10.9% | 2.5% | 2.1% | 15.5% |
+| MLIN\_5 | 3 | 10.8% | 2.5% | 2.1% | 15.4% |
+
+:::table tab-11-3 | Table 11.3: **Frame error rates of different acoustic models for unsupervised adaptation.** The table shows the phone error rate at the frame level relative to the hypothesised transcriptions on the H3 task using a single LIN model and MLIN models with 2, 4 and 5 experts (MLIN\_2, MLIN\_4, MLIN\_5).
+| Model | Passes | Frame Error Rate |
+| RNN | 0 | 22.8% |
+| LIN | 3 | 19.9% |
+| MLIN\_2 | 3 | 18.9% |
+| MLIN\_4 | 3 | 18.0% |
+| MLIN\_5 | 3 | 17.8% |
+
+{p150}
+:::figure fig-11-5 | Figure 11.5: **Change in word error rate per speaker for unsupervised learning.** The figure shows the improvement of word error rate per speaker using a single LIN, a mixture of 2 LINs, and a mixture of 4 LINs, after a third pass of adaptation.
+
+harder then the accuracy of their guess may be improved, but this may still be the wrong guess that they are learning. By improving the transform used in adaptation, significant improvements in error rate for some speakers are achieved at the expense of degradations in others. The MLIN makes a better job of transforming the input for both the correctly and incorrectly transcribed frames than the LIN does. This effect is demonstrated in Figure 11.5 which shows the improvement or degradation per speaker after different adaptation schemes. The speakers for which adaptation degraded word error rates correspond to those for which the speaker independent system (RNN) gave very crude initial alignments.
+
+## 11.7 Conclusions
+
+This chapter has shown that the mixtures-of-experts framework can be effectively incorporated into the ABBOT system using recurrent networks. I have described how the linear input network adaptation scheme can be augmented using mixtures of linear input networks and recurrent networks (MLIN). I have demonstrated significant improvements on both supervised and unsupervised adaptation tasks from the WSJ database. These results suggest that the MLIN is an effective method for performing adaptation in connectionist HMM hybrids. The results must be taken with caution, however, in the case of unsupervised adaptation since it seems that more complex models such as the MLIN can cause degradation in the per speaker error rates.
+
+There are a number of possible future directions for this work. Instead of performing speaker adaptation with the MLIN, channel adaptation is also possible. Prior knowledge could then be used to initialise {p151}each LIN to a particular speaker before training the MLIN. This could enable faster training and a more effective adaptation overall. Alternatively, the mixtures of RNNs could be used for recognition alone rather than adaptation. A more attractive architecture could be a mixture of multinomial logit experts gated by a recurrent network which is a further generalisation of the work presented here. This structure is then akin to the IOHMM of Bengio and Frasconi [10] and the HMDT of Jordan et al. [110].

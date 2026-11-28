@@ -47,3 +47,6 @@ Changes from the 1997 text. Typographical slips fixed silently are listed too, s
 - 10.4: "evaluated on four different tests" lists five test sets; kept as printed in the list, and "using 5 different acoustic models" -> "6" (Table 10.1 has six columns).
 - 10.4: "a dedicate fixed point processor" -> "dedicated".
 - 10.4, Table 10.1: the best result in each row is set in bold (the text names Boost+Mixed as best on all sets).
+- 11.1: "using a recurrent neural network as the acoustic" -> "as the acoustic model"; chapter outline now mentions Section 11.2.
+- 11.2: "attempts to the mimic" -> "attempts to mimic"; "the remained of this chapter" -> "remainder"; "the adaptation begins to adapt itself" -> "the system begins to adapt itself"; "Gauvian and Lee" -> "Gauvain and Lee".
+- 11.6: "this process is known as" -> "This process"; Table 11.3 caption listed "2 and 4 experts (MLIN_2, MLIN_4)" but the table also has MLIN_5; caption updated.
