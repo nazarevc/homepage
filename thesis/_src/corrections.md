@@ -24,3 +24,9 @@ Changes from the 1997 text. Typographical slips fixed silently are listed too, s
 - 6.2: a sentence pointing to Figure 6.7 is added after the speed comparison; the original never cites Figure 6.7 in the text.
 - 6.2, Figure 6.3: "weighted by $\zeta^{(n)}$" -> "weighted by $\zeta_p^{(n)}$" (the parent's posterior, as defined in the same figure).
 - 6.2, Figure 6.4 caption: "(shown with dots) is which is" -> "(shown with dots), which is".
+- 7.1: "when cross validation and committees used" -> "when cross validation and committees are used".
+- 7.2: "the simply the covariance" -> "simply the covariance"; "which is expected due the use" -> "due to the use"; "such as that that used by" -> "such as that used by"; "various approximation suggested" -> "various approximations suggested".
+- 7.2: Equation 7.29 contained a stray "Z" in the integrand, removed; Equation 7.39 and 7.50 show the means $\bar{\bw}_j$, $\bar{\bv}_j$ as the text defines.
+- 7.2, multinomial logit experts: "is given by: given by:" -> "is given by:".
+- 7.3: "I denote this methods" -> "I denote these methods"; "early stopping method of `me-ese-1` and `hme-ese-1` of Chapter 4" -> "of Chapter 5".
+- 7.3, Figure 7.4: "1.8765 * N/4" written as "1.8765 x N/4".

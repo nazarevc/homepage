@@ -1,0 +1,390 @@
+number: 7
+title: Bayesian Methods for Mixtures of Experts
+pdf: chapter-07.pdf
+first_page: 85
+---
+{p85}
+## 7.1 Introduction
+
+Complexity control, in the form of preventing over-fitting, is a key issue in machine learning. In Chapters 5 and 6 I described methods for controlling the complexity of mixture of experts models based on early stopping via cross validation in either fixed (Chapter 5) or adaptive architecture models (Chapter 6). Early stopping can be an effective method for complexity control, as was shown empirically in Chapters 5 and 6, and in more detail in Chapter 8, via experiments on the DELVE data sets. However, early stopping has a number of critics in the literature. One of the cited disadvantages of early stopping is the fact that some training data must be left aside for validation. This is a somewhat obscure point, especially when cross validation and committees are used, since all the training data is used in the committee. Also, although the validation data is not used to actually train the parameters of the models, it is used to control the complexity, and is thus effectively used for training. The second most commonly cited criticism of early stopping is that the resulting search path through complexity space is not a good one, in the sense that some parameters of the model are less well trained than others. Hopefully, the use of cross validation and committees averages over this latter effect, leading to well trained models. However, there remains some doubt as to whether the models resulting from early stopping, even when using committees and cross validation, are actually good models, and whether a better scheme could be used.
+
+In this chapter I describe an alternative method for controlling complexity of mixtures-of-experts models. This approach aims to use all the available training data to infer the parameters of the models and also to control the model complexity. The approach used is Bayesian in flavour and owes much to the evidence framework of MacKay [133] and the variational free energy view of the EM algorithm of Neal and Hinton [154]. I use *ensemble learning*, a technique originally proposed by Hinton and van Camp [87] and subsequently extended by MacKay [136], to motivate an alternating minimisation procedure that combines the standard EM training algorithm with re-estimation of hyper-parameters of priors on gate and expert parameters.
+
+The outline of this chapter is as follows. I separate the chapter into two overall parts, the *theory* of ensemble learning and Bayesian methods for mixtures-of-experts is described in Section 7.2 whereas the *implementation* of this theory in two learning methods, `me-el-1` and `hme-el-1`, is covered in {p86}Section 7.3. Finally, related work in this area is discussed in Section 7.4.
+
+## 7.2 Background Theory
+
+This section describes the background theory of ensemble learning in mixtures-of-experts. It is organised in the following way. First, I discuss the possible priors which can be used in a mixtures-of-experts model and introduce the specific priors which I use in this chapter. I then introduce the concept of ensemble learning and show how it can be used for learning from data in mixtures-of-experts. Following this I describe how prediction can be performed in the presence of priors.
+
+### Priors for mixtures-of-experts models
+
+The choice of priors for a model is an important one in Bayesian inference. Priors embody the assumptions about such aspects as the generative processes in the data, form of the model and shape or desired accuracy of the output function. The priors on a model are typically placed either on the structure, the output function or the parameters. In this chapter I consider priors on the parameters only.
+
+The mixtures-of-experts model is implicitly a modular architecture in which the parameters of the experts and gate may be assumed to be independent. This assumption motivates the use of a separable prior distribution on the parameters of the experts and gate. In addition, I use separate priors on each parameter vector of the experts and gates which is similar to the framework described by MacKay [133] for multi-layer perceptrons. This yields an overall separable prior on the parameters of the model. In the simple case of a mixture of $I$ experts, this prior is given by:
+
+$$ P(\bv, \bw|\mu, \alpha) = \prod_{i=1}^{I} P(\bv_i|\mu_i) \prod_{l=1}^{k} P(\bw_{il}|\alpha_{il}) $$ (7.1)
+
+where $i$ indexes the $I$ experts in the model, and $l$ indexes the $k$ outputs of each expert. The prior for each expert parameter vector $\bw_{il}$ is parameterised by a hyper-parameter $\alpha_{il}$. Each gate parameter vector $\bv_i$ has a hyper-parameter $\mu_i$. Given this form for the overall priors on the model parameters, how do we choose priors for these parameters? In this chapter I use zero mean Gaussian priors on each distinct parameter vector $\bw_{il}$ and $\bv_i$. Gaussian priors correspond to the traditional method of ridge regression [90] in statistics or weight decay [86] in neural networks. For expert parameter vector $\bw_{il}$ the prior is given by:
+
+$$ P(\bw_{il}|\alpha_{il}) = \left(\frac{\alpha_{il}}{2\pi}\right)^{d/2} \exp\left(-\frac{\alpha_{il}}{2} \bw_{il}^T \bw_{il}\right), $$ (7.2)
+
+and for gate parameter vector $\bv_i$ the prior is given by:
+
+$$ P(\bv_i|\mu_i) = \left(\frac{\mu_i}{2\pi}\right)^{d/2} \exp\left(-\frac{\mu_i}{2} \bv_i^T \bv_i\right). $$ (7.3)
+
+The hyper-parameters $\mu_i$ and $\alpha_{il}$ represent the reciprocal of the variance of these Gaussian distributions. Small values for the hyper-parameters therefore imply wide priors for the parameters. Large values imply tight priors, constraining the parameters to be close to 0.
+
+{p87}
+:::figure fig-7-1 | Figure 7.1: **Belief network for the mixtures-of-experts with priors in the case of regression.**
+
+In the case of linear regression I also place a prior on the variance for each expert. For the variance of an expert $\E_i$ I use the same Gamma hyper-prior on $\log \beta_i$ as in Section 4.3:
+
+$$ P(\log \beta_i|\rho, \upsilon) = \frac{1}{\Gamma(\rho)} \left(\frac{\beta_i}{\upsilon}\right)^{\rho} \exp(-\beta_i/\upsilon), $$ (7.4)
+
+where $\upsilon, \rho$ are the *hyper*-hyper-parameters which specify the range in which the noise levels $\beta_i$ are expected to lie as described in Section 4.3. Once again I set the hyper-parameters to the fixed values given in Section 4.3. Unlike the hyper-parameters of the gate and expert parameter vectors, I do not attempt to infer the variance hyper-parameters $\upsilon$ since these parameterise only a single variable $\beta$. Once again, as in Chapter 4 the Gamma prior is used mostly as a computational device, to avoid the possibility of singularities in the variance estimate when the number of observations at an expert is very small.
+
+Potentially, Gamma priors could also be placed on the hyper-parameters $\mu_i$ and $\alpha_{il}$ since these are also scale parameters [13]. This was done by MacKay [136] in his presentation of ensemble learning for linear regression, and also suggested by Neal [153] for Markov chain Monte-Carlo methods for multi-layer perceptrons, although this is not considered here.
+
+Combining the priors with the distributions for data and missing data gives the following posterior distribution for a mixtures-of-experts model for regression:
+
+$$ \begin{aligned} P(\bw, \bv, \alpha, \beta|X, Y) = &\prod_{i=1}^{I} P(\bv_i|\mu_i) P(\bw_i|\alpha_i) P(\beta_i|\rho, \upsilon) \\ &\prod_{n=1}^{N} P(z_i^{(n)} = 1|\bx^{(n)}, \bv_i) P(\by^{(n)}|\bx^{(n)}, z_i^{(n)} = 1, \bw_i, \beta_i) \end{aligned} $$ (7.5)
+
+This framework is represented in the belief network of Figure 7.1. Comparing this to Figure 2.2 we can see that the parameters $\bw$, and $\bv$ have been introduced, as well as the hyper-parameters $\alpha$, $\beta$ and $\mu$.
+
+### Ensemble learning for mixtures-of-experts
+
+Given the specification of priors for the mixtures-of-experts model, many possible methods for inference of the parameters exist. If we simply fixed the hyper-parameters to particular values and inferred the parameters, we would get *maximum a-posteriori* (MAP) estimates of the parameters. Whilst this approach is possible in some circumstances and for certain types of models, it is generally difficult to choose the {p88}values for the hyper-parameters in advance, especially when there are many such hyper-parameters as in this model. Alternatively we can adopt a *Bayesian* method for inferring the parameters *and* hyper-parameters of the model.
+
+There are broadly two approaches to Bayesian inference in neural networks, that which uses approximations to integrals [29, 133] and another based on Markov chain Monte Carlo methods to find integrals numerically [153]. Bishop [14] gives a good review and tutorial on this area. In this chapter I use an approach to Bayesian inference which is motivated by the evidence framework of MacKay [133]. Other motivations include the ensemble learning method of Hinton and van Camp [87] and MacKay [136], the EM viewpoint of Neal and Hinton [154] and the mean field theory method of Saul and Jordan [209]. Whilst it is acknowledged that many Bayesian methods could be used for the mixtures-of-experts, I attempt in this chapter to generalise the maximum likelihood method described in Chapter 2 in a logical way. Hopefully this will allow the attractive properties of the EM based learning algorithm of Jordan and Jacobs [112] to be retained.
+
+The starting point for the framework is the EM algorithm viewpoint of Neal and Hinton [154]. In this section I reproduce Neal and Hinton's argument in a slightly more general form by considering a prior distribution over parameters $P(\bth|\boldsymbol{\phi})$, where $\boldsymbol{\phi}$ is a set of hyper-parameters for this prior. I assume the following decomposition of the joint distribution:
+
+$$ P(\bth, \boldsymbol{\phi}, Z, D) = P(\bth|\boldsymbol{\phi}) P(\boldsymbol{\phi}) P(Z, D|\bth). $$ (7.6)
+
+In the mixtures-of-experts model the parameters $\bth$ encompass the expert parameters $\bw$ and gate parameters $\bv$. The hyper-parameters $\boldsymbol{\phi}$ encompass the expert and gate complexity hyper-parameters $\alpha$ and $\mu$ and the expert noise hyper-parameters $\beta$ in the case of regression. The data $D$ is the set of input and target data: $D = (X, Y)$, and the missing data $Z$ is the set of node assignments $\{z_j^{(n)}\}_{n=1}^N$ for all nodes $\E_j$. The complete data $P(Z, D|\bth)$ in the mixtures-of-experts model is given by:
+
+$$ P(Z, D|\bth) = \prod_n \prod_i [P(\by^{(n)}|\bx^{(n)}, z_i^{(n)} = 1, \bw_i) P(z_i^{(n)} = 1|\bx^{(n)}, \bv_i)]^{z_i^{(n)}} $$ (7.7)
+
+where the product is over all discrete choices of $Z$.
+
+Following the framework of MacKay [136] I approximate the posterior distribution $P(\bth, \boldsymbol{\phi}, Z|D)$ by a distribution $Q(\bth, \boldsymbol{\phi}, Z)$. In order to measure the quality of the approximation I use the *variational free energy* $F$:
+
+$$ F(\bth, \boldsymbol{\phi}, Z) = -\int Q(\bth, \boldsymbol{\phi}, Z) \log\left[\frac{P(\bth, \boldsymbol{\phi}, Z, D)}{Q(\bth, \boldsymbol{\phi}, Z)}\right] d\bth\, d\boldsymbol{\phi}\, dZ. $$ (7.8)
+
+The free energy function $F$ is a central concept in statistical physics. If we take the values of $Z$, $\bth$ and $\boldsymbol{\phi}$ to represent physical states, the energy of each state is given by $P(\bth, \boldsymbol{\phi}, Z|D)$. The free energy is also equivalent to the Kullback-Leibler distance [123], [14, pp. 59] between $Q(\bth, \boldsymbol{\phi}, Z)$ and $P(\bth, \boldsymbol{\phi}, Z, D)$. Since the joint distribution may be written as $P(\bth, \boldsymbol{\phi}, Z|D)P(D)$, the free energy may also be rewritten as:
+
+$$ F = KL\left[Q(\bth, \boldsymbol{\phi}, Z) \,\|\, P(\bth, \boldsymbol{\phi}, Z|D)\right] - \log[P(D)] $$ (7.9)
+
+{p89}
+:::figure fig-7-2 | Figure 7.2: **Moral graph for the mixtures-of-experts with priors.** The shaded nodes $X$ and $Y$ indicate that these are observed variables.
+
+*i.e.,* the sum of the *Kullback-Leibler distance* or *asymmetric divergence* between $Q$ and the posterior probability $P(\bth, \boldsymbol{\phi}, Z|D)$ and the negative of the log of the evidence $P(D)$ of the model. This implies that the free energy $F$ is bounded below by the negative log evidence:
+
+$$ F \geq -\log[P(D)] $$ (7.10)
+
+so that minimising $F$ is equivalent to maximising the evidence. We now make the following approximation of assuming that the distribution $Q(\bth, \boldsymbol{\phi}, Z)$ is *separable*:
+
+$$ Q(\bth, \boldsymbol{\phi}, Z) = Q(\bth) Q(\boldsymbol{\phi}) Q(Z) $$ (7.11)
+
+which is equivalent to the mean field approximation [168, pp. 24], [209]. This is a fairly restrictive assumption that implies that each approximating distribution is independent of the other variables. Although this assumption allows the free energy to be evaluated in a tractable way it is unlikely that the true posterior distribution is separable in this way. The quality of the approximation is measured by the free energy, and the log evidence will be underestimated by the KL distance between $Q$ and the true posterior $P(\bth, \boldsymbol{\phi}, Z|D)$.
+
+An indication of why the mean field approximation is a good idea can be seen in Figure 7.2 which shows the *moralised* graph [106, pp. 81] of the belief network of Figure 7.1. Propagation of probabilities in this graph is hard because of the tightly interconnected clique. Making the mean field approximation effectively approximates the complex graph of Figure 7.1 with a simpler one in which some of the links are dropped. A similar approach is taken for sigmoidal belief networks by Saul and Jordan [209].
+
+We now find the optimal $Q(\bth, \boldsymbol{\phi}, Z)$ by alternately minimising $F$ with respect to each of the variables $\bth$, $\boldsymbol{\phi}$ and $Z$ while the others are held fixed. This will lead to three *optimal* distributions $Q^*(Z)$, $Q^*(\bth)$ and $Q^*(\boldsymbol{\phi})$. This is possible since we have made the separability assumption about $Q$. Rewriting $F$ in terms of the three variables and using Equation 7.6 gives:
+
+$$ \begin{aligned} F_Z &= -\int Q(Z) \left\{ \int Q(\bth) \log[P(Z, D|\bth)]\, d\bth - \log Q(Z) \right\} dZ + C_1 \\ F_{\bth} &= -\int Q(\bth) \left\{ \int Q(Z) \log[P(Z, D|\bth)]\, dZ + \int Q(\boldsymbol{\phi}) \log[P(\bth|\boldsymbol{\phi})]\, d\boldsymbol{\phi} - \log[Q(\bth)] \right\} d\bth + C_2 \\ F_{\boldsymbol{\phi}} &= -\int Q(\boldsymbol{\phi}) \left\{ \int Q(\bth) \log[P(\bth|\boldsymbol{\phi}) P(\boldsymbol{\phi})]\, d\bth - \log[Q(\boldsymbol{\phi})] \right\} d\boldsymbol{\phi} + C_3 \end{aligned} $$ (7.12)
+
+{p90}where $C_1$, $C_2$ and $C_3$ are constants. In order to compute *optimal* distributions the following principle [136], [14, pp. 59] is used:
+
+$$ \begin{aligned} &\textit{The divergence } -\int Q(\omega) \{\log[P(\lambda)] - \log[Q(\omega)]\}\, d(\omega) \\ &\textit{is minimised by setting } Q(\omega) = P(\lambda). \end{aligned} $$ (7.13)
+
+Some simple algebra then gives optimal distributions for $Z$, $\bth$ and $\boldsymbol{\phi}$ as:
+
+$$ \begin{aligned} \log Q^*(Z) &= \int Q(\bth) \log[P(Z, D|\bth)]\, d\bth + C_1' \\ \log Q^*(\bth) &= \int Q(Z) \log[P(Z, D|\bth)]\, dZ + \int Q(\boldsymbol{\phi}) \log[P(\bth|\boldsymbol{\phi})]\, d\boldsymbol{\phi} + C_2' \\ \log Q^*(\boldsymbol{\phi}) &= \int Q(\bth) \log[P(\bth|\boldsymbol{\phi}) P(\boldsymbol{\phi})]\, d\bth + C_3' \end{aligned} $$ (7.14)
+
+where $C_1'$, $C_2'$ and $C_3'$ are different constants. Two viewpoints are now possible. If $Z$ is ignored, we get the ensemble learning framework of Hinton and van Camp [87] and MacKay [136] in which the parameters and hyper-parameters of a single model (as distinct from a *mixture* of models) are inferred in a scheme which converges to the maximum evidence framework [136]. Alternatively, if $\boldsymbol{\phi}$ is ignored (*i.e.,* a flat prior on $\bth$ is used), and $Q(\bth)$ is given by a delta function about a fixed point $\bar{\bth}$:
+
+$$ Q(\bth) = \delta(\bth - \bar{\bth}), $$ (7.15)
+
+we get the free energy EM framework of Neal and Hinton [154] in which $F$ is bounded by the negative log likelihood $-\log[P(D|\bth)]$. In this case, the optimal distributions are given by:
+
+$$ \log Q^*(Z) = \int Q(\bth) \log P(Z, D|\bth)\, d\bth + C_1'' $$ (7.16)
+
+$$ \log Q^*(\bth) = \int Q(Z) \log P(Z, D|\bth)\, dZ + C_2'' $$ (7.17)
+
+From this we have that $Q^*(Z)$ is proportional to $P(Z, D|\bar{\bth})$. Since we also have the constraint that $\sum_Z Q^*(Z) = 1$ [154], the optimal distribution $Q^*(Z)$ is given by:
+
+$$ Q^*(Z) = P(Z|D, \bar{\bth}) $$ (7.18)
+
+*i.e.,* the posterior distribution of missing data given data and parameters. Maximising $\log Q^*(\bth)$ over $Q^*(Z)$ is then clearly equivalent to the EM algorithm.
+
+A number of other researchers have also considered the EM algorithm from this viewpoint. Csiszár and Tusnády [41] considered the EM algorithm from an information geometry viewpoint and also generalised the framework to a more general class of alternating minimisation procedures. Hathaway [82] described a derivation of the EM algorithm using the method of coordinate descent [253] which alternately minimises the free energy with respect to $P(Z)$ and $\bth$. Coordinate ascent minimises a function {p91}by alternately finding the minimum in different coordinate directions. For example in three dimensions, the coordinate directions would be $[\pm 1\; 0\; 0]^T$, $[0\; \pm 1\; 0]^T$ and $[0\; 0\; \pm 1]^T$.
+
+The concept behind the variational free energy principle has also been applied to a number of systems by Saul and Jordan [209] who consider it in terms of mean field theory. In their framework a set of states $\{S\}$ is considered, where the states are for example hidden variables in the EM algorithm. The energy $E\{S\}$ and probability $P\{S\}$ of the states are related by the Boltzmann distribution:
+
+$$ P\{S\} = \frac{\exp(-\beta E\{S\})}{\mathcal{Z}} $$ (7.19)
+
+where $\beta$ is the inverse temperature and $\mathcal{Z}$ is the *partition function*. In order to perform inference about the states, averages must be made over $P\{S\}$. Given that this is generally intractable, a simpler distribution $Q\{S\}$ is postulated over the states which typically takes the form of the mean field approximation which is identical to the separable assumption for $Q$ made above. The next stage is to minimise the Kullback-Leibler divergence between $Q\{S\}$ and $P\{S\}$. In the case where $\mathcal{Z}$ is a likelihood function, minimisation of the KL divergence is equivalent to maximising the likelihood since the negative log likelihood forms a lower bound on the KL divergence. This is identical to the case of ensemble learning considered above where the log evidence formed the lower bound on the free energy $F$. The mean field approach has been widely applied to models in which the true likelihood is intractable, such as sigmoid belief networks [207], factorised hidden Markov models [72], and Boltzmann machines [208, 206]. Recently Jaakkola and Jordan [96] have also computed *upper* bounds for likelihoods in intractable networks in addition to lower bounds resulting from the KL divergence. The concept of using a bound on likelihoods and minimising the bound rather than the actual likelihood has also been used by Dayan et al. [43] in the Helmholtz machine.
+
+Having given the general outline of the ensemble learning approach, I now turn my attention to specific instances of its use in Bayesian inference of mixtures-of-experts. In the following sections I consider the form of the optimal distributions for ME models with multinomial logit gates and linear regression experts or multinomial logit experts.
+
+### Linear regression experts
+
+As described in Chapter 4, the complete data likelihood for a mixture of $I$ experts is given by:
+
+$$ P(Y, X, Z|\theta) = \prod_{n=1}^{N} \prod_{i=1}^{I} P(z_i^{(n)} = 1|\bx^{(n)}, \bv_i) P(\by^{(n)}|\bx^{(n)}, z_i^{(n)} = 1, \bw_i). $$ (7.20)
+
+Combining this with the priors specified in Section 7.2, gives the joint distribution in the case of regres{p92}sion for a mixture of $I$ experts as:
+
+$$ \begin{aligned} P(\bw, \bv, \alpha, \beta, Z, X, Y) &= P(\bv|\mu) P(\bw|\alpha) P(\beta|\rho, \upsilon) P(Y, X, Z|\theta) \\ &= \prod_{i=1}^{I} P(\bv_i|\mu_i) P(\bw_i|\alpha_i) P(\beta_i|\rho, \upsilon) \prod_{n=1}^{N} \left\{ P(z_i^{(n)} = 1|\bx^{(n)}, \bv_i) P(\by^{(n)}|\bx^{(n)}, z_i^{(n)} = 1, \bw_i, \beta_i) \right\}^{z_i^{(n)}}. \end{aligned} $$ (7.21)
+
+We postulate an approximating ensemble distribution $Q$ to the posterior distribution $P(\bw, \bv, \alpha, \mu, \beta, Z)$. $Q$ is once again constrained to be separable:
+
+$$ Q(\bw, \bv, \alpha, \mu, \beta, Z) = Q(\bw) Q(\bv) Q(\alpha) Q(\mu) Q(\beta) Q(Z). $$ (7.22)
+
+The optimal separable distribution $Q$ is found by minimisation of the free energy $F$ between the joint distribution of Equation 7.21 and the approximating distribution of Equation 7.22. This minimisation is performed over each separate ensemble component $Q(\cdot)$ with all other components fixed. For each variable the optimal distribution is found in the following manner, in which we take the example of the variable $\bw$:
+
+1. Express $F$ as a function of $\bw$: $$F = -\int Q(\bw) \left[ \int Q(\alpha) \log[P(\bw|\alpha)]\, d\alpha + \int Q(Z) Q(\beta) \log[P(Y, Z|X, \bw, \beta)]\, d\beta\, dZ - \log Q(\bw) \right] d\bw + C_1. \qquad (7.23)$$
+2. Use the principle of Equation 7.13 to write the log of the optimal distribution for $\bw$ as: $$\log Q^*(\bw) = \int Q(\alpha) \log[P(\bw|\alpha)]\, d\alpha + \int Q(Z) Q(\beta) \log[P(Y, Z|X, \bw, \beta)]\, d\beta\, dZ + C_2 \qquad (7.24)$$
+
+This gives the optimal distribution for the expert parameters $\bw$ given the current $Q(Z)$, $Q(\bv)$, $Q(\alpha)$ and $Q(\beta)$. Performing the same process on each of the variables in Equation 7.22 gives the optimal distributions for the gate parameters, $Q^*(\bv)$, for the complexity hyper-parameters, $Q^*(\alpha)$ and $Q^*(\mu)$, and for the missing data, $Q^*(Z)$. To minimise $F$, each of these optimal distributions is computed in turn, whilst holding the other variables fixed. The optimal distributions are given by the following equations. The dependencies between these expressions are summarised in Table 7.1.
+
+{p93}
+:::table tab-7-1 | Table 7.1: **Dependency of terms in the optimal distributions.** Each optimal distribution is shown across the top of the table. A dependency of a distribution on one of the terms at the left of the table is shown by way of a diamond $\diamond$ in the table. See also Equations 7.25 to 7.30.
+| Term | $Q^*(\bw)$ | $Q^*(\bv)$ | $Q^*(\alpha)$ | $Q^*(Z)$ | $Q^*(\beta)$ | $Q^*(\mu)$ |
+| $\int Q(Z) \log[P(Y, X, Z|\bw, \beta)]\, dZ$ | $\diamond$ | | | | $\diamond$ | |
+| $\int Q(Z) \log[P(Z, X|\bv)]\, dZ$ | | $\diamond$ | | | | |
+| $\int Q(\bw) \log[P(\bw|\alpha)]\, d\bw$ | | | $\diamond$ | | | |
+| $\int Q(\bv) \log[P(Z|X, \bv)]\, d\bv$ | | | | $\diamond$ | | |
+| $\int Q(\bw) \log[P(Y|Z, X, \bw, \beta)]\, d\bw$ | | | | $\diamond$ | $\diamond$ | |
+| $\int Q(\beta) \log[P(Y, X, Z|\bw, \beta)]\, d\beta$ | $\diamond$ | | | $\diamond$ | | |
+| $\int Q(\alpha) \log[P(\bw|\alpha)]\, d\alpha$ | $\diamond$ | | | | | |
+| $\int Q(\mu) \log[P(\bv|\mu)]\, d\mu$ | | $\diamond$ | | | | |
+| $\int Q(\bv) \log[P(\bv|\mu)]\, d\bv$ | | | | | | $\diamond$ |
+
+1. Expert and Gate parameters: $$\log Q^*(\bw) = \int Q(Z) Q(\beta) Q(\alpha) \log[P(Y, Z, X|\bw, \beta) P(\bw|\alpha)]\, dZ\, d\beta\, d\alpha + C_1 \qquad (7.25)$$ $$\log Q^*(\bv) = \int Q(Z) Q(\mu) \log[P(Z, X|\bv) P(\bv|\mu)]\, dZ\, d\mu + C_2 \qquad (7.26)$$
+2. Expert and gate complexity hyper-parameters: $$\log Q^*(\alpha) = \int Q(\bw) \log[P(\bw|\alpha) P(\alpha)]\, d\bw + C_3 \qquad (7.27)$$ $$\log Q^*(\mu) = \int Q(\bv) \log[P(\bv|\mu) P(\mu)]\, d\bv + C_4 \qquad (7.28)$$
+3. Expert noise hyper-parameter: $$\log Q^*(\beta) = \int Q(\bw) Q(Z) \log[P(Y, X, Z|\bw, \beta) P(\beta|\rho, \upsilon)]\, dZ\, d\bw + C_5 \qquad (7.29)$$
+4. Missing data $Z$: $$\log Q^*(Z) = \int Q(\bw) Q(\beta) \log[P(Y|X, Z, \bw, \beta)]\, d\bw\, d\beta + \int Q(\bv) \log[P(Z|X, \bv)]\, d\bv + C_6 \qquad (7.30)$$
+
+Given the set of optimal distributions in Equations 7.25 to 7.30, we have seemingly solved the problem. Using these distributions for the variables we may minimise $F$ and thus better approximate the posterior distribution $P(\bw, \bv, \alpha, \mu, \beta, Z|D)$. The actual form of each of the approximating distributions {p94}depends on the choice of expert and gate. In the case of generalised linear models used here the integrations are straightforward. If more complex experts and gates were used, *e.g.,* multi-layer perceptrons, two courses of action could be taken: either to use numerical integration via MCMC techniques or to make approximations to the integrands and perform the integrations analytically. In this work most of the integrations can be performed analytically without approximations. In some cases a Gaussian approximation is made to the integrand and the resulting approximation integrated analytically.
+
+In the case of the missing data the optimal distribution $Q^*(Z)$ gives a new set of node joint and conditional posterior probabilities: $\bar{\zeta}_j^{(n)}$ and $\bar{\varphi}_j^{(n)}$. In the case of the distributions of parameters and hyper-parameters the parameters of each of the optimal distributions are found. The means of each of these optimal distributions give fixed point estimates for the parameters and hyper-parameters which are denoted as $\bar{\bw}_j$, $\bar{\bv}_j$, $\bar{\alpha}_j$, $\bar{\mu}_j$ and $\bar{\beta}_j$. The expressions for each of these estimates are given in the following sections.
+
+##### Optimal distributions for expert networks
+
+For the *parameters* of the experts the optimal distribution is given by:
+
+$$ \log Q^*(\bw) = \sum_{j=1}^{J} \log Q^*(\bw_j) = \sum_{j=1}^{J} \left[ -\frac{\bar{\alpha}_j}{2} \bw_j^T \bw_j - \sum_n \bar{\zeta}_j^{(n)} \frac{\bar{\beta}_j}{2} \left(y^{(n)} - \hat{y}_j^{(n)}\right)^2 \right] + C_1. $$ (7.31)
+
+Comparing this expression to the auxiliary function for the maximum likelihood EM algorithm (Equation 4.13) we notice that Equation 7.31 is given by the sum of the auxiliary function and the log of the prior $P(\bw_j|\alpha_j)$. Since the auxiliary function is the expected value of the complete data log-likelihood, we can interpret Equation 7.31 as the sum of log-prior and log-likelihood terms.
+
+We may note that Equation 7.31 is a set of $J$ Gaussian distributions with means $\{\bar{\bw}_j\}$, and covariance matrices $\{A_{\bw_j}\}$. For node $\E_j$ the covariance matrix is given by the negative of the inverse of its Hessian matrix which is a $(d+1) \times (d+1)$ matrix [140, pp. 71], [173]:
+
+$$ A_{\bw_j} = \left( -\frac{\partial^2 \log Q^*(\bw_j)}{\partial \bw_j \partial \bw_j^T} \right)^{-1}, $$ (7.32)
+
+where
+
+$$ \frac{\partial^2 \log Q^*(\bw_j)}{\partial \bw_j \partial \bw_j^T} = -\sum_n \bar{\zeta}_j^{(n)} \bar{\beta}_j (\bx^{(n)})(\bx^{(n)})^T - \bar{\alpha}_j I, $$ (7.33)
+
+where $I$ is an identity matrix.
+
+To obtain new values of the parameters $\bw_j$ we optimise Equation 7.31 with respect to the parameters. The derivatives of $\log Q^*(\bw_j)$ take a similar form to the derivatives of the auxiliary function (Equations 4.14 and 4.15) but with the additional derivative of the log-prior term. The new values $\bar{\bw}_j$ are found by solving:
+
+$$ \sum_n \bar{\zeta}_j^{(n)} \bar{\beta}_j (y^{(n)} - \hat{\by}_j^{(n)}) \bx^{(n)} - \bar{\alpha}_j \bw_j = 0 $$ (7.34)
+
+{p95}
+For the expert complexity hyper-parameters, the integration of Equation 7.27 takes the following form:
+
+$$ \log Q^*(\alpha_j) = \frac{d}{2} \log \alpha_j - \frac{\alpha_j}{2} \int Q(\bw_j) \bw_j^T \bw_j\, d\bw_j. $$ (7.35)
+
+The integral of $\bw_j^T \bw_j$ may be rewritten as:
+
+$$ \int Q(\bw_j) \bw_j^T \bw_j\, d\bw_j = \int Q(\bw_j)(\bw_j - \bar{\bw}_j)^T (\bw_j - \bar{\bw}_j)\, d\bw_j + \bar{\bw}_j^T \bar{\bw}_j $$ (7.36)
+
+where $\bar{\bw}_j = \int \bw_j Q(\bw_j)\, d\bw_j$. If we now observe that the inner product in the integral may be expressed as the trace of an outer product, we may write:
+
+$$ \int Q(\bw_j) \bw_j^T \bw_j\, d\bw_j = \text{Trace}\left( \int Q(\bw_j)(\bw_j - \bar{\bw}_j)(\bw_j - \bar{\bw}_j)^T\, d\bw_j \right) + \bar{\bw}_j^T \bar{\bw}_j. $$ (7.37)
+
+The term inside the trace operator is simply the covariance of $\bw_j$ over $Q(\bw_j)$, which is given by Equation 7.32. This allows the log of the optimal distribution $Q^*(\alpha_j)$ to be written as:
+
+$$ \log Q^*(\alpha_j) = \frac{d}{2} \log \alpha_j - \frac{\alpha_j}{2} \left( \bar{\bw}_j^T \bar{\bw}_j + \text{Trace}(A_{\bw_j}) \right). $$ (7.38)
+
+This is the log of a Gamma distribution with mean $\bar{\alpha}_j$ given by:
+
+$$ \frac{1}{\bar{\alpha}_j} = \frac{\bar{\bw}_j^T \bar{\bw}_j + \text{Trace}(A_{\bw_j})}{d}. $$ (7.39)
+
+This gives a new estimate of the hyper-parameters $\alpha_j$. Note that this is in the same form as the update for hyper-parameters in a generalised linear regression model by the ensemble learning method of MacKay [136], except that MacKay also uses a Gamma distribution for $\alpha$ which introduces extra terms to the update.
+
+For the noise hyper-parameter of expert $\E_j$, the required integral is given by Equation 7.29. Expanding the integral and performing the integration with respect to $Q(Z)$ gives:
+
+$$ \log Q^*(\beta_i) = -\frac{\beta_i}{2} \sum_n \zeta_i^{(n)} \int Q(\bw_i)(y^{(n)} - \bw_i^T \bx^{(n)})^2\, d\bw_i + \tfrac{1}{2} \sum_n \zeta_i^{(n)} \log \frac{\beta_i}{2\pi} + \rho \log\left(\frac{\beta_i}{\upsilon}\right) - \frac{\beta_i}{\upsilon}. $$ (7.40)
+
+The last two terms of this expression come from the Gamma prior on $\log \beta_i$. To integrate the first term of the expression with respect to $\bw_i$, we make the following expansion:
+
+$$ A = \int Q(\bw_i)(y^{(n)} - \bw_i^T \bx^{(n)})^2\, d\bw_i = \int Q(\bw_i) \left[ (y^{(n)} - \bar{\bw}_i^T \bx^{(n)}) - (\bw_i - \bar{\bw}_i)^T \bx^{(n)} \right]^2 d\bw_i, $$ (7.41)
+
+where
+
+$$ \bar{\bw}_i = \int \bw_i Q(\bw_i)\, d\bw_i. $$ (7.42)
+
+{p96}This may be rearranged to give:
+
+$$ A = (y^{(n)} - \bar{\bw}_i^T \bx^{(n)})^2 + \int Q(\bw_i) \bx^{(n)T} (\bw_i - \bar{\bw}_i)(\bw_i - \bar{\bw}_i)^T \bx^{(n)}\, d\bw_i, $$ (7.43)
+
+in which the term $\int Q(\bw_i)(\bw_i - \bar{\bw}_i)(\bw_i - \bar{\bw}_i)^T\, d\bw_i$ may be recognised as the covariance matrix $A_{\bw_i}$ (7.32). This allows the log of the optimal distribution to be written as:
+
+$$ \begin{aligned} \log Q^*(\beta_i) = &-\frac{\beta_i}{2} \left( \sum_n \zeta_i^{(n)} (y^{(n)} - \bar{\bw}_i^T \bx^{(n)})^2 + \sum_n \zeta_i^{(n)} \bx^{(n)T} A_{\bw_i} \bx^{(n)} \right) \\ &+ \tfrac{1}{2} \sum_n \zeta_i^{(n)} \log \frac{\beta_i}{2\pi} + \rho \log\left(\frac{\beta_i}{\upsilon}\right) - \frac{\beta_i}{\upsilon}. \end{aligned} $$ (7.44)
+
+This is the log of a Gamma distribution whose mean $\int \beta_i Q^*(\beta_i)\, d\beta_i$ is given by:
+
+$$ \frac{1}{\bar{\beta}_i} = \frac{\sum_n \bar{\zeta}_j^{(n)} \left[ (y^{(n)} - \bar{\bw}_i^T \bx^{(n)})^2 + \bx^{(n)T} A_{\bw_j} \bx^{(n)} \right] + 2/\upsilon}{\sum_n \bar{\zeta}_j^{(n)} + 2\rho}. $$ (7.45)
+
+$1/\bar{\beta}_i$ is the estimate of the noise variance for expert $\E_j$. In this framework it is modified to include a dependence on the hyper-hyper-parameters $\upsilon$ and $\rho$, which is expected due to the use of the Gamma prior on $\log \beta$. In addition, the noise variance is modified by the term $\sum_n \bar{\zeta}_j^{(n)} (\bx^{(n)T} A_{\bw_j} \bx^{(n)})$ which represents the sum of the uncertainties of the expert's predictions.
+
+##### Optimal distributions for gate networks
+
+The optimal distribution for the gate parameters $Q^*(\bv)$ is obtained in a similar fashion to the other optimal distributions, and its log is given by:
+
+$$ \log Q^*(\bv) = \sum_j \log Q^*(\bv_j) = -\sum_j \frac{\bar{\mu}_j}{2} \bv_j^T \bv_j + \sum_n \bar{\varphi}_j^{(n)} \log g_j^{(n)} + C. $$ (7.46)
+
+Each optimal distribution for the gates $Q^*(\bv_j)$ is approximated by a Gaussian distribution fitted at its maximum $\bv_j = \bar{\bv}_j$ with covariance matrix $A_{\bv_j}$:
+
+$$ \log Q(\bv_j) \approx \log Q(\bar{\bv}_j) - \tfrac{1}{2} \Delta\bv_j^T A_{\bv_j}^{-1} \Delta\bv_j, $$ (7.47)
+
+where $\Delta\bv_j = \bv_j - \bar{\bv}_j$, and the covariance matrix of $\bv_j$ is given by the negative of the inverse of the second derivative of $\log Q^*(\bv_j)$ [140, pp. 119]:
+
+$$ \frac{\partial^2 \log Q^*(\bv)}{\partial \bv_j \partial \bv_j^T} = -\sum_{n=1}^{N} g_j^{(n)} (1 - g_j^{(n)}) (\bx^{(n)})(\bx^{(n)})^T - \bar{\mu}_j I. $$ (7.48)
+
+The parameters $\bar{\bv}_j$ are found by solving the following equations:
+
+$$ \sum_{n=1}^{N} (\varphi_j^{(n)} - g_j^{(n)}) \bx^{(n)} - \bar{\mu}_j \bv_j = 0. $$ (7.49)
+
+{p97}Using this approximation, the re-estimation equations for the hyper-parameters $\mu$ are given by:
+
+$$ \frac{1}{\bar{\mu}_j} = \frac{\bar{\bv}_j^T \bar{\bv}_j + \text{Trace}(A_{\bv_j})}{d}. $$ (7.50)
+
+##### Optimal distribution of $Z$
+
+Finally, for the optimal distribution of missing data, the following integral is required:
+
+$$ \begin{aligned} \log Q^*(Z) = \sum_{n=1}^{N} \sum_{j=1}^{I} &\int Q(\bw_j) Q(\beta_j) \log[P(\by^{(n)}|\bx^{(n)}, z_j^{(n)} = 1, \beta_j, \bw_j)]\, d\bw_j\, d\beta_j \\ &+ \int Q(\bv_j) \log[P(z_j^{(n)} = 1|\bx^{(n)}, \bv_j)]\, d\bv_j + C, \end{aligned} $$ (7.51)
+
+where the sum is over $I$ experts. The integrals over $\bw_j$ and $\beta_j$ are straightforward using the techniques of the previous section:
+
+$$ \begin{aligned} \log Q^*(Z) = \sum_{n=1}^{N} \sum_{j=1}^{I} &\left( \log[P(\by^{(n)}|\bx^{(n)}, z_j^{(n)} = 1, \bar{\beta}_j, \bar{\bw}_j)] - \frac{\beta_j}{2} \bx^{(n)T} A_{\bw_j} \bx^{(n)} \right) \\ &+ \int Q(\bv_j) \log[P(z_j^{(n)} = 1|\bx^{(n)}, \bv_j)]\, d\bv_j + C. \end{aligned} $$ (7.52)
+
+The integral over $\bv_j$ is less easy, however. If we write $a_j = \bv_j^T \bx^{(n)}$, we may write the softmax function as:
+
+$$ \begin{aligned} P(z_j^{(n)} = 1|\bx^{(n)}, \bv_j) &= \frac{\exp(a_j)}{\sum_{i=1}^{I} \exp(a_i)} \\ &= \frac{1}{1 + \sum_{i \neq j} \exp(-(a_j - a_i))}, \end{aligned} $$ (7.53)
+
+so that the integral is given by:
+
+$$ \int Q(\bv_j) \log P(z_j^{(n)} = 1|\bx^{(n)}, \bv_j)\, d\bv_j = -\int Q(\bv_j) \log\left(1 + \sum_{i \neq j} \exp(-(a_j - a_i))\right) $$ (7.54)
+
+Since we have made a Gaussian approximation to $Q(\bv_j)$, a local linear approximation to $a_j$ means $Q(a_j)$ will also be a Gaussian [14, pp. 405]. This integral does not have an analytic solution, however. Potentially, an approximation such as that used by MacKay [132] for evaluating the integral of a Gaussian times a sigmoid could be used, although in this case we have the integral of a Gaussian times the *log* of a sigmoid. Alternatively, a variational method [95] could be used to bound the integral with a simpler expression. Another possibility is the use of various approximations suggested by Gales [65].
+
+In this work I simply approximate the integral by its value at $\bar{\bv}_j$:
+
+$$ \int Q(\bv_j) \log[P(z_j^{(n)} = 1|\bx^{(n)}, \bv_j)]\, d\bv_j = \log \frac{\exp(\bar{\bv}_j^T \bx^{(n)})}{\sum_i \exp(\bar{\bv}_i^T \bx^{(n)})}, $$ (7.55)
+
+{p98}where $\bar{\bv}_j$ is the value of the gate parameter vector given by the mean $\int \bv_j Q^*(\bv_j)\, d\bv_j$. This is an expedient approximation and we recognise that it could be improved.
+
+After normalising, the optimal distribution $Q^*(Z)$ is then given by:
+
+$$ \begin{aligned} Q^*(Z) &= \prod_n \prod_j \left\{ \exp(s_j^{(n)}) \Big/ \sum_{i=1}^{I} \exp(s_i^{(n)}) \right\} \\ \text{where} \quad s_j^{(n)} &= \log[P(z_j^{(n)} = 1|\bar{\bv}_j, \bx^{(n)})] + \log[P(\by^{(n)}|\bx^{(n)}, \bar{\bw}_j, z_j^{(n)} = 1, \bar{\beta}_j)] - \frac{\bar{\beta}_j}{2} \bx^{(n)T} A_{\bw_j} \bx^{(n)} \end{aligned} $$ (7.56)
+
+Comparing this to the standard EM algorithm, we may observe that the standard E-step computes a distribution of $Z$ given fixed values of parameters and the data. In this case, by finding the optimal $Q(Z)$ the alternative expression of Equation 7.56 is obtained, with dependencies on the uncertainty of the experts' predictions, $\frac{\bar{\beta}_j}{2} \bx^{(n)T} A_{\bw_j} \bx^{(n)}$.
+
+### Making predictions
+
+In order to make predictions via Bayesian inference of a target $y^{(N+1)}$ given an input vector $\bx^{(N+1)}$, we use the *predictive* distribution which is given by:
+
+$$ P(y^{(N+1)}|\bx^{(N+1)}, D) = \int P(y^{(N+1)}|\bx^{(N+1)}, \theta) P(\theta|D)\, d\theta $$ (7.57)
+
+where $P(\theta|D)$ is the posterior distribution of the parameters $\theta$. We use the optimal distributions $Q^*$ to approximate the posterior distribution. In the case of regression over one dimensional targets, the overall mean $\hat{y}^{(N+1)}$ of the predictive distribution is given by:
+
+$$ \hat{y}^{(N+1)} = \sum_j P(\E_j|\bx^{(N+1)}, \bar{\bv}_j) \hat{y}_j^{(N+1)} $$ (7.58)
+
+where $\hat{y}_j^{(N+1)}$ is the prediction of $y^{(N+1)}$ by expert $\E_j$.
+
+### Multinomial logit experts
+
+In the case of multinomial logit experts the joint probability density is given by:
+
+$$ P(\bw, \bv, \alpha, \mu, Z, X, Y) = \prod_{i=1}^{I} P(\bv_i|\mu_i) P(\bw_i|\alpha_i) \prod_{n=1}^{N} \left\{ P(z_i^{(n)} = 1|\bx^{(n)}, \bv_i) \prod_{c=1}^{k} (\hat{y}_{ic}^{(n)})^{y_c^{(n)}} \right\}, $$ (7.59)
+
+where $\hat{y}_{ic}^{(n)} = P(y_c^{(n)}|\bx^{(n)}, z_i^{(n)} = 1, \bw_i)$.
+
+Once again we specify an approximating distribution which we assume to be separable:
+
+$$ Q(\bw, \bv, \alpha, \mu, Z) = Q(\bw) Q(\bv) Q(\alpha) Q(\mu) Q(Z). $$ (7.60)
+
+{p99}
+In common with the gate parameters for linear regression, we make a Gaussian approximation to $Q(\bw)$ and $Q(\bv)$:
+
+$$ \log Q(\bw_j) \approx \log Q(\bar{\bw}_j) - \tfrac{1}{2} \Delta\bw_j^T A_{\bw_j}^{-1} \Delta\bw_j, $$ (7.61)
+
+where $A_{\bw_j}$ is the covariance matrix of $\bw_j$, and $\Delta\bw_j = \bw_j - \bar{\bw}_j$. Using this approximation, the re-estimation equations for the hyper-parameters $\alpha$ are given by:
+
+$$ \frac{1}{\bar{\alpha}_j} = \frac{\bar{\bw}_j^T \bar{\bw}_j + \text{Trace}(A_{\bw_j})}{d}. $$ (7.62)
+
+For the gate hyper-parameters the re-estimation equations are the same as for the linear regression experts (Equation 7.50). This leaves the optimal distributions of expert parameters and missing data:
+
+$$ \begin{aligned} \log Q^*(\bw) &= \int Q(Z) Q(\alpha) \log[P(Y|X, Z, \bw) P(\bw|\alpha)]\, dZ\, d\alpha + C_1; \\ \log Q^*(Z) &= \int Q(\bw) \log[P(Y|X, Z, \bw)]\, d\bw + \int Q(\bv) \log[P(Z|X, \bv)]\, d\bv + C_2. \end{aligned} $$ (7.63)
+
+In the case of the expert parameters $\bw_j$, the integral is straightforward, and the log of the optimal distribution is given by:
+
+$$ \log Q^*(\bw_j) = \sum_{n=1}^{N} \zeta_j^{(n)} \sum_{c=1}^{k} y_c \log \hat{y}_c - \sum_{c=1}^{k} \frac{\alpha_{jc}}{2} \bw_{jc}^T \bw_{jc}. $$ (7.64)
+
+The derivatives of this expression are similar to the derivatives of the gate parameters. For the missing data, the integrals over the expert parameters and gate parameters are approximated by the values of the integrands at $\bar{\bw}$ and $\bar{\bv}$ using the same assumptions as for the missing data in the case of linear regression experts. This gives the distribution of missing data in the same form as in Chapter 4 with the difference that $\bar{\zeta}_j^{(n)}$ and $\bar{\varphi}_j^{(n)}$ are computed using the mean values $\bar{\bw}_j$ and $\bar{\bv}_j$ for the parameters.
+
+## 7.3 Method
+
+In the previous section I have outlined the theory of ensemble learning as applied to mixtures-of-experts. This framework extends naturally from the EM learning algorithm covered in Chapter 2. In this section I describe how I implement this theory in two learning methods. The first of these methods uses a fixed width mixtures-of-experts, whilst the second uses a fixed depth binary hierarchy of experts. I denote these methods `me-el-1` and `hme-el-1` respectively. The code `-el-` denotes the use of the ensemble learning framework. These methods are similar to the early stopping methods with fixed structure, `me-ese-1` and `hme-ese-1` described in Chapter 5, but use the ensemble learning framework to infer their parameters rather than maximum likelihood plus early stopping.
+
+{p100}
+:::algo fig-7-3 | Figure 7.3: **Exact search algorithm for ensemble learning in mixtures-of-experts.**
+1. The hyper-parameters are initialised to small values $\alpha_{jk} = 0.00001$, for each output $k$ of expert $\E_j$ and $\mu_j = 0.0001$ for each output of the gate. The expert and gate parameters are initialised using the randomised segmentation algorithm of Section 4.5.
+2. Compute the log posterior probability $L^{(t)} = \log[P(\bw^{(t)}, \bv^{(t)}, \beta^{(t)}, \mu^{(t)}, \alpha^{(t)}|D)]$.
+3. Keeping the values of the hyper-parameters fixed, the EM algorithm is used to train the expert and gate parameters to convergence. The E step of the EM algorithm computes the optimal distribution $Q^*(Z)$ rather than the standard joint posteriors. In the case of regression, $\beta_j$ for each expert $\E_j$ is updated during each M step.
+4. The hyper-parameters are re-estimated using Equations 7.39, 7.45 and 7.50.
+5. Compute log posterior probability $L^{(t+1)} = \log[P(\bw^{(t+1)}, \bv^{(t+1)}, \beta^{(t+1)}, \mu^{(t+1)}, \alpha^{(t+1)}|D)]$.
+6. If $\delta L^{(t)} = L^{(t+1)} - L^{(t)} > 10^{-4}$ go to 3, else terminate.
+
+### A search method for ensemble learning in mixtures-of-experts models
+
+This section is organised as follows. First, I outline a method for searching through the various possible parameter and hyper-parameter configurations defined by the ensemble learning optimal distributions. I show that although a training algorithm can be derived which implements the ensemble learning framework exactly, this is typically computationally demanding, and therefore it is preferable to use an approximate search method which I describe. Second, I describe the use of committees of models which, in common with Chapters 5 and 6, I used in the methods `me-el-1` and `hme-el-1`.
+
+The ensemble learning framework outlined in Section 7.2 specifies that the free energy $F$ should be minimised with respect to each variable in turn. Given the set of optimal distributions derived in Section 7.2, this minimisation becomes the alternate maximisation of the optimal distributions with respect to each variable. The scheduling of these maximisations can potentially have an effect on the speed of the search, *i.e.,* the path through parameters, hyper-parameters and missing data to a converged model, and the final configuration of this model. For example, if the hyper-parameters $\{\mu\}$ are updated too early in the search the model will typically under-fit the data, with the complexity priors $P(\bv|\mu)$ dominating. This point was also discussed in the context of the evidence framework for MLPs by MacKay [133] and Thodberg [221]. The solution to this particular problem in MLPs is typically to train only the parameters of the model using fixed initial small values for the complexity hyper-parameters by maximising the posterior probability of the parameters. After this the hyper-parameter and parameter updates are alternated in turn until convergence of the posterior probability. This scheme is called the *exact* method for search in this chapter, and is described in Figure 7.3.
+
+The exact search algorithm of Figure 7.3 proved successful at producing well trained models on small artificial data sets, and also on the `Boston` data. For larger problems, however, the algorithm takes a large amount of time. In order to speed up the algorithm, two approaches could be taken: speed up
+{p101}the EM algorithm itself using methods such as those suggested by Jordan and Xu [113]; or speed up the search method by *increasing* the values of the optimal distributions rather than maximising them in a similar fashion to generalised EM algorithms. Although speeding up the EM algorithm would be preferred, current research into speed ups has been inconclusive. I therefore choose the latter option and seek to only *increase* the values of $\log Q^*(\bw)$ and $\log Q^*(\bv)$ rather than to maximise them. This scheme is similar to, and inspired by, the one outlined by Thodberg [221] for implementation of the evidence framework [133] in MLPs. It is anticipated that the search will still converge to a well trained model, but with fewer computational demands. The modified search algorithm is shown in Figure 7.4.
+
+:::algo fig-7-4 | Figure 7.4: **An approximate search algorithm for ensemble learning in mixtures-of-experts.** This is the basis of the methods `me-el-1` and `hme-el-1`.
+1. Initialise the hyper-parameters and parameters as in Figure 7.3.
+2. Compute $L^{(t)}$.
+3. Train the parameters for 100 iterations.
+4. Update the hyper-parameters as in Figure 7.3.
+5. Compute $\delta L^{(t)}$.
+6. If $\delta L^{(t)} > 10^{-4}$ and elapsed time $< 1.8765 \times N/4$ seconds, go to 3, else terminate.
+
+In order to investigate the effect of the restricted search algorithm, I compared their performance on the artificial data set described in Chapter 3 and on the `Boston` data. The evolution of the log posterior probability for the two algorithms on the `Boston` data is compared in Figure 7.5. One interesting point of these curves is that the log posterior probability typically drops after a hyper-parameter update. This is a function of the initial over-fitting used to start the search. After each hyper-parameter update the error on the training set increases until it has "taken up the slack" in the model.
+
+### Committees
+
+In common with the early stopping methods `me-ese-1` and `hme-ese-1` of Chapter 5, I used committees of models in the methods `me-el-1` and `hme-el-1`. Each committee was trained on all of the training data, but initialised with different random segmentations, by choosing different seeds for the random number generators. The outputs of the committee members were averaged for out of sample prediction as before.
+
+As in the methods `me-ese-1` and `hme-ese-1`, I allowed a minimum of 3 committee members, and a maximum of 50. The number of committee members was also a function of time, with the algorithm terminating after $1.8765 \times N$ seconds had elapsed. In practice, since the methods `me-el-1` and `hme-el-1` took longer to train than the early stopping methods, only 3 committee members were typically trained. The extra computation is caused by the cycling through parameter and hyper-parameter training, and {p102}also because in the early stopping methods the parameter training is not iterated to convergence on the training data. Indeed, as described in Chapter 5, the early stopping point often occurs within very few iterations of the training algorithm. A comparison of the speed of the different learning methods is given in Chapter 8. Finally, in order to choose the number of experts for `me-el-1` and the depth of `hme-el-1` I used the algorithm described in Section 5.3.
+
+:::figure fig-7-5 | Figure 7.5: **Comparison of exact and approximate search methods for ensemble learning.** The figure shows a comparison of the exact (a) and approximate (b) ensemble learning procedures. The vertical axes show the log probability of the two methods for initially identical models (using the same random seed in the initialisation). The horizontal axis shows the iterations of the algorithm. The vertical dashed lines indicate where a hyper-parameter update took place. Note that the frequency of hyper-parameter updates increases towards the end of the algorithms.
+
+## 7.4 Related Work
+
+There are a number of possible methods that could be used for Bayesian inference of mixtures-of-experts. Firstly, it should be noted that since the mixtures-of-experts model can be considered as a belief network, structure as well as parameters could be estimated in a Bayesian framework. This approach is not taken in this chapter, although a data-driven cross validation method for learning structure is given in Chapter 6. In addition, via the belief network formulation of the mixtures-of-experts, a multitude of inference techniques are possible *e.g.,* Bayesian inference using Gibbs sampling techniques [222] or Markov Chain Monte Carlo (MCMC) [153]. A similar technique was used by Peng et al. [172] to infer parameters of a mixture of experts. This method was applied to the Peterson Barney vowel data set. One drawback of the Gibbs sampling approach used by Peng et al. [172] is the potentially large amount of computation required to make a parameter update. In other related work, Neal has applied the MCMC technique to unsupervised mixture models [152] and has shown how mixture models with infinite components can be inferred.
+
+Many other priors such as entropic priors are discussed in Buntine and Weigend [29]. Many practitioners of neural networks have used the concept of weight decay, often to good effect. In many cases, {p103}however, only a single hyper-parameter is used, which corresponds to the assumption that all the parameters of the network are distributed according to a single common Gaussian. Nowlan and Hinton [161] address this assumption by using a mixture of Gaussians as a prior on the network parameters.
+
+## 7.5 Summary
+
+In this chapter I have described the ensemble learning framework for mixtures-of-experts which generalises the EM algorithm along an empirical Bayesian direction. This framework was used to develop two learning methods `me-el-1` and `hme-el-1` whose implementation was also described in this chapter. These methods will be compared in Chapter 8 with the other ME methods of Chapter 5 and Chapter 6.
