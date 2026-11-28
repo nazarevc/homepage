@@ -1,0 +1,314 @@
+number: 3
+title: Introduction to Part I
+pdf: chapter-03.pdf
+first_page: 35
+---
+{p35}
+The aim of Part I of this thesis is, first, to describe five learning methods based on mixtures-of-experts, and second, to compare these methods with other established learning methods. The point of the comparisons is to place mixtures-of-experts in their correct context with respect to other machine learning techniques. The comparisons are performed within a common framework known as DELVE, which is described further in this chapter.
+
+Comparison of learning methods requires careful planning and consideration. This chapter describes DELVE, which is the framework which I chose to evaluate my learning methods. DELVE is an attractive suite to use since it implements a consistent framework for comparisons. This allows fair comparisons to be made with other algorithms and ensures a degree of consistency in testing and evaluation. Because of the framework of DELVE and the sheer number of comparisons done in this part of the thesis, I found it necessary to create completely automatic learning algorithms, *i.e.,* ones which required no human intervention. There are a number of issues to consider when designing these automatic learning algorithms which are considered in this chapter.
+
+A common criticism of machine learning research, especially that done in the neural networks community, is that accounts of algorithms and techniques are not descriptive enough [178]. Notable exceptions include the excellent description of C4.5 [186]. My aim in this thesis has been to describe my algorithms carefully, including descriptions of implementation wherever necessary. I stop short of including source code for the learning methods, although I have made it publicly available (see Appendix A), but do include pseudo-code where appropriate. This should make it possible for future researchers to re-implement my methods if necessary.
+
+## 3.1 Issues in Comparing Learning Methods
+
+Statistical comparison of learning algorithms has become the focus of a number of articles in the last few years. Cohen [37] described empirical methods for evaluating general AI programs and gave a good overview of the field. Prechelt [179] discussed the problem of statistical comparison in the context of neural network research [see also 178]. The "Prechelt test" is defined as the test of whether a research article contains more than one real world example:
+
+{p36}
+> An algorithm evaluation is called acceptable if it uses a minimum of two real or realistic problems and compares the results to those of at least one alternative algorithm. -- Prechelt [179]
+
+In Prechelt's research he found that many of the current research articles in neural network journals failed this test. Similar results for computer science in general were obtained by Tichy et al. [223].
+
+A number of comparison studies have been performed for different learning algorithms including [47, 91, 177, 193, 213]. A comprehensive review of many comparison studies is given in Michie et al. [144]. StatLog [144] is perhaps the most well known. In the StatLog project, comparisons were made between a number of learning algorithms on both classification and regression tasks. King et al. [119] also summarised the classification portion of StatLog. The majority of the data sets used in StatLog were natural. The comparison procedure used in StatLog was either to train on a fixed portion of the data and test on an independent set in the case of large data sets, or to use 10-fold cross validation in the case of smaller data sets.
+
+Considerable care must be taken when comparing algorithms. Simply stating that a particular algorithm gives an improvement is not sufficient. The improvement must be shown to be *significant*, according to an appropriate test methodology. Flexer [54] notes that very few neural network research publications describe significance tests between their proposed algorithms and existing ones. Experimental design is therefore of paramount importance when comparing learning methods. Salzberg [205] recommends an approach for comparing classifiers based on cross validation and the use of a binomial test to assess significance. Rasmussen [189], however, stresses that cross validation produces dependent training sets which make statistical comparisons difficult. Rasmussen therefore proposes the use of disjoint training sets and either a common, or a set of disjoint, test sets. The results of these experiments are analysed using an Analysis of Variance (ANOVA) method^[See Cohen [37, pp. 192-194] for an accessible introduction to ANOVA.]. This scheme is implemented in the DELVE framework which is the framework that I use in this part of the thesis. DELVE will be described further in Section 3.2.
+
+One of the problems with a number of the data sets used in comparisons is that they are too simple. The UC Irvine (UCI) collection of data sets [143] is a common source of data for comparisons. Holte [92] reports results on some of the most popular of the UCI data sets which show that the average performance of an extremely naive classifier is comparable with the performance of much more sophisticated classifiers such as CART. Cohen [37, pp. 80] denotes this the "ceiling effect" and explains it by the fact that the test data is too easy to solve, therefore making comparisons between algorithms difficult to perform. A conjugate effect occurs when the data sets are too difficult, denoted by Cohen as the *floor* effect. An example of this effect can be seen in the DARPA Switchboard speech recognition evaluations [75]. In this task, word error rates of over 40% are the norm. In such a situation it is difficult to assess whether the alteration of a component of the model results in improved performance since the baseline error rate is so high.
+
+{p37}
+## 3.2 The DELVE Framework
+
+> The aim of DELVE is to help researchers and potential users to assess learning methods in a way that is relevant to real-world problems and allows for statistically-valid comparisons of different methods. Improved assessments will make it easier to determine which methods work best for various applications, and will promote the development of better learning methods by allowing researchers to easily determine how the performance of a new method compares to that of existing methods. -- Rasmussen et al. [190]
+
+DELVE is an attempt by researchers at Toronto University, including Rasmussen et al. [190], to overcome some of the previous problems with comparison of learning methods. DELVE provides a framework in which statistical comparison between different methods can be evaluated in a consistent manner. It consists of a set of tools which both designs an experiment for the user and assesses the results of the method after it has been run through the experiment.
+
+There is various terminology associated with DELVE which will be used in this part of the thesis. Firstly, each data set may contain many *prototasks*. A prototask is a supervised learning problem consisting of certain target attributes to be predicted from the values of input attributes. A single prototask may have many *tasks* which generally differ in the amount of training data (and potentially in the amount of prior information specified, although this aspect is not explored in this thesis). Each task then contains a number of *task instances* each of which has a *training set* and a *test set*. The task instances all contain disjoint training sets and either disjoint test sets in the case of large data sets (a *hierarchical* testing scheme) or overlapping test sets in the case of smaller data sets (a *common* testing scheme). This framework is illustrated in Figure 3.1. As an example, consider the Boston housing data set described in Section 3.3. The data set is given the name `Boston` and the prototask studied in this thesis is the prediction of house prices, `Boston/price`. This prototask has three tasks, `Boston/price/std.32`, `Boston/price/std.64` and `Boston/price/std.128` which have 32, 64 and 128 data points in their training sets respectively. Each of these tasks contains 8, 4 and 2 task instances respectively.
+
+The hierarchical testing scheme uses a hierarchical Analysis of Variance (ANOVA) design and tests significance via a $t$-test. The common testing scheme uses a 2-way ANOVA design and a $F$-test of significance. Since the hierarchical testing scheme is the simpler of the two, I will restrict my discussion to this. Further details of both schemes and other aspects of DELVE can be found in either Rasmussen [189] or the DELVE manual [190].
+
+To assess a learning method via DELVE, the first step is to generate the tasks and train the method on each of the training sets in each task instance and generate predictions for each of the test sets. The tools of DELVE are then used to compute the expected loss and standard error of this loss for each of the task instances in a task. For a set of $J$ cases in each of $I$ task instances, the average loss for task instance $i$ and the overall average loss is given by [189]:
+
+$$ \bar{y}_i = \frac{1}{J} \sum_j y_{ij}, \quad \text{and} \quad \bar{y} = \frac{1}{IJ} \sum_i \sum_j y_{ij} $$ (3.1)
+
+{p38}
+:::figure fig-3-1 | Figure 3.1: **A schematic diagram illustrating the structure of the DELVE framework.**
+
+where $y_{ij}$ is the loss on case $j$ of task instance $i$. For hierarchical testing schemes, the standard error is given by:
+
+$$ SE = \left( \frac{1}{I(I-1)} \sum_i (\bar{y}_i - \bar{y})^2 \right)^{\frac{1}{2}}. $$ (3.2)
+
+When comparing two learning methods the null hypothesis we wish to test is that the average losses of the two methods are equal. In hierarchical testing schemes a $t$-test on this hypothesis is used. If the *difference* between the losses on case $j$ of task instance $i$ is given by $z_{ij}$, the $t$-statistic may be written as:
+
+$$ t = \bar{z} \left( \frac{1}{I(I-1)} \sum_i (\bar{z}_i - \bar{z})^2 \right)^{-\frac{1}{2}} $$ (3.3)
+
+which has $I - 1$ degrees of freedom. If the $p$-values resulting from this $t$-statistic are low, they indicate that the observed difference between the learning methods is unlikely to be due to chance. If $p < 0.05$ we say that the difference between the methods is *significant*.
+
+{p39}
+## 3.3 The Data Sets used in Part I
+
+In Chapters 5 to 7 five new learning methods based on the mixtures-of-experts framework are introduced. Comparison of these methods with each other or with existing methods in DELVE is deferred until Chapter 8. However, some of the data sets in DELVE are used to illustrate the behaviour of the methods during Chapters 5 to 7. For this reason the DELVE data sets are introduced in this chapter. Before this, however, let us introduce one of the artificial data sets that was used for design and validation of the methods.
+
+### An artificial data set
+
+Many of the design issues described in Chapters 5 to 7 require empirical tests. During the design of each of the five methods I used a variety of simple data sets to validate their performance. I avoided the use of the DELVE data sets, using instead artificial data sets, such as the one shown in Figure 3.2 which is used in the rest of this part as an example. Whilst the use of artificial data sets is no substitute for real or realistic data, I expect that the methods resulting from their use does not bias them overly to such data. In any learning method design process, however, some feedback from empirical trials is essential and typically affects the design choices made. It is hoped that the insights that I provide in this part of the thesis and in the results of Chapter 8 will benefit future work into mixtures-of-experts learning methods.
+
+:::figure fig-3-2 | Figure 3.2: **An artificial data set.** This data set is based on an example by Wahba & Wold (1975). It consists of 50 points generated by adding zero-mean Gaussian noise with standard deviation 0.2 to the function $y = 4.26(\exp(-x) - 4\exp(-2x) + 3\exp(-3x))$.
+
+{p40}
+### The DELVE data sets
+
+The data sets used can be divided into regression and classification tasks. These are shown in summary form in Tables 3.1 and 3.2. Further details are given in the remainder of this section. All the data sets were taken from the DELVE archive. The data sets were chosen as being the ones on which the largest number of comparisons had already been performed. On the regression tasks seven other methods have previously been investigated by Rasmussen [189]. On the classification tasks three other methods have been investigated by Mike Revow^[Details available at http://www.cs.utoronto.ca/~delve/.]. These methods are described in Chapter 8. Although other studies such as [144] have used more data sets and compared more methods, I chose the DELVE framework and the data sets shown since I believe DELVE provides a consistent manner for future researchers to compare my results with theirs. Hopefully as more data sets and methods are added to DELVE the methods and results described in this thesis will be able to be judged in a wider context. At present, however, it is possible to still judge the results in comparison with the existing results in DELVE on the data sets described here.
+
+For the regression tasks the only natural data set used is the Boston housing data [78]. The other data sets represent particular versions of two families of data sets: the `Kin` family and `Pumadyn` family. These are realistic simulations of the kinematics and dynamics of robot arms. The `Kin` and `Pumadyn` data sets span a range of different types of problems: from medium to high noise and fairly linear to non-linear interactions. These allow some conclusions to be drawn about the specific behaviour of different methods on these different tasks. The classification tasks consist of three data sets, all of which are real data and have been used in previous studies. Results on both the regression and classification tasks are given in Chapter 8, although some of the data sets are used as examples in Chapters 5, 6 and 7.
+
+{p41}
+:::table tab-3-1 | Table 3.1: **The regression tasks considered in this study.** The table shows the total number of cases available in each data set (Total Cases) and how these are divided into training sets (Training Set Sizes) and test sets (Test Set Size). Also shown are the number of inputs in the task; all regression tasks have univariate targets. Finally the selection method is marked as C for common and H for hierarchical. This denotes the method used to select training and test sets. See Section 3.2 for further details on selection methods.
+| Name | Total Cases | Training Set Sizes | Test Set Size | Inputs | Selection Method (H/C) |
+| `Boston` | 506 | 32, 64, 128 | 250 | 13 | C |
+| `Kin-32fh` | 8192 | 64, 128, 256, 1024 | 4096 | 32 | H |
+| `Kin-32fm` | 8192 | 64, 128, 256, 1024 | 4096 | 32 | H |
+| `Kin-32nh` | 8192 | 64, 128, 256, 1024 | 4096 | 32 | H |
+| `Kin-32nm` | 8192 | 64, 128, 256, 1024 | 4096 | 32 | H |
+| `Kin-8fh` | 8192 | 64, 128, 256, 1024 | 4096 | 8 | H |
+| `Kin-8fm` | 8192 | 64, 128, 256, 1024 | 4096 | 8 | H |
+| `Kin-8nh` | 8192 | 64, 128, 256, 1024 | 4096 | 8 | H |
+| `Kin-8nm` | 8192 | 64, 128, 256, 1024 | 4096 | 8 | H |
+| `Pumadyn-32fh` | 8192 | 64, 128, 256, 1024 | 4096 | 32 | H |
+| `Pumadyn-32fm` | 8192 | 64, 128, 256, 1024 | 4096 | 32 | H |
+| `Pumadyn-32nh` | 8192 | 64, 128, 256, 1024 | 4096 | 32 | H |
+| `Pumadyn-32nm` | 8192 | 64, 128, 256, 1024 | 4096 | 32 | H |
+| `Pumadyn-8fh` | 8192 | 64, 128, 256, 1024 | 4096 | 8 | H |
+| `Pumadyn-8fm` | 8192 | 64, 128, 256, 1024 | 4096 | 8 | H |
+| `Pumadyn-8nh` | 8192 | 64, 128, 256, 1024 | 4096 | 8 | H |
+| `Pumadyn-8nm` | 8192 | 64, 128, 256, 1024 | 4096 | 8 | H |
+
+:::table tab-3-2 | Table 3.2: **The classification tasks considered in this study.** The table shows the total number of cases available in each data set (Total Cases) and how these are divided into training sets (Training Set Sizes) and test sets (Test Set Size). Also shown are the number of inputs and the number of classes in each task. Finally the selection method is marked as C for common and H for hierarchical. This denotes the method used to select training and test sets. See Section 3.2 for further details on selection methods.
+| Name | Total Cases | Training Set Sizes | Test Set Size | Inputs | Classes | Selection Method (H/C) |
+| `Splice` | 3175 | 100, 200, 400 | 1575 | 61 | 3 | C |
+| `Image` | 2310 | 70, 140, 280 | 1190 | 19 | 7 | C |
+| `Letter` | 20000 | 390, 780, 1560 | 10640 | 16 | 26 | H |
+
+{p42}
+#### Boston
+
+:::table tab-3-3 | Table 3.3: **The Boston Housing data set.** Each of the attributes of the `Boston` data set are shown with its name, whether it is categorical or uniform (c/u), its range and its description. The attributes are separated into 13 inputs and a single target.
+| Name | c/u | Range | Description |
+| **Inputs** | | | |
+| CRIM | u | $\{0:\infty\}$ | per capita crime rate by town |
+| ZN | u | $\{0:100\}$ | proportion of residential land zoned for lots over 25,000 sq.ft. |
+| NDUS | u | $\{0:100\}$ | proportion of non-retail business acres per town |
+| CHAS | u | $\{0/1\}$ | Charles River dummy variable (1 if tract bounds river; 0 otherwise) |
+| NOX | u | $\{0:\infty\}$ | nitric oxides concentration (parts per 10 million) |
+| RM | u | $\{0:\infty\}$ | average number of rooms per dwelling |
+| AGE | u | $\{0:100\}$ | proportion of owner-occupied units built prior to 1940 |
+| DIS | u | $\{0:\infty\}$ | weighted distances to five Boston employment centres |
+| RAD | u | $\{0:\infty\}$ | index of accessibility to radial highways |
+| TAX | u | $\{0:\infty\}$ | full-value property-tax rate per \$10,000 |
+| PTRATIO | u | $\{0:\infty\}$ | pupil-teacher ratio by town |
+| B | u | $\{0:396.9\}$ | $1000(Bk - 0.63)^2$ where $Bk$ is the proportion of blacks by town |
+| LSTAT | u | $\{0:100\}$ | percentage lower status of the population |
+| **Target** | | | |
+| MEDV | u | $\{0:\infty\}$ | median value of owner-occupied homes in \$1000s |
+
+The Boston housing data set was originally published in [78]. The data contains information about housing in the Boston Massachusetts area collected by the United States Census Service. The data is also available in the StatLib archive^[http://lib.stat.cmu.edu/datasets/boston].
+
+The data set has been widely used throughout statistical literature as a benchmark. The prototask considered in this thesis is `Boston/price` which involves the prediction of the median value of a home given its other 13 attributes.
+
+There are 3 subtasks with 32, 64 and 128 examples. There are 8 training sets of 32 examples, 4 of 64 examples and 2 of 128 examples. There are 506 examples in the total data set. The training and test sets are drawn from the total data set so as to ensure 250 points in each of the test sets. The test set selection method is *common*.
+
+{p43}
+#### The `Kin` Family
+
+The `Kin` family of data sets consists of 8 different data sets which share the same model but which have different numbers of inputs (8 or 32) and differing levels of noise and degrees of linearity. The model for the `Kin` family is a simulation of the forward dynamics of an 8 link all-revolute robot arm. The task in all data sets is to predict the proximity of the end-effector of the arm from a target. The inputs are shown in Table 3.4.
+
+All the data sets in the `Kin` family have the common base name `Kin` which is appended by a dash and followed by:
+
+1. the number of input attributes, either 32 or 8,
+2. the degree of linearity: either $f$ for "fairly linear" or $n$ for "non-linear",
+3. the level of noise, either $m$ for medium noise or $h$ for high noise.
+
+In total there are 8192 cases in each of the data sets. The training set sizes in the subtasks are 64, 128, 256, 512 and 1024. The 1024 example subtask has 4 training sets, whilst all others have 8 training sets. The test set selection method is *hierarchical*. Further details of the design of the `Kin` data sets can be found in Ghahramani [69].
+
+#### The `Pumadyn` Family
+
+The `Pumadyn` family is similar in form to the `Kin` family with the distinction that the model used is a simulation of the dynamics of a Puma 560 robot arm. The task is to predict the angular acceleration of one of the links of the robot. Once again there are 8192 total examples in each data set in the `Pumadyn` family with training sets of size 64, 128, 256, 512 and 1024 examples. The data set naming is as for the `Kin` family, with the prefix `Pumadyn` rather than `Kin`. Further details of the `Pumadyn` data sets can be found in Ghahramani [70].
+
+{p44}
+:::table tab-3-4 | Table 3.4: **The `Kin` family of data sets.** Each of the attributes of the `Kin` family of data sets are shown with its name, whether it is categorical or uniform (c/u), its range and its description. The attributes are separated into 32 inputs and a single target. Two subsets of tasks are created from this data set: tasks with 32 input variables and tasks with 8. For the 8 input variable tasks, only the first 8 attributes are used: theta1 to theta8.
+| Name | c/u | Range | Description |
+| **Inputs** | | | |
+| theta1 | u | $\{-3.1416:3.1416\}$ | angular position of joint 1 in radians |
+| theta2 | u | $\{-3.1416:3.1416\}$ | angular position of joint 2 in radians |
+| theta3 | u | $\{-3.1416:3.1416\}$ | angular position of joint 3 in radians |
+| theta4 | u | $\{-3.1416:3.1416\}$ | angular position of joint 4 in radians |
+| theta5 | u | $\{-3.1416:3.1416\}$ | angular position of joint 5 in radians |
+| theta6 | u | $\{-3.1416:3.1416\}$ | angular position of joint 6 in radians |
+| theta7 | u | $\{-3.1416:3.1416\}$ | angular position of joint 7 in radians |
+| theta8 | u | $\{-3.1416:3.1416\}$ | angular position of joint 8 in radians |
+| alpha1 | u | $\{-3.1416:3.1416\}$ | link 1 twist angle |
+| alpha2 | u | $\{-3.1416:3.1416\}$ | link 2 twist angle |
+| alpha3 | u | $\{-3.1416:3.1416\}$ | link 3 twist angle |
+| alpha4 | u | $\{-3.1416:3.1416\}$ | link 4 twist angle |
+| alpha5 | u | $\{-3.1416:3.1416\}$ | link 5 twist angle |
+| alpha6 | u | $\{-3.1416:3.1416\}$ | link 6 twist angle |
+| alpha7 | u | $\{-3.1416:3.1416\}$ | link 7 twist angle |
+| alpha8 | u | $\{-3.1416:3.1416\}$ | link 8 twist angle |
+| a1 | u | $\{0:\infty\}$ | link 1 length |
+| a2 | u | $\{0:\infty\}$ | link 2 length |
+| a3 | u | $\{0:\infty\}$ | link 3 length |
+| a4 | u | $\{0:\infty\}$ | link 4 length |
+| a5 | u | $\{0:\infty\}$ | link 5 length |
+| a6 | u | $\{0:\infty\}$ | link 6 length |
+| a7 | u | $\{0:\infty\}$ | link 7 length |
+| a8 | u | $\{0:\infty\}$ | link 8 length |
+| d1 | u | $\{0:\infty\}$ | link 1 offset distance |
+| d2 | u | $\{0:\infty\}$ | link 2 offset distance |
+| d3 | u | $\{0:\infty\}$ | link 3 offset distance |
+| d4 | u | $\{0:\infty\}$ | link 4 offset distance |
+| d5 | u | $\{0:\infty\}$ | link 5 offset distance |
+| d6 | u | $\{0:\infty\}$ | link 6 offset distance |
+| d7 | u | $\{0:\infty\}$ | link 7 offset distance |
+| d8 | u | $\{0:\infty\}$ | link 8 offset distance |
+| **Target** | | | |
+| y | u | $\{0:\infty\}$ | Cartesian distance of end point from $(0.1, 0.1, 0.1)$ |
+
+{p45}
+:::table tab-3-5 | Table 3.5: **The `Pumadyn` family of data sets.** Each of the attributes of the `Pumadyn` family of data sets are shown with its name, whether it is categorical or uniform (c/u), its range and its description. The attributes are separated into 32 inputs and a single target. Two subsets of tasks are created from this data set: tasks with 32 input variables and tasks with 8. For the 8 input variable tasks, the following attributes are used as inputs: theta1 to theta3, thetad1 to thetad3, tau1 and tau2.
+| Name | c/u | Range | Description |
+| **Inputs** | | | |
+| theta1 | u | $\{-3.1416:3.1416\}$ | angular position of joint 1 in radians |
+| theta2 | u | $\{-3.1416:3.1416\}$ | angular position of joint 2 in radians |
+| theta3 | u | $\{-3.1416:3.1416\}$ | angular position of joint 3 in radians |
+| theta4 | u | $\{-3.1416:3.1416\}$ | angular position of joint 4 in radians |
+| theta5 | u | $\{-3.1416:3.1416\}$ | angular position of joint 5 in radians |
+| theta6 | u | $\{-3.1416:3.1416\}$ | angular position of joint 6 in radians |
+| thetad1 | u | $\{-\infty:\infty\}$ | angular velocity of joint 1 in rad/sec |
+| thetad2 | u | $\{-\infty:\infty\}$ | angular velocity of joint 2 in rad/sec |
+| thetad3 | u | $\{-\infty:\infty\}$ | angular velocity of joint 3 in rad/sec |
+| thetad4 | u | $\{-\infty:\infty\}$ | angular velocity of joint 4 in rad/sec |
+| thetad5 | u | $\{-\infty:\infty\}$ | angular velocity of joint 5 in rad/sec |
+| thetad6 | u | $\{-\infty:\infty\}$ | angular velocity of joint 6 in rad/sec |
+| tau1 | u | $\{-\infty:\infty\}$ | torque on joint 1 |
+| tau2 | u | $\{-\infty:\infty\}$ | torque on joint 2 |
+| tau3 | u | $\{-\infty:\infty\}$ | torque on joint 3 |
+| tau4 | u | $\{-\infty:\infty\}$ | torque on joint 4 |
+| tau5 | u | $\{-\infty:\infty\}$ | torque on joint 5 |
+| dm1 | u | $\{0:\infty\}$ | proportion change in mass of link 1 |
+| dm2 | u | $\{0:\infty\}$ | proportion change in mass of link 2 |
+| dm3 | u | $\{0:\infty\}$ | proportion change in mass of link 3 |
+| dm4 | u | $\{0:\infty\}$ | proportion change in mass of link 4 |
+| dm5 | u | $\{0:\infty\}$ | proportion change in mass of link 5 |
+| da1 | u | $\{0:\infty\}$ | proportion change in length of link 1 |
+| da2 | u | $\{0:\infty\}$ | proportion change in length of link 2 |
+| da3 | u | $\{0:\infty\}$ | proportion change in length of link 3 |
+| da4 | u | $\{0:\infty\}$ | proportion change in length of link 4 |
+| da5 | u | $\{0:\infty\}$ | proportion change in length of link 5 |
+| db1 | u | $\{0:\infty\}$ | proportion change in viscosity of friction of link 1 |
+| db2 | u | $\{0:\infty\}$ | proportion change in viscosity of friction of link 2 |
+| db3 | u | $\{0:\infty\}$ | proportion change in viscosity of friction of link 3 |
+| db4 | u | $\{0:\infty\}$ | proportion change in viscosity of friction of link 4 |
+| db5 | u | $\{0:\infty\}$ | proportion change in viscosity of friction of link 5 |
+| **Target** | | | |
+| thetadd6 | u | $\{-\infty:\infty\}$ | angular acceleration of joint 6 |
+
+{p46}
+#### `Image`
+
+:::table tab-3-6 | Table 3.6: **The `Image` data set.** Each of the attributes of the `Image` data set are shown with its name, whether it is categorical or uniform (c/u), its range and its description. The attributes are separated into 18 inputs and a single target of one out of 7 classes.
+| Name | c/u | Range | Description |
+| **Inputs** | | | |
+| region-centroid-col | u | $\{0:255\}$ | The column of the centre pixel of the region. |
+| region-centroid-row | u | $\{0:255\}$ | The row of the centre pixel of the region. |
+| short-line-density-5 | u | $\{0:1\}$ | Low contrast line count. This is the result of a line extraction algorithm that counts how many lines of length 5 (any orientation) with low contrast (less than or equal to 5) go through the region. |
+| short-line-density-2 | u | $\{0:1\}$ | High contrast line count. This is the same as short-line-density-5 but counts lines of high contrast (greater than 5). |
+| vedge-mean | u | $\{0:\infty\}$ | Mean vertical contrast. This measures the contrast of horizontally adjacent pixels in the region. This attribute is used as a vertical edge detector. |
+| vedge-sd | u | $\{0:\infty\}$ | Standard deviation of horizontal contrast |
+| hedge-mean | u | $\{0:\infty\}$ | Mean horizontal contrast. This measures the contrast of vertically adjacent pixels. Used for horizontal line detection. |
+| hedge-sd | u | $\{0:\infty\}$ | Standard deviation of vertical contrast |
+| intensity-mean | u | $\{0:\infty\}$ | Average intensity of red (R), green (G) and blue (B): (R+G+B)/3 |
+| rawred-mean | u | $\{0:\infty\}$ | Average red over areas |
+| rawblue-mean | u | $\{0:\infty\}$ | Average blue over areas |
+| rawgreen-mean | u | $\{0:\infty\}$ | Average green over areas |
+| exred-mean | u | $\{-\infty:\infty\}$ | Excess red (2R - (G + B)) |
+| exblue-mean | u | $\{-\infty:\infty\}$ | Excess blue (2B - (G + R)) |
+| exgreen-mean | u | $\{-\infty:\infty\}$ | Excess green (2G - (R + B)) |
+| value-mean | u | $\{-\infty:\infty\}$ | 3-d non linear transformation of RGB |
+| saturation-mean | u | $\{-\infty:\infty\}$ | same as for value-mean |
+| hue-mean | u | $\{-\infty:\infty\}$ | same as for value-mean |
+| **Target** | | | |
+| pixel-class | u | | the class of the current pixel |
+
+The task of the `Image` data set is to classify the centre pixel of a 3x3 patch of an image into one of 7 categories. There are 18 inputs which are the image processing features shown in Table 3.6. The classes are *brickface*, *sky*, *foliage*, *cement*, *window*, *path*, and *grass*. The `Image` data set was created by Carla Brodley of the Vision Group, University of Massachusetts. Each of the instances was drawn randomly from a database of 7 outdoor images which were hand segmented to classify each pixel into {p47}one of the 7 classes. There are 30 instances per class for the training data and 300 instances per class for the test data. The data set was modified by Mike Revow for DELVE. The modifications from the original data set were as follows. The data and test files were combined and stratified so as to give an even distribution of the 7 classes in each of the task instances. Also, one attribute (the region-pixel-count) was deleted since it is constant (value 9) for the data set. This data set originally came from the UCI collection [143]. The algorithm for the 3-d non-linear transformations of value-mean, saturation-mean and hue-mean can be found in Foley and van Dam [55].
+
+There are 3 subtasks with 8 training sets of 70 and 140 examples and 4 training sets of 280 examples. There is a common test set of 1190 examples in each case. The test set selection method is *common*.
+
+#### `Letter`
+
+:::table tab-3-7 | Table 3.7: **The `Letter` data set.** Each of the attributes of the `Letter` data set are shown with its name, whether it is categorical or uniform (c/u), its range and its description. The attributes are separated into 16 inputs and a single target of one out of 26 classes.
+| Name | c/u | Range | Description |
+| **Inputs** | | | |
+| x-box | u | $\{0:\infty\}$ | horizontal position of box |
+| y-box | u | $\{0:\infty\}$ | vertical position of box |
+| width | u | $\{0:\infty\}$ | width of box |
+| high | u | $\{0:\infty\}$ | height of box |
+| onpix | u | $\{0:\infty\}$ | total on pixels |
+| x-bar | u | $\{0:\infty\}$ | mean $x$ of on pixels in box |
+| y-bar | u | $\{0:\infty\}$ | mean $y$ of on pixels in box |
+| x2bar | u | $\{0:\infty\}$ | mean $x$ variance |
+| y2bar | u | $\{0:\infty\}$ | mean $y$ variance |
+| xybar | u | $\{0:\infty\}$ | mean $xy$ correlation |
+| x2ybr | u | $\{0:\infty\}$ | mean of $x \times x \times y$ |
+| xy2br | u | $\{0:\infty\}$ | mean of $x \times y \times y$ |
+| x-ege | u | $\{0:\infty\}$ | mean edge count left to right |
+| xegvy | u | $\{0:\infty\}$ | correlation of x-ege with $y$ |
+| y-ege | u | $\{0:\infty\}$ | mean edge count bottom to top |
+| yegvx | u | $\{0:\infty\}$ | correlation of y-ege with $x$ |
+| **Target** | | | |
+| class | u | A:Z | letter class |
+
+This data set consists of sets of 16 attributes derived from raster scan images of 26 capital letters. The 16 attributes are shown in Table 3.7. The data set was created and originally used by Frey and Slate [56]. The character images were based on 20 different fonts. Each letter within these 20 fonts was randomly distorted to create 20,000 unique patterns.
+
+{p48}
+There are 3 subtasks, with 6 training sets per subtask of size 390, 780 and 1560 examples. The test set selection method is *hierarchical*.
+
+#### `Splice`
+
+During protein creation, splice junctions are sites in a DNA sequence at which superfluous DNA is removed. The sequence spliced out is the *intron* portion, whilst the *exon* is the portion of sequence retained. The origin of this data set is Genbank 64.1^[ftp://genbank.bio.net]. The donors [158] took the intron:exon and exon:intron examples from primates in the Genbank 64.1 database and the non-splice (neither class) from sequences known not to include a splicing site.
+
+The task in this data set is to predict whether a particular position in a DNA sequence is a donor (intron:exon boundary), or an acceptor (exon:intron boundary), or neither of these types. The data set consists of a window of 60 base pairs (or *nucleotides*) around the position at which the boundary is to be predicted. The base pairs are one of A, G, T or C (which represent the different possible base pairs), which are encoded using a 1 of 4 encoding scheme (so that A is 1000, G is 0100, T is 0010 and C is 0001), giving a total number of input attributes of 240. There are 3175 total cases in the data set, divided into 2000 for training and 1575 for testing. The data set originally came from the UCI collection [143]. There are 8 training sets of size 100 and 200 points and 4 of size 400 points. The test set selection method is *common*.
+
+## 3.4 Issues in Designing Learning Algorithms
+
+Modern machine learning techniques, such as the ones considered in this thesis, typically have many free parameters which affect their performance, *e.g.,* the number of hidden units in an MLP or the choice of splitting and pruning criteria for decision trees. Comparison of different methods is therefore only fair if these free parameters are set in a consistent fashion. There are two approaches for doing this. The first is to use a human expert in the method to set the free parameters, *e.g.,* according to the characteristics of the problem, the performance of the method on validation data or via certain heuristics. The alternative, and the approach used in this thesis, is to design *automatic* learning methods which have few or, ideally, no free parameters.
+
+The use of experts to set free parameters was considered in the StatLog project. King et al. [119, pp. 298] describe the evaluation methodology used in StatLog. A two phase procedure was used in which experienced experts in each method performed the initial trials and filed a report on the techniques used to set each free parameter. Using this report a novice user then also performed secondary trials and compared the results with those of the expert. The two trials were then evaluated by a third party and if the results were close^[The measure of closeness is not defined. Ideally a significance test should have been used, but this would have been difficult given the cross validation framework used for testing.] they were accepted, if not a further evaluation was used.
+
+The major problem with the use of experts is firstly the degree of reproducibility of the results, and {p49}secondly the variability of the experts which is difficult to account for in a comparison, *i.e.,* if different experts were used a different conclusion might be drawn. The approach of StatLog goes some way to addressing the problems of using experts but still ignores the choice of heuristics or techniques for setting free parameters. Ideally such heuristics should be encoded in an automatic learning algorithm so that a novice user could always get the same performance as an expert without having to consult a report. This issue is particularly important when a large number of data sets are used in a comparison, as is done in this study, or when the final choice of algorithm is also dependent on its ease of use.
+
+Automatic learning methods are thus a fairer way of comparing techniques and also force researchers to make explicit the choices made in the design of a learning method. By using automatic methods we are also comparing particular *instances* of general learning methods. For example it is inappropriate to say that C4.5 [186] is better or worse than multi-layer perceptrons on a particular data set since C4.5 is an instance of a general framework of decision tree algorithms and uses particular choices of splitting rules and pruning criteria whereas "MLPs" encompass a wide range of possible instances of learning methods, some of which may well be better or worse than C4.5. If we compare C4.5 with a particular instance of an MLP, *e.g.,* `mlp-ese-1` [189], we are now making explicit the methods used in the comparison. Given these instances we can then compare different design choices in their implementation. For example ID3 [185] and C4.5 are both instances of decision trees which use different design choices and implementations: ID3 was an early version of C4.5. Shavlik et al. [213] compared ID3 and found it to be worse than an MLP at some classification tasks. Subsequent studies on the same data have found that C4.5 performs as well or better than MLPs.
+
+Descriptions of automatic learning methods are fairly common in statistics, *e.g.,* MARS [58], and symbolic approaches, *e.g.,* CART [21] and C4.5 [186], but less so in neural networks. A notable exception is the work of Rasmussen [189] which has inspired many of the concepts in this discussion.
+
+The decomposition of learning methods introduced in Chapter 1 can be further generalised to the concepts of model, estimation and search *biases* [26]. A particular learning method will exhibit different biases in model, estimation and search which will bias it towards one data set and away from another. This leads to, and is exhibited in, the issue of *selective superiority* [26] of learning methods in which one method does not perform universally well on all tasks.
+
+One danger of comparing automatic learning methods is that it ignores prior information. It is possible that some methods could benefit greatly from prior knowledge in a comparison. Neglecting such information could therefore lead one to conclude that a particular method was better than another when in fact additional information could reverse the results of the comparison. In such cases, however, tests should be done in which the prior knowledge is presented to all learning methods in a consistent manner so that those methods which can perform best with this extra information can be judged. Obviously this raises the question of how to encode prior knowledge which is a subject of current research in fields such as belief networks [215].
+
+One final problem with any comparison of learning methods is that they are always in some sense artificial comparisons. This is because in many applications the researcher will have some idea as to which method will work well for their problem which they have worked out either through trial and error or through a consideration of the features of the data. For example in speech recognition hidden {p50}Markov models (HMMs) have emerged as the dominant technology for learning. HMMs are well suited to speech due to their sequential modelling and issues such as representation, estimation and search methods as well as design of model architectures have been evaluated experimentally over many years. For such a domain it is unlikely that the lessons learnt in a comparison will be of benefit, unless a new model class is proposed for the domain. Comparisons thus represent only one part of the *process* of designing learning methods which may include feedback from results of applying the method to the domain [25]. Other issues include ease of use of the method, time taken during training and testing and interpretability of the parameters of the models. Of these issues, only the final predictive performance is considered in this study, although a discussion of the other points is given in Chapter 8.
+
+## 3.5 Outline of Part I
+
+Part I of this thesis is organised as follows. Chapter 4 describes a framework for regression and classification using mixtures-of-experts. This framework addresses the choice of models for the experts and gates, methods of posterior propagation and methods for optimisation of parameters. This framework is then used in Chapters 5, 6 and 7 which describe three different approaches to *complexity control* in mixtures-of-experts models.
+
+The first approach to complexity control, described in Chapter 5, is based on early stopping by cross validation. The architecture of the models is determined in advance of training and is either a fixed width mixture or a fixed depth hierarchy. The chapter describes two learning methods: `me-ese-1` and `hme-ese-1`. In Chapter 6 early stopping is also used but the architecture of hierarchical mixtures-of-experts models is determined during training by recursive splitting of terminal nodes. This method is called `hme-grow-1`. Finally, in Chapter 7 Bayesian inference methods are used to control complexity within a fixed architecture. This approach is used to develop two methods: `me-el-1` and `hme-el-1`.
+
+Chapter 8 presents the results obtained from these five methods on the DELVE data sets introduced in this chapter. These are compared with the existing learning methods in DELVE. Finally, this part of the thesis is concluded in Chapter 8 with a discussion of the issue of *selective superiority* for mixtures-of-experts and other learning methods and gives suggestions for future work in the area of mixtures-of-experts.

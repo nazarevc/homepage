@@ -64,6 +64,7 @@ function inline(text, ctx) {
   text = text.replace(/\$\$([^$]+?)(?:\\qquad\s*\((\d+\.\d+)\))?\$\$/g, (_, m, l) => keep(`<div class="eq"${l ? ` id="${eqId(l)}"` : ''}><div class="m">${tex(m.trim(), true)}</div>${l ? `<span class="eqn">(${l})</span>` : ''}</div>`));
   text = text.replace(/\$([^$]+)\$/g, (_, m) => keep(tex(m, false)));
   text = text.replace(/\{p(\d+)\}/g, (_, n) => keep(`<span class="pg" id="page-${n}"></span>`));
+  text = text.replace(/`([^`]+)`/g, (_, c) => keep(`<code>${esc(c)}</code>`));
   text = esc(text);
   text = text.replace(/'/g, '’');
   text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>').replace(/\*([^*]+)\*/g, '<em>$1</em>');
@@ -90,6 +91,11 @@ function inline(text, ctx) {
     if (!FIG.has(id)) return all;
     const ch = FIG.get(id);
     return `${w} <a href="${ch === ctx.number ? '' : chHref(ch)}#${id}">${c}.${k}</a>`;
+  });
+  // appendix references
+  text = text.replace(/\bAppendix ([A-C])\b/g, (all, a) => {
+    const web = fs.existsSync(path.join(SRC, `app${a.toLowerCase()}.txt`));
+    return `Appendix <a href="${web ? `/thesis/appendix-${a.toLowerCase()}/` : `/thesis/chapters/appendix-${a.toLowerCase()}.pdf`}">${a}</a>`;
   });
   // equation references (2.3)
   text = text.replace(/\((\d+\.\d+)\)/g, (all, l) => EQ.has(l) ? `(<a class="eqref" href="${EQ.get(l) === ctx.number ? '' : chHref(EQ.get(l))}#${eqId(l)}">${l}</a>)` : all);
@@ -135,6 +141,10 @@ function renderBody(body, ctx) {
       html.push(`${pg}<figure class="tbl" id="${m[1]}"><figcaption>${lab ? `<span class="fl">Table ${lab[1]}</span> ` : ''}${inline(lab ? m[2].slice(lab[0].length) : m[2], ctx)}</figcaption><div class="tw"><table><thead><tr>${head.map(c => cell(c, 'th')).join('')}</tr></thead><tbody>${bodyRows.map(r => `<tr>${r.map(c => cell(c, 'td')).join('')}</tr>`).join('')}</tbody></table></div></figure>`);
     } else if ((m = b.match(/^:::raw\n([\s\S]*)\n:::$/))) {
       html.push(pg + m[1]);
+    } else if (/^> /.test(b)) {
+      const q = b.replace(/^> ?/gm, '').replace(/\s*\n\s*/g, ' ');
+      const m2 = q.match(/^(.*?)\s*--\s*(.+)$/);
+      html.push(`${pg}<blockquote><p>${inline(m2 ? m2[1] : q, ctx)}</p>${m2 ? `<footer>${inline(m2[2], ctx)}</footer>` : ''}</blockquote>`);
     } else if (/^- /.test(b)) {
       html.push(`${pg}<ul class="lst">${b.split(/\n(?=- )/).map(li => `<li>${inline(li.slice(2).replace(/\s*\n\s*/g, ' '), ctx)}</li>`).join('')}</ul>`);
     } else if (/^1\. /.test(b)) {
@@ -199,6 +209,10 @@ th,td{padding:6px 10px;border-bottom:1px solid var(--line);text-align:left;verti
 th{font-weight:500;color:var(--ink)}
 td{font-variant-numeric:tabular-nums}
 ol.alg,ul.lst{margin:0 0 1em;padding-left:22px}
+blockquote{margin:0 0 1.2em;padding:2px 0 2px 16px;border-left:2px solid var(--line);font-style:italic;color:var(--ink2)}
+blockquote p{margin:0}
+blockquote footer{font-style:normal;font-size:14px;margin-top:4px}
+code{font:13px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ink);background:var(--surface);padding:2px 5px;border-radius:4px}
 ol.alg li,ul.lst li{margin:0 0 .4em}
 .notes{margin-top:2.4em;border-top:1px solid var(--line);padding-top:12px;font-size:14px;color:var(--ink2)}
 .notes h2{font:500 15px/1.3 var(--font);color:var(--ink);margin:0 0 8px}
