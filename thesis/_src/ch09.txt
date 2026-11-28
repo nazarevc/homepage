@@ -1,0 +1,162 @@
+number: 9
+title: Introduction to Part II
+pdf: chapter-09.pdf
+first_page: 123
+---
+{p123}
+## 9.1 Automatic Speech Recognition
+
+Automatic speech recognition (ASR) is the transcription of speech into text. It is one of the most exciting areas of machine learning, since its solution promises many applications and innovations in everyday life. It is, however, one of the most difficult aspects of machine learning, involving very large data sets and issues such as noisy environments and variation in speakers. In the last decade a large amount of research effort has gone into ASR and current state of the art systems are capable of word error rates around 10% in controlled environments, with speech recorded in quiet conditions with a known microphone [165]. This chapter gives a basic introduction to one of the state of the art speech recognition systems: the ABBOT system of Robinson et al. [199].
+
+The dominant technique for speech recognition is based on statistical methods [*e.g.,* 6]. In this framework, the goal of a speech recogniser is to find the word sequence $\hat{W} = w_1 w_2 \ldots w_N$ with the maximum *a posteriori* probability given the sequence of acoustic observations $X = x_1 x_2 \ldots x_T$:
+
+$$ \hat{W} = \arg\max_W P(W|X) $$ (9.1)
+
+$$ = \arg\max_W \left( \frac{P(X|W) P(W)}{P(X)} \right). $$ (9.2)
+
+While some of the original recognition systems attempted to model $P(W|X)$ directly it is generally acknowledged that this is an impractical approach. Standard systems now break the problem down into the modelling of $P(W)$ via a *language model* and the modelling of $P(X|W)$ via an *acoustic model*. Ideally we would like to model $P(X|W)$ directly but this is impractical since $W$ is the set of all possible word sequences in the vocabulary. Instead we could choose to model $P(X|\{w_i\})$ where $w_i$ is a particular word, and then use the language model to provide probabilities of each sequence of words. This is a practical approach only for small vocabularies, less than say 100 words, but is impractical for larger vocabularies. This approach also blurs the fact that words occur in different contexts. For large vocabulary modelling, therefore, the following approach is used. We model *sub-word* units $\{q_i\}$ via an acoustic model $P(X|q_i)$. These sub-word units are mapped to words using a *lexicon*. Possible word {p124}sequences are subsequently evaluated using the language model. The most common sub-word unit used is the *phone*. As an example, the word "speech" is represented by a sequence of phones as /s/p/iy/ch/.
+
+The most popular speech recognition systems are based on hidden Markov models (HMM) [*e.g.,* 130, 94]. Individual HMMs are used to model the probability $P(X|q_i)$ of the sequence of acoustic data $X$ given each phone $q_i$. These phone HMMs are concatenated together to form a larger HMM which models the possible phone sequences that made up the acoustic data. The language model allows any word sequence but gives low probability to sequences not observed in the training data. A lexicon is used to map from words to phone sequences. Most language models consist of counts of the frequency of each token (phone or word) given the previous set of $N$ tokens. These are called $N$-gram language models and common examples in use are *trigrams* and *bigrams* although some more recent systems have used *four-grams*.
+
+There are two major approaches to modelling the probability of the acoustics given each phone $P(X|q_i)$ in HMMs for speech recognition. The oldest, and most popular, is to use parametric densities to model each state in the HMM for each phone. The most popular choice of density is a Gaussian mixture with mean $\bmu$ and diagonal covariance matrix $\Sigma$ (denoted collectively as parameters $\theta$). For example, for state $j$ of an HMM for phone $q_i$ the density is given by:
+
+$$ P(X|s_j, \theta) = \sum_{k=1}^{K} \alpha_k P(X|s_j, \bmu_{jk}, \Sigma_{jk}) $$ (9.3)
+
+where the sum is over the $K$ mixture components and $\alpha_k$ is the weight for each component. These systems are known as *continuous density hidden Markov models* (CDHMM) speech recognition systems.
+
+Training of the HMM is performed using the Baum-Welch (BW) algorithm [8] which is a specific instance of the EM algorithm [45]. The E step of the BW algorithm involves calculating posterior probabilities of state occupation using the *forward-backward* algorithm. The M step then computes the updated state transition probabilities and parameters of the Gaussians. The updates of the Gaussian distributions are particularly simple, consisting of the accumulation of sufficient statistics [49] weighted by the posterior probabilities of state occupation. CDHMM systems remain the most popular and successful method for speech recognition. A good overview of state of the art techniques in CDHMM systems is given by Knill and Young [120].
+
+An alternative acoustic modelling approach is to model the *posterior* $P(q_i|X)$ using a classifier such as a neural network, and subsequently use Bayes' rule to compute the probability density $P(X|q_i)$ for each state in a HMM. Since neural networks are used to model $P(q_i|X)$ these systems are known as *connectionist-HMM* hybrids. Both multi-layer perceptrons [17] and recurrent networks [198] have been used in these systems. The hybrid systems generally have similar performance to CDHMM systems and use many fewer parameters [84]. However, the best systems on benchmark trials (described in Section 9.3) remain the CDHMMs [165].
+
+Before describing the speech recognition framework further, let us introduce some commonly used terms in ASR. State of the art speech recognition systems (either CDHMMs or hybrids) are either speaker independent (SI) in that they are designed to work equally well across a set of speakers or speaker dependent (SD) in that they are designed to work for one speaker only. In order to handle new speak{p125}ers from outside the corpus in SI systems *speaker adaptation* is used. Note that this is different from speaker *recognition* or *identification* which is the problem of classifying the identity of different speakers. Speaker adaptation is considered further in Chapter 11. Finally a related research area is speech *coding* which is concerned with the efficient compression of speech and decompression of these codes to naturally sounding speech (see Atal et al. [5] for a review). Speech coding is not considered further in this thesis.
+
+In this thesis I focus on a hybrid connectionist speech recognition system, specifically the ABBOT system of Robinson et al. [199]. In this part of the thesis I describe two extensions to the ABBOT system based on mixtures-of-experts models. The aim is firstly to demonstrate how the mixtures-of-experts framework can be integrated into an existing hybrid ASR system and secondly to investigate whether mixtures-of-experts can give a significant improvement in performance of this system. In Chapter 10 I describe the use of mixtures of multi-layer perceptrons within ABBOT and demonstrate improved recognition accuracy. In Chapter 11 I extend the speaker adaptation method of ABBOT via a mixtures-of-experts scheme and demonstrate improved performance on supervised speaker adaptation. One of the main issues in this part of the thesis is the scaling up of the mixtures-of-experts framework to large data sets. In speech there are often many millions of examples in training sets. Efficient search through parameter space is therefore vital for training a speech recognition system.
+
+In this chapter I introduce the ABBOT system of Robinson et al. [199] and important aspects of speech recognition that relate to this system. This chapter is structured as follows. In Section 9.2 I describe the ABBOT system: methods for acoustic preprocessing, alternative acoustic models and the language modelling scheme used in ABBOT. I conclude this chapter with a discussion of evaluation schemes for speech recognition systems and a description of the data sets used.
+
+## 9.2 The ABBOT System
+
+The ABBOT system of Cambridge University Engineering Department (UK) was one of the first hybrid connectionist-HMM speech recognition systems and evolved from research into the use of recurrent neural networks for phone recognition by Robinson [197], [see also 198] at Cambridge University Engineering Department (CUED). Another influence on the development of ABBOT was the work of Bourlard and Morgan [17] at the International Computer Science Institute (ICSI) (Berkeley, CA) on the use of multi-layer perceptrons for speech recognition with hybrid systems.
+
+A schematic diagram of the ABBOT system is shown in Figure 9.1. The individual components of this figure will be explained further in the following sections. In summary, speech is pre-processed into *frames* every 16 ms. Each frame is a vector of 13 features in length. These frames are presented as inputs to a connectionist model which estimates the probability of 54 phones. The resulting sequence of phone probabilities are converted to likelihoods and used as observation probabilities in a set of hidden Markov models. The most likely word sequence or *utterance hypothesis* is then computed by the combination of a pronunciation lexicon, language model and the NOWAY stack decoder [191].
+
+{p126}
+:::figure fig-9-1 | Figure 9.1: **The ABBOT system.** See Section 9.2 for more details.
+
+### Acoustic Preprocessing
+
+Although speech is a non-stationary process, it is generally assumed to be "quasi-stationary" over short time periods. The original speech is sampled at between 8 and 16 kHz depending on the quality of the speech (8 kHz is used for telephone quality speech while 16 kHz is used for high quality speech). Features are extracted into *frames* every 16 ms. The quasi-stationarity assumption is that over the period of these frames the statistics of the speech do not differ considerably.
+
+A number of acoustic feature formats have been used in the past, including spectral coefficients and linear predictive coefficients [138]. Two of the predominant feature vectors in use in modern ASR systems are mel-frequency cepstral coefficients (MFCC) [42] and perceptually-based linear prediction (PLP) [85]. MFCC coefficients are used predominantly in CDHMM systems [250] whilst PLP coefficients are used in the ABBOT system. Perceptual linear prediction is similar in form to standard linear prediction [138]. In PLP, however, several well known auditory properties are simulated, and the resulting spectrum approximated by an all-pole model.
+
+To improve the temporal modelling across frames, difference coefficients [64] or *deltas* of acoustic features are used to augment the feature vectors. If the original PLP feature vector is given by $\bx^{(n)}$, the resulting vector after deltas are added is given by $[\bx^{(n)T}\, \boldsymbol{\Delta}^{(n)T}]^T$. The delta coefficients are computed over a symmetric window of $2P$ frames and take the following form:
+
+$$ \boldsymbol{\Delta}^{(n)} = \frac{\sum_{p=1}^{P} \left(\bx^{(n+p)} - \bx^{(n-p)}\right) p}{2 \sum_{p=1}^{P} p^2}. $$ (9.4)
+
+where $p$ is the index over the window of frames. $P$ is typically set to 5.
+
+An additional method of modelling context is a *sliding window* which was first proposed by Sejnowski and Rosenberg [212] in the NETtalk system. A sliding window pads each feature vector (of length $d$) with a set of its adjacent frames *e.g.,* from time $(n - P)$ to $(n + P)$ for feature vector $\bx^{(n)}$, yielding an overall feature vector of
+{p127}length $(2P + 1)d$. Sliding windows may be applied to either the acoustic feature vectors alone or to the vectors after they have been augmented with delta coefficients.
+
+### Acoustic Modelling
+
+The acoustic model of a connectionist-HMM hybrid system computes the probabilities of a set of phones given an acoustic vector. Two types of acoustic model are used in ABBOT: recurrent neural networks [198] (RNN) and multi-layer perceptrons (MLP) [16]. The recurrent neural network is the most commonly used model for large vocabulary evaluations. However, recent research into efficient methods of using MLPs in ABBOT by Cook [38] has suggested that these may be competitive with RNNs. In this work I have used mixtures of both the MLP and RNN models within ABBOT. I describe these models further in Chapters 10 and 11 respectively.
+
+Although the models developed in Part I of this thesis could potentially be used as acoustic models within ABBOT, I have not pursued this line of research. My aim was to demonstrate how an existing model, either RNN or MLP, could be augmented by a mixture-of-experts framework, rather than starting from scratch with a completely new model. Indeed considerable research has been done at both CUED and ICSI on methods of training these models effectively. Complexity control is performed in both of these models by early stopping via cross-validation. Bayesian methods for the MLP acoustic model of ABBOT have also been investigated by Renals and MacKay [192]. They used the evidence framework of MacKay [133] to train MLPs with up to 256 hidden units on the Resource Management task. They also made an approximation that the number of well determined parameters was equal to the number of weights for each model (the "cheap" approximation discussed by MacKay [135]). Although they used the evidence framework to set the hyper-parameters of the priors, they still used cross-validation to set the learning rates of the MLPs in a similar scheme to that described in Section 10.2. In their evaluations they found that the use of the Bayesian methods did not improve the performance of the ABBOT system and led to poorer results when the automatic relevance determination (ARD) method [153] was used. For this reason, I do not consider the use of Bayesian methods for acoustic models in this thesis. I also believe that Bayesian methods would require much more computation than cross validation training methods, as was the case for the Bayesian methods of Chapter 7. Given that training times for the RNN and MLPs are already around 3 weeks for the Wall Street Journal corpus (see Section 9.3) on a dedicated parallel computer, the issue of fast computation is clearly paramount.
+
+### Decoding
+
+The decoder component of ABBOT is responsible for finding the most probable word sequence $\hat{W}$ given the estimates of phone probabilities from the acoustic model. The decoder used is NOWAY [191]. The search procedure in this decoder is based on stack decoding [169] and is an approximated $A^*$ search. NOWAY combines information from the pronunciation dictionary, the language model and the acoustic model to compute $\hat{W}$. The pronunciation dictionary contains a database of the legal word pronunciations and the relative frequencies. The language model contains the probabilities of each word in the domain given the previous words. Generally a bigram or trigram language model is used in ABBOT.
+
+{p128}
+The decoding process requires the likelihoods of each phone $P(X|q_i)$ to compute the optimal word sequence. Since the acoustic model gives the posterior probability $P(q_i|X)$ the following approximate scaling procedure is used [199]. The posterior probabilities are divided by the prior probabilities of the phones $P(q_i)$ to give *scaled likelihoods*:
+
+$$ P(X|q_i) \propto \frac{P(q_i|X)}{P(q_i)}. $$ (9.5)
+
+## 9.3 Evaluating Speech Recognition Systems
+
+The majority of speech recognition evaluations are conducted by the US Defense Advanced Research Projects Agency (DARPA)^[DARPA was formerly known as the Advanced Research Projects Agency (ARPA).]. DARPA invites research sites to take part in yearly benchmark tests with data drawn from a corpus of speech data. The first such corpus was the Resource Management (RM) database [181] which consisted of 1000 words from 109 speakers with a total of 4290 sentences. A slightly larger database is the TIMIT database [124] which consists of 630 speakers and a total of 6300 sentences. The TIMIT database is also phonetically hand labelled and is thus commonly used for comparisons of phone classification accuracy [*e.g.,* 198]. The RM database, on the other hand, is not phonetically labelled, and only a transcript of the words spoken with start and end times is given for each sentence. In order to use the RM database for training or recognition, therefore, a process of *forced alignment* is used. In this process a reference transcript of words is used in conjunction with a pronunciation dictionary to produce a Viterbi alignment of the speech data in terms of phones. The method of forced alignment is also used on all the modern databases which will now be described.
+
+Although the TIMIT and RM databases were used for a number of years and are still used for development of new models, they are restrictive in their domain and speaker sets. For example, the domain for RM is US military terminology and the speaker set is US military personnel. In order to develop speech recognition systems for everyday use a wider domain and speaker set are required. The Wall Street Journal (WSJ) corpus [170] was therefore gathered to achieve these aims. The WSJ corpus was the first general purpose English large vocabulary database and contains recorded data from a large number of north American speakers. The domain is north American business news, specifically sentences from the Wall Street Journal newspaper. The database contains both speaker independent (SI) and speaker dependent (SD) portions. The SI portions are intended for the development of SI speech recognition systems and consist of the following sets:
+
+- **SI84**: This was released as the pilot database, and is also known as WSJ0. SI84 contains 84 speakers, each uttering either 50 or 100 sentences. There are 7240 sentences in total giving 15.3 hours of speech.
+- **SI12**: This was released as another pilot database. SI12 is the same size as SI84 but only contains 12 speakers with consequently more sentences per speaker.
+- {p129}**SI284**: This was released as a full training set corpus and contains both the data of SI84 and an additional 200 speakers. There are 284 speakers in total each uttering between 50 and 150 sentences. There are 36,000 sentences in total lasting over 80 hours.
+- **SI37**: This was another full training set corpus which is the same length in total hours as SI284 but only contains 37 speakers.
+
+A number of tests have been constructed from the WSJ corpus. These are specified according to size of vocabulary in words (5k, 20k or unlimited), the type of vocabulary (either open or closed) and the type of language model (either bigram, trigram or any). Tables 9.1, 9.2, and 9.3 list all the DARPA large vocabulary development and evaluation test sets used throughout this work. The constraints (if any) placed on these tests are also summarised in the table. Further information on all these test sets (*i.e.,* data collection practices, speaker information etc.) can be found in [166, 165, 167].
+
+The phone set used in ABBOT for the WSJ corpus is the ICSI-LIMSI 54 phone set. This is shown in Table 9.4.
+
+:::table tab-9-1 | Table 9.1: **The 1993 DARPA large vocabulary continuous read speech tasks.** WSJ tasks; standard bigram and trigram language models provided.
+| Test Set Name | Number of Words | Training Data | Vocabulary Size | Vocabulary Type | Language Model | Adaptation Allowable |
+| dt\_s5 | 3343 | SI84 or SI12 | 5k | closed | bigram | none |
+| dt\_s6 | 3318 | SI84 or SI12 | 5k | closed | bigram | none |
+| et\_h2\_c1 | 3851 | SI84 or SI12 | 5k | closed | bigram | none |
+| et\_h2\_p0 | 3851 | any | 5k | closed | any | incremental |
+
+:::table tab-9-2 | Table 9.2: **The 1994 DARPA large vocabulary continuous read speech tasks.** H1 North American Business News; standard 20k trigram provided.
+| Test Set Name | Number of Words | Training Data | Vocabulary Size | Vocabulary Type | Language Model | Adaptation Allowable |
+| et\_h1\_c0 | 8186 | SI284 or SI37 | 20k | open | trigram | none |
+| et\_h1\_p0 | 8186 | any | unlimited | open | any | incremental |
+
+{p130}
+:::table tab-9-3 | Table 9.3: **The 1995 DARPA large vocabulary continuous read speech tasks.** H3 Multiple Unknown Microphone; c0 Sennheiser, p0 unknown microphone.
+| Test Set Name | Number of Words | Training Data | Vocabulary Size | Vocabulary Type | Language Model | Adaptation Allowable |
+| et\_h3\_p0 | 6026 | any | unlimited | open | any | block |
+| et\_h3\_c0 | 6026 | any | unlimited | open | any | block |
+
+:::table tab-9-4 | Table 9.4: **The ICSI-LIMSI phone set.** There are 54 phones in total, separated in the table into vowels, semi-vowels, nasals, stops, fricatives, affricates, closures and silence. Each phone symbol is accompanied by an example of its usage in a word. The location of the phone in each word is signified by the use of bold face.
+| Class | Phones |
+| Vowels | eh b**e**t, ih b**i**t, ao b**ough**t, ae b**a**t, aa b**o**tt, ah b**u**t, uw b**oo**t, uh b**oo**k, er b**ir**d, ay b**i**te, oy b**oy**, ey b**ai**t, iy b**ee**t, aw b**ou**t, ow b**oa**t, ax **a**bout, axr butt**er**, ix deb**i**t |
+| Semi-vowels | l **l**at, el bott**le**, r **r**ay, w **w**ay, y **y**acht, hh **h**ay, hv a**h**ead |
+| Nasals | m **m**um, em bott**om**, n **n**oon, en butt**on**, ng si**ng** |
+| Stops | p **p**ea, b **b**ee, t **t**ea, d **d**ay, k **k**ey, g **g**ay, dx mu**dd**y |
+| Fricatives | s **s**ea, sh **sh**e, z **z**one, zh a**z**ure, th **th**in, dh **th**en, f **f**in, v **v**an |
+| Affricates | ch **ch**oke, jh **j**oke |
+| Closures | pcl ha**pp**y, bcl ho**bb**it, tcl ke**tt**le, dcl da**dd**y, kcl ho**ck**ey, gcl ha**gg**le |
+| Silence | h# |
+
+{p131}
+### Scoring and significance tests
+
+The first step in scoring a speech recognition system requires determining an alignment between a hypothetical word string that is recognised and the true reference transcript. This is performed by a Viterbi dynamic programming algorithm. From this alignment the number of substitutions, deletions and insertions with respect to the true transcript can be determined. These are defined as follows:
+
+- **substitutions**: words which are substituted for other words, *e.g.,* *is* for *as*;
+- **deletions**: words which are completely deleted from the transcript;
+- **insertions**: words which are inserted into the hypothesised transcript that were not present in the true transcript.
+
+The word error rate is proportional to the sum of these quantities:
+
+$$ \text{Word error rate (WER)} = \frac{S + D + I}{N} \times 100 $$ (9.6)
+
+where $N$ is the number of words in the reference transcription, $S$ the number of substitutions, $D$ the number of deletions and $I$ the number of insertions.
+
+In most cases word error rate is used rather than sentence error rate. Sentence error rates are typically very high, at around 70%, but in most systems little effort is actually made to reduce this, with the emphasis being on word error rates. The use of more sophisticated sentence level language models or syntactical constraints would likely reduce this sentence error rate considerably.
+
+To test whether one recogniser has performed significantly better than another, NIST have designed a number of tests. In this section only the most powerful of these tests is used, the *matched pairs sentence segment word error test* (MAPSSWE) suggested by Gillick and Cox [74]. A description of this and other NIST significance tests is given by Martin [139]. In the MAPSSWE the recognisers are tested on the same set of speech. This test set is then divided into a series of segments which are at most one word long and at most one sentence long. Each of the segments are bounded by at least two words correctly recognised by both systems or by the start or end of a sentence. The total number of word errors in both systems is then computed for each segment. Let $z_i$ be the difference between the word errors of the two systems for segment $i$. The mean and variance of such differences for $n$ segments is given by:
+
+$$ \bar{z} = \frac{1}{n} \sum_{i=1}^{n} z_i, \quad \text{and} \quad \bar{\sigma}_z^2 = \frac{1}{n-1} \sum_{i=1}^{n} (z_i - \bar{z})^2. $$ (9.7)
+
+The test statistic $W$ may now be written as:
+
+$$ W = \frac{\bar{z}}{(\bar{\sigma}_z / \sqrt{n})}. $$ (9.8)
+
+We reject the null hypothesis that the two systems are the same if the measured value, $w$, of $W$ is such that $2 \times Pr(W \geq w) \leq 0.05$.
+
+All the significance tests used in Chapters 10 and 11 were performed using the NIST software package `score v3.6.2`, and the matched pair sentence segment (word error) test^[The NIST testing software was available via anonymous ftp from ftp://jaguar.ncsl.nist.gov/pub/score_3.6.2.tar.Z.].
+
+{p132}
+## 9.4 Previous Applications of Mixtures-of-Experts to Speech Recognition
+
+There have been a number of applications of modular architectures, of which the mixture of experts is an example, to speech recognition. One motivation for the use of the mixture of experts in speech recognition is the inherent modularity of speech. Speech is composed of a number of different sub-processes such as speaker dialect region or sex and at lower levels, broad phonetic category. It is generally more difficult for a monolithic architecture to learn the effect and interplay of all these sub-processes. Modular architectures provide an alternative solution to this problem.
+
+One of the first applications of modular networks to speech recognition was Waibel et al. [231]. The Meta-Pi network [77] was a generalisation of these ideas. The Meta-Pi network is similar to the mixtures-of-experts model and consists of a series of time-delay neural networks (TDNN) whose outputs are combined by a gating network. Its training algorithm was very different however, with each expert trained individually on a specific speaker or broad class of phones, and the gating network trained with these broad labels as targets.
+
+Zhao et al. [258] used an HME in combination with a hidden Markov model for continuous speech recognition. The HME was used in a connectionist-HMM hybrid framework in which the HME estimates the probability densities for each of the HMM states. Zhao et al. [258] reported good results on a subset of the Wall Street Journal corpus. Fritsch [60] considered a related connectionist hybrid system (JANUS) in which HME models were used again. In this work however, both gating and expert networks were based on normalised Gaussian radial basis functions. This method was successfully applied to the Switchboard corpus, a notoriously difficult spontaneous speech database [61]. The method has also been extended via a growing algorithm for HME models [62], similar to that described in Chapter 6, and to allow the incorporation of context via "polyphone trees" [63]. Within the ABBOT hybrid system described in this chapter, Hochberg et al. [89] have investigated a variety of combination methods for pre-trained connectionist models in the ABBOT system, including mixtures-of-experts, although they found that simple averaging of outputs often worked as well as more complex schemes.
+
+Speaker identification has also emerged as a popular area of application of modular networks. Bennani [11] used a modular network with TDNNs as experts, whose outputs are combined via a "typology detector". The overall framework is identical to the mixtures-of-experts, although the training algorithm is quite different. The input data is first clustered via $k$-means into distinct typologies. The data from each typology is used to train each expert network. The typology detector is trained to predict which typology is active. Bennani reported perfect identification on a 102 speaker task. Other work on HME models in speaker identification has also yielded good results [35, 34].
+
+## 9.5 Outline of Part II
+
+The next two chapters describe two applications of the mixtures-of-experts framework within the ABBOT system. The aim is to demonstrate that the ME framework can be extended to a large, real world problem. The results of both applications indicate that the ME framework can significantly improve the performance of the ABBOT speech recogniser. In Chapter 10 the use of mixtures of MLPs is com{p133}pared to the use of single MLPs as acoustic models in ABBOT. The single MLPs contained a similar number of parameters as the mixture models. Results on the Wall Street Journal database indicate a significant improvement for the mixture models over the single MLP models. In Chapter 11 mixtures of recurrent networks are used for speaker adaptation within the ABBOT system. The performance of these mixture models is compared with the use of a single recurrent network on an adaptation task from the WSJ database. Once again, significant improvements are obtained for the mixture models over the single models. However, it is noted in Chapter 11 that the mixture models give better improvement for supervised adaptation than for unsupervised adaptation, an effect which is investigated further in that chapter.

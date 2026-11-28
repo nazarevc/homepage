@@ -37,3 +37,9 @@ Changes from the 1997 text. Typographical slips fixed silently are listed too, s
 - 8.3: "Each of the sections C.2 to C.3" -> "C.1 to C.3".
 - 8.4: "This yardstick approach was been used" -> "has been used"; "significantly better that other methods" -> "better than"; "using less covariates" -> "fewer covariates"; "this does not mean that a poorly performing method means that another implementation" restructured to "a poorly performing implementation does not mean that another implementation".
 - 8.4, Figure 8.9 caption: "Sun Sparc-station 20" -> "Sun SPARCstation 20".
+- 8.2: Figures 8.3 (fairly linear tasks) and 8.5 (medium noise tasks) are the same plot in the 1997 PDF; the web edition reproduces both as printed. The correct Figure 8.5 is not recoverable from the thesis.
+- 9.1: "one of state of the art speech recognition systems" -> "one of the state of the art"; "[eg 130, 94]" -> "[e.g., 130, 94]"; "let use introduce" -> "let us introduce".
+- 9.1: the chapter outline pointed to "Section 9.2" four times for different topics; merged into one sentence for Section 9.2.
+- 9.2: "The the original speech" -> "The original speech"; "MFCC coefficients are use predominantly" -> "are used"; "a set phones" -> "a set of phones"; "first proposed by [212]" -> "first proposed by Sejnowski and Rosenberg [212]"; the decoder output written as $\hat{W}$ throughout (the original also used $W^*$).
+- 9.3: "US Defence Advanced Research Projects Agency (ARPA)" -> "US Defense Advanced Research Projects Agency (DARPA)"; "Tables 9.1, 9.2, and 9.3 lists" -> "list"; "with the emphasis begin on" -> "being on"; "To test the whether one recogniser" -> "To test whether one recogniser".
+- 9.3: the NIST ftp address is reproduced as printed; it no longer resolves.
