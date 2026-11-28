@@ -3,10 +3,6 @@ title: Preface, Summary and Notation
 pdf: front-matter.pdf
 first_page: 1
 ---
-:::raw
-<p class="ded"><em>To Fran, Rick and Nathan Waterhouse.</em></p>
-:::
-
 ## Preface
 
 This thesis is not substantially the same as any other that I have submitted for a degree or diploma or other qualification at any other university. This thesis is entirely the result of my own work over the last four years at Cambridge University Engineering Department. The length of this thesis is approximately 62,000 words, including appendices and bibliography. Some of the work in this thesis has previously been published in: Waterhouse and Cook [233], Waterhouse, Kershaw and Robinson [234], Waterhouse, MacKay and Robinson [235], Waterhouse and Robinson [236], Waterhouse and Robinson [237] and Waterhouse and Robinson [238]. Also, some of the chapters were inspired by joint work with David MacKay, Gary Cook and Dan Kershaw. The level of collaboration was as follows.
