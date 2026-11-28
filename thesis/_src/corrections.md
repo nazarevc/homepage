@@ -57,3 +57,4 @@ Changes from the 1997 text. Typographical slips fixed silently are listed too, s
 - Tables in Appendices B and C are set from the PDF text layer; bold marks the lowest loss in each column, as in the original.
 - Front matter: "some of the chapters, were inspired" -> "some of the chapters were inspired"; "som abuses of notation" -> "some abuses"; the transpose of x was printed as $x^{(n)T}$ and is set as $x^T$; "Cambridge Univeristy" -> "University"; "Defence Advanced Research Projects Agency" -> "Defense"; "National Institute for Standards" -> "of Standards".
 - Bibliography: page ranges are set with hyphens rather than en dashes.
+- Front matter: the dedication and one funder name are omitted from the web edition and from the PDF copies on this site.

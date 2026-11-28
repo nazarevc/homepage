@@ -36,7 +36,7 @@ The original contribution of this thesis may be summarised as follows:
 
 Many thanks to all the people who have made the last four years so interesting and enjoyable. To my supervisor, Tony Robinson, whose guidance and advice have been invaluable. To all the people in the Fallside lab who have advised me through the years, in particular Horacio Ayestaran, Simon Blackburn, Dan Kershaw, Jason Humphries, Gary Cook, Mahesan Niranjan, Carl Seymour, Marty Scott, and especially David Lovell.
 
-Thanks also to Leo Breiman, Mike Hochberg, Mike Jordan, Ronjon Nag, Radford Neal, Steve Nowlan and Andreas Weigend for many helpful comments on my research over the last three years. I would like to thank David MacKay in particular for his advice and help. I would also like to acknowledge the financial support I received from Waterhouse Associates, Hewlett Packard, EPSRC, Jesus College, Cambridge University Engineering Department, the NIPS foundation and the Sprach ESPRIT project.
+Thanks also to Leo Breiman, Mike Hochberg, Mike Jordan, Ronjon Nag, Radford Neal, Steve Nowlan and Andreas Weigend for many helpful comments on my research over the last three years. I would like to thank David MacKay in particular for his advice and help. I would also like to acknowledge the financial support I received from Hewlett Packard, EPSRC, Jesus College, Cambridge University Engineering Department, the NIPS foundation and the Sprach ESPRIT project.
 
 ## Notation
 
