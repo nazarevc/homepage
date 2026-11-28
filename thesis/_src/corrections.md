@@ -43,3 +43,7 @@ Changes from the 1997 text. Typographical slips fixed silently are listed too, s
 - 9.2: "The the original speech" -> "The original speech"; "MFCC coefficients are use predominantly" -> "are used"; "a set phones" -> "a set of phones"; "first proposed by [212]" -> "first proposed by Sejnowski and Rosenberg [212]"; the decoder output written as $\hat{W}$ throughout (the original also used $W^*$).
 - 9.3: "US Defence Advanced Research Projects Agency (ARPA)" -> "US Defense Advanced Research Projects Agency (DARPA)"; "Tables 9.1, 9.2, and 9.3 lists" -> "list"; "with the emphasis begin on" -> "being on"; "To test the whether one recogniser" -> "To test whether one recogniser".
 - 9.3: the NIST ftp address is reproduced as printed; it no longer resolves.
+- 10.2: "these type of frames" -> "these types of frames".
+- 10.4: "evaluated on four different tests" lists five test sets; kept as printed in the list, and "using 5 different acoustic models" -> "6" (Table 10.1 has six columns).
+- 10.4: "a dedicate fixed point processor" -> "dedicated".
+- 10.4, Table 10.1: the best result in each row is set in bold (the text names Boost+Mixed as best on all sets).
